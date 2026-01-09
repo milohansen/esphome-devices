@@ -32,6 +32,10 @@ wifi:
   ap:
     password: "RZ7D3EzJdPM6"
   on_connect: 
+    - script.execute: register_device_with_api
+    - delay: 2s
+    - script.execute: fetch_slideshow_queue
+    - delay: 2s
     - lambda: |-
         id(image_index).publish_state(0);
     - delay: 2s
@@ -78,6 +82,12 @@ api:
   id: ha_api
   homeassistant_services: true
   # on_client_connected:
+
+# Fetch new slideshow queue every 30 minutes
+interval:
+  - interval: 30min
+    then:
+      - script.execute: fetch_slideshow_queue
   #   - lambda: |-
   #       if (!id(boot_sound_played)) {
   #         id(boot_sound_played) = true;

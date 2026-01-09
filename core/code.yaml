@@ -1,5 +1,159 @@
 
 script:
+  - id: register_device_with_api
+    then:
+      - logger.log: "Registering device with slideshow API..."
+      - http_request.post:
+          url: "${slideshow_api_base}/api/devices"
+          request_headers:
+            Content-Type: application/json
+          json:
+            id: "${slideshow_device_id}"
+            name: "${friendly_name}"
+            width: ${screenwidth}
+            height: ${screenheight}
+            orientation: "landscape"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code == 200)
+                  {
+                    ESP_LOGI("slideshow_api", "Device registered successfully");
+                  }
+                  else
+                  {
+                    ESP_LOGW("slideshow_api", "Device registration failed with status %d", response->status_code);
+                  }
+
+  - id: fetch_slideshow_queue
+    then:
+      - logger.log: "Fetching slideshow queue from API..."
+      - http_request.get:
+          url: "${slideshow_api_base}/api/devices/${slideshow_device_id}/slideshow"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code != 200)
+                  {
+                    ESP_LOGW("slideshow_api", "Failed to fetch queue: status %d", response->status_code);
+                    return;
+                  }
+                  
+                  ESP_LOGI("slideshow_api", "Queue response: %s", body.c_str());
+                  
+                  // Parse JSON and extract image IDs (simplified parser)
+                  std::vector<std::string> image_ids;
+                  size_t pos = 0;
+                  while ((pos = body.find("\"imageId\":\"", pos)) != std::string::npos)
+                  {
+                    pos += 11; // Length of "imageId":"
+                    size_t end = body.find("\"", pos);
+                    if (end != std::string::npos)
+                    {
+                      image_ids.push_back(body.substr(pos, end - pos));
+                      pos = end;
+                    }
+                  }
+                  
+                  ESP_LOGI("slideshow_api", "Found %d images in queue", image_ids.size());
+                  
+                  // Store image IDs and construct URLs for first 6 slots
+                  text_sensor::TextSensor* url_sensors[6] = {
+                    id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+                    id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+                  };
+                  
+                  id(slideshow_queue_ids).clear();
+                  for (size_t i = 0; i < image_ids.size(); i++)
+                  {
+                    id(slideshow_queue_ids).push_back(image_ids[i]);
+                  }
+                  id(slideshow_queue_index) = 0;
+                  
+                  // Record fetch time and status
+                  if (id(homeassistant_time).now().is_valid())
+                  {
+                    auto now = id(homeassistant_time).now();
+                    char time_str[6];
+                    int hour = now.hour % 12;
+                    if (hour == 0) hour = 12;
+                    snprintf(time_str, sizeof(time_str), "%d:%02d", hour, now.minute);
+                    id(slideshow_last_fetch_time) = time_str;
+                  }
+                  else
+                  {
+                    id(slideshow_last_fetch_time) = "Pending";
+                  }
+                  
+                  if (image_ids.size() > 0)
+                  {
+                    id(slideshow_queue_status) = "OK (" + std::to_string(image_ids.size()) + " images)";
+                  }
+                  else
+                  {
+                    id(slideshow_queue_status) = "Empty queue";
+                  }
+                  
+                  // // Update LVGL labels only if they're initialized
+                  // if (id(debug_queue_status) != nullptr)
+                  // {
+                  //   lv_label_set_text(id(debug_queue_status), id(slideshow_queue_status).c_str());
+                  // }
+                  // if (id(debug_last_fetch) != nullptr)
+                  // {
+                  //   lv_label_set_text(id(debug_last_fetch), ("Fetched: " + id(slideshow_last_fetch_time)).c_str());
+                  // }
+                  
+                  // Populate first 6 URL slots
+                  for (int i = 0; i < 6 && i < image_ids.size(); i++)
+                  {
+                    std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_ids[i];
+                    url_sensors[i]->publish_state(url);
+                    ESP_LOGI("slideshow_api", "Slot %d URL: %s", i, url.c_str());
+                  }
+
+  - id: advance_slideshow
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int next = (current + 1) % 6;
+          
+          // Check if we need to fetch more images from queue
+          if (id(slideshow_queue_index) < id(slideshow_queue_ids).size() - 6)
+          {
+            // Load next image from queue into the slot we just left
+            id(slideshow_queue_index)++;
+            int queue_pos = id(slideshow_queue_index) + 5; // Position for lookahead
+            if (queue_pos < id(slideshow_queue_ids).size())
+            {
+              std::string image_id = id(slideshow_queue_ids)[queue_pos];
+              std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_id;
+              
+              text_sensor::TextSensor* url_sensors[6] = {
+                id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+                id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+              };
+              
+              url_sensors[current]->publish_state(url);
+              ESP_LOGI("slideshow", "Loaded queue position %d into slot %d", queue_pos, current);
+            }
+          }
+          else if (id(slideshow_queue_index) >= id(slideshow_queue_ids).size() - 1)
+          {
+            // Queue exhausted, fetch new queue
+            ESP_LOGI("slideshow", "Queue exhausted, fetching new queue");
+            id(fetch_slideshow_queue).execute();
+          }
+      - script.execute: find_next_valid_slot
+
+  - id: slideshow_timer
+    mode: restart
+    then:
+      - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
+      - script.execute: advance_slideshow
+
   - id: start_wake_word
     then:
       - if:
@@ -240,6 +394,22 @@ script:
             ESP_LOGI("update_images", "Updating LVGL widget for lookahead slot %d", lookahead);
             lv_img_set_src(widgets[lookahead], id(online_image_lookahead)->get_lv_img_dsc());
           }
+          
+          // // Update debug status panel
+          // std::string status_str = "";
+          // for (int i = 0; i < 6; i++)
+          // {
+          //   if (id(image_slot_success)[i])
+          //   {
+          //     status_str += std::to_string(i);
+          //   }
+          //   else if (id(image_slot_loading)[i])
+          //   {
+          //     status_str += "(" + std::to_string(i) + ")";
+          //   }
+          //   if (i < 5) status_str += " ";
+          // }
+          // lv_label_set_text(id(debug_slots_loaded), ("Loaded: " + status_str).c_str());
 
   - id: find_next_valid_slot
     then:
@@ -320,4 +490,21 @@ globals:
   - id: image_slot_retry_count
     type: 'std::map<int, int>'
     restore_value: no
+  
+  # Slideshow queue management
+  - id: slideshow_queue_ids
+    type: 'std::vector<std::string>'
+    restore_value: no
+  - id: slideshow_queue_index
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: slideshow_last_fetch_time
+    type: std::string
+    restore_value: no
+    initial_value: '"--:--"'
+  - id: slideshow_queue_status
+    type: std::string
+    restore_value: no
+    initial_value: '"Not loaded"'
     

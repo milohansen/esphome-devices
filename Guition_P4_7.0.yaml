@@ -12,6 +12,10 @@ substitutions:
   startup_sound: "Home_Connected" # (options are: available, Home_Connected, Home_Connected_Male, Computer_Ready)
 
   weather_entity: "weather.forecast_home"
+  
+  # Slideshow API configuration
+  slideshow_api_base: !secret slideshow_api_base
+  slideshow_device_id: "kitchen-display"
 
 ##################################################################################################################################################
 

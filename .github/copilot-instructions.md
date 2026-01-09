@@ -1,7 +1,7 @@
 # ESPHome Voice Assistant Display Project
 
 ## Project Overview
-This is a modular ESPHome configuration for a Guition P4 7.0" display with ESP32-P4 hardware, implementing a Home Assistant voice assistant with LVGL UI, wake word detection, and multimedia capabilities.
+This is a modular ESPHome configuration for a Guition P4 7.0" display with ESP32-P4 hardware, implementing a Home Assistant voice assistant with LVGL UI, wake word detection, multimedia capabilities, and an automated slideshow system powered by a REST API backend.
 
 ## Architecture
 
@@ -10,12 +10,12 @@ Inspired by [jtenniswood/esphome-lvgl](https://github.com/jtenniswood/esphome-lv
 
 **Active Structure** (packages loaded from [Guition_P4_7.0.yaml](Guition_P4_7.0.yaml)):
 - **`core/`**: Application logic and ESPHome configuration
-  - `esphome.yaml` - Base ESPHome config, OTA, WiFi, time
-  - `code.yaml` - Scripts (wake word control, phase management)
-  - `input.yaml` - User input controls
-  - `sensors.yaml` - Home Assistant sensor integration
+  - `esphome.yaml` - Base ESPHome config, OTA, WiFi, time, slideshow queue fetch interval
+  - `code.yaml` - Scripts (wake word, phase management, slideshow queue fetch, auto-advance)
+  - `input.yaml` - User input controls (image duration, display index)
+  - `sensors.yaml` - Internal template sensors for image URLs (API-populated)
   - `visuals.yaml` - Images, fonts, colors
-  - `voice.yaml` - Voice assistant callbacks and configuration
+  - `assistant.yaml` - Voice assistant callbacks and configuration
 - **`hw/`**: Hardware-specific definitions
   - `peripherals.yaml` - I2C buses, audio DAC/ADC
   - `audio.yaml` - Microphone, speaker, mixer architecture
@@ -41,7 +41,8 @@ substitutions:
   screenwidth: "1024"
   screenheight: "600"
   voice_assist_idle_phase_id: "1"
-  clock_background_file: ${imagepath}/Other/${screenwidth}x${screenheight}/${clock_background_image}.png
+  slideshow_api_base: !secret slideshow_api_base
+  slideshow_device_id: "kitchen-display"
 ```
 
 #### 2. LVGL Widget Templates
@@ -62,6 +63,16 @@ Voice assistant phases are tracked via numeric IDs (substitutions like `voice_as
 - `TimerState` enum (RUNNING, PAUSED, CANCELLED, RINGING, COMPLETED)
 - `TimerController` struct for managing multiple timers
 - Lambda-safe functions to prevent stack crashes
+
+#### 5. Slideshow API Integration
+Automatic image slideshow system fetching content from REST API backend:
+- **Device registration**: On WiFi connect, registers with `POST /api/devices`
+- **Queue management**: Fetches shuffled image queue via `GET /api/devices/{deviceId}/slideshow`
+- **6-slot buffer**: Manages prev/current/next/lookahead images with 4 `online_image` components
+- **Auto-advance**: Timer-based progression using `image_duration_minutes` setting
+- **URL construction**: Builds image URLs as `{base}/api/devices/{deviceId}/images/{imageId}`
+- **Queue refresh**: Every 30 minutes or when local queue exhausted
+- **Debug UI**: Status panel shows current index, queue position, loaded slots, fetch time
 
 ## Critical Workflows
 
@@ -94,20 +105,29 @@ esphome logs ./Guition_P4_7.0.yaml
 ### Voice Assistant Phase Changes
 1. Define phase ID in substitutions (e.g., `voice_assist_custom_phase_id: "15"`)
 2. Add phase logic to `script.set_phase` in [core/code.yaml](core/code.yaml)
-3. Handle in voice callbacks in [core/voice.yaml](core/voice.yaml)
+3. Handle in voice callbacks in [core/assistant.yaml](core/assistant.yaml)
 4. Update UI widgets to respond to phase changes via `on_value` triggers
+
+### Managing Slideshow Integration
+1. **API Configuration**: Set `slideshow_api_base` in [secrets.yaml](secrets.yaml), `slideshow_device_id` in substitutions
+2. **Queue Fetch**: `fetch_slideshow_queue` script in [core/code.yaml](core/code.yaml) parses JSON and populates URL sensors
+3. **Image Loading**: Existing `update_online_images` script handles downloads with retry logic
+4. **Auto-Advance**: `slideshow_timer` script executes `advance_slideshow` after delay
+5. **Queue Cycling**: As images viewed, new ones loaded from queue; fetches new queue when exhausted
+6. **Debug Status**: LVGL status panel in [hw/lvgl.yaml](hw/lvgl.yaml) shows live slideshow state
 
 ## Project Conventions
 
 ### File Organization
 Main entrypoint: [Guition_P4_7.0.yaml](Guition_P4_7.0.yaml) defines substitutions and imports packages.
 
-- **Sensors** → `core/sensors.yaml` (Home Assistant integration)
+- **Sensors** → `core/sensors.yaml` (internal template sensors for image URLs, weather integration)
 - **Hardware definitions** → `hw/peripherals.yaml` (I2C buses, pins)
-- **Scripts & automation** → `core/code.yaml` (wake word, phase management)
-- **Voice assistant** → `core/voice.yaml` (callbacks, pipeline config)
+- **Scripts & automation** → `core/code.yaml` (wake word, phase management, slideshow API, queue fetch)
+- **Voice assistant** → `core/assistant.yaml` (callbacks, pipeline config)
 - **Visual assets** → `core/visuals.yaml` (images, fonts, colors)
-- **LVGL UI** → `hw/lvgl.yaml` (widgets, layouts, templates)
+- **LVGL UI** → `hw/lvgl.yaml` (widgets, layouts, templates, debug status panel)
+- **Secrets** → `secrets.yaml` (WiFi credentials, API URLs) - NEVER commit this file
 - **NEVER edit `legacy/` directory** - deprecated files kept for reference only
 
 ### YAML Formatting
@@ -143,9 +163,11 @@ Main entrypoint: [Guition_P4_7.0.yaml](Guition_P4_7.0.yaml) defines substitution
 
 ### Image Handling
 - **Format**: RGB565 with little-endian byte order for LVGL
-- **Online images**: Use `online_image:` component, set `update_interval: never` for static backgrounds
+- **Online images**: Use `online_image:` component, set `update_interval: never` for manual control
 - **Resize**: Always specify `resize: ${screenwidth}x${screenheight}` to match display
-- **Large images**: Place in `homeassistant/www/images/` and reference via HTTP URL
+- **Slideshow system**: 4 `online_image` components (previous, current, next, lookahead) buffering 6 display slots
+- **Image URLs**: Populated by `fetch_slideshow_queue` from API, stored in template text sensors
+- **Loading state**: Tracked via `image_slot_success`, `image_slot_loading`, `image_slot_retry_count` globals
 
 ## Dependencies & Integration
 
@@ -153,6 +175,17 @@ Main entrypoint: [Guition_P4_7.0.yaml](Guition_P4_7.0.yaml) defines substitution
 - **Weather entity**: Required (`weather_entity` substitution)
 - **Media player**: `external_media_player` defined in [hw/audio.yaml](hw/audio.yaml)
 - **Wake word**: Can use "On device" (micro_wake_word) or "In Home Assistant" mode
+- **Slideshow control**: `image_duration_minutes` number entity controls display time
+
+### Slideshow Backend API
+- **Base URL**: Stored in `secrets.yaml` as `slideshow_api_base`
+- **Device ID**: Set in substitutions (e.g., `kitchen-display`)
+- **Endpoints used**:
+  - `POST /api/devices` - Register device with dimensions/orientation
+  - `GET /api/devices/{deviceId}/slideshow` - Fetch shuffled image queue
+  - `GET /api/devices/{deviceId}/images/{imageId}` - Download specific image
+- **Queue format**: JSON with array of `{imageId, filePath}` objects
+- **Refresh interval**: 30 minutes via `interval:` component in [core/esphome.yaml](core/esphome.yaml)
 
 ### Wake Word Engines
 Models defined in main config under `micro_wake_word:`. Only include needed models to conserve memory:
@@ -208,6 +241,9 @@ The project now includes `material_theme` custom component for Material Design 3
 5. **Voice assistant not ready**: Check `api.connected` and `wifi.connected` before starting
 6. **Timer crashes**: Use `va_helpers.h` functions in lambdas, never call timer methods directly
 7. **Material theme not updating**: Ensure callbacks registered before first scheme generation (`on_boot` priority: -100)
+8. **LVGL updates before init**: Always null-check LVGL widgets before calling `lv_*` functions in boot scripts
+9. **Slideshow API errors**: Check `slideshow_api_base` secret exists and device registration succeeded
+10. **Image loading hangs**: Verify `update_interval: never` on `online_image` components, use `update()` for manual trigger
 
 ## Testing & Alternative Configurations
 The `legacy/localtest/` directory contains experimental/alternative package structures not currently in use:

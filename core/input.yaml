@@ -23,7 +23,7 @@ number:
     min_value: 1
     max_value: 600
     step: 1
-    initial_value: 10
+    initial_value: 1
 
   - id: image_index
     platform: template
@@ -40,6 +40,8 @@ number:
     initial_value: 0
     on_value:
       - script.execute: update_online_images
+      - script.stop: slideshow_timer
+      - script.execute: slideshow_timer
 
 
 switch:

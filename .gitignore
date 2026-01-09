@@ -4,3 +4,4 @@
 /.esphome/
 .venv
 /secrets.yaml
+changes

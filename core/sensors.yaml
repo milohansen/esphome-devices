@@ -186,10 +186,9 @@ text_sensor:
     attribute: pressure_unit
     internal: true
 
-  # Image URL sensors from Home Assistant
+  # Image URL sensors - now populated from slideshow API
   - id: ha_image_url_slot_0
-    platform: homeassistant
-    entity_id: input_text.image_url_slot_0
+    platform: template
     internal: true
     on_value:
       - lambda: |-
@@ -207,8 +206,7 @@ text_sensor:
             - script.execute: update_online_images
 
   - id: ha_image_url_slot_1
-    platform: homeassistant
-    entity_id: input_text.image_url_slot_1
+    platform: template
     internal: true
     on_value:
       - lambda: |-
@@ -226,8 +224,7 @@ text_sensor:
             - script.execute: update_online_images
 
   - id: ha_image_url_slot_2
-    platform: homeassistant
-    entity_id: input_text.image_url_slot_2
+    platform: template
     internal: true
     on_value:
       - lambda: |-
@@ -245,8 +242,7 @@ text_sensor:
             - script.execute: update_online_images
 
   - id: ha_image_url_slot_3
-    platform: homeassistant
-    entity_id: input_text.image_url_slot_3
+    platform: template
     internal: true
     on_value:
       - lambda: |-
@@ -264,8 +260,7 @@ text_sensor:
             - script.execute: update_online_images
 
   - id: ha_image_url_slot_4
-    platform: homeassistant
-    entity_id: input_text.image_url_slot_4
+    platform: template
     internal: true
     on_value:
       - lambda: |-
@@ -283,8 +278,7 @@ text_sensor:
             - script.execute: update_online_images
 
   - id: ha_image_url_slot_5
-    platform: homeassistant
-    entity_id: input_text.image_url_slot_5
+    platform: template
     internal: true
     on_value:
       - lambda: |-
