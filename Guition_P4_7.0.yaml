@@ -1,0 +1,155 @@
+substitutions:
+  name: guition-p4-70
+  friendly_name: Guition P4 70
+
+## Modular version Main P4
+
+## SETTINGS ######################################################################################################################################
+  screenwidth:  "1024"
+  screenheight: "600"
+  rotate_display: "0"
+
+  startup_sound: "Home_Connected" # (options are: available, Home_Connected, Home_Connected_Male, Computer_Ready)
+
+  weather_entity: "weather.forecast_home"
+
+##################################################################################################################################################
+
+  font_glyphsets: "GF_Latin_Kernel"
+
+  # FROM core-lvgl.yaml
+  startup_sound_file: https://github.com/RealDeco/xiaozhi-esphome/raw/main/sounds/${startup_sound}.flac
+  voice_assist_idle_phase_id: "1"
+  voice_assist_waiting_for_command_phase_id: "2"
+  voice_assist_listening_phase_id: "3"
+  voice_assist_thinking_phase_id: "4"
+  voice_assist_replying_phase_id: "5"
+  voice_assist_not_ready_phase_id: "10"
+  voice_assist_error_phase_id: "11"
+  voice_assist_muted_phase_id: "12"
+  voice_assist_playing_phase_id: "13"
+  voice_assist_timer_finished_phase_id: "20"
+
+  # Material Theme
+  theme_source_color: "0xFF2A9D8F"  # Pacific Teal (current primary_base color)
+  theme_variant: "TONAL_SPOT"       # Options: TONAL_SPOT, VIBRANT, EXPRESSIVE, CONTENT, MONOCHROME, NEUTRAL
+
+# esphome:
+#   name: ${name}
+#   friendly_name: ${friendly_name}
+#   min_version: 2025.5.0
+#   name_add_mac_suffix: false
+#   on_boot:
+#     then:
+#       # read the RTC time once when the system boots
+#       rx8130.read_time:
+#   includes:
+#     - va_helpers.h
+
+logger:
+  level: DEBUG
+
+esp32:
+  board: esp32-p4-evboard
+  flash_size: 16Mb
+  cpu_frequency: 360MHz
+  framework:
+    type: esp-idf
+    advanced:
+      enable_idf_experimental_features: yes
+      disable_vfs_support_termios: false
+      disable_vfs_support_select: false
+      disable_vfs_support_dir: false
+    sdkconfig_options:
+      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"   # Stop screen flashing during OTA
+      CONFIG_SDMMC_HOST_DEFAULT: "y"
+      CONFIG_LV_COLOR_SCREEN_TRANSP: "y"  # Enable LVGL screen transparency
+
+psram:
+  mode: hex
+  speed: 200MHz
+
+esp_ldo:
+  - channel: 3
+    id: dsi_phy_enable
+    voltage: 2.5V
+    adjustable: True
+
+esp32_hosted:
+  active_high: true
+  variant: ESP32C6
+  reset_pin: GPIO54
+  cmd_pin: GPIO19
+  clk_pin: GPIO18
+  d0_pin: GPIO14
+  d1_pin: GPIO15
+  d2_pin: GPIO16
+  d3_pin: GPIO17
+
+# External components for Material Theme
+external_components:
+  - source:
+      type: local
+      path: components
+
+# Material Theme component - Dynamic Material Design 3 color schemes
+material_theme:
+  id: material_theme_component
+  source_color: ${theme_source_color}
+  is_dark: false
+  contrast_level: 0.0  # -1.0 (min contrast) to 1.0 (max contrast), 0.0 = standard
+  variant: ${theme_variant}
+
+packages: # Local
+  # core: !include localtest/core-lvgl.yaml
+  # hw:   !include localtest/HW/hw-lvgl.yaml
+
+  esphome: !include core/esphome.yaml
+  code: !include core/code.yaml
+  input: !include core/input.yaml
+  sensors: !include core/sensors.yaml
+  visuals: !include core/visuals.yaml
+  assistant: !include core/assistant.yaml
+  timers: !include core/timers.yaml
+  material_theme_integration: !include core/material_theme.yaml
+  # core: !include localtest/core-lvgl.yaml
+
+  peripherals: !include hw/peripherals.yaml
+  audio: !include hw/audio.yaml
+  screen: !include hw/screen.yaml
+  lvgl: !include hw/lvgl.yaml
+
+## ENABLE / DISABLE WAKE WORDS ## IF LOW ON MEMORY, USE LESS WAKE WORDS ##########################################################################
+
+micro_wake_word:
+  id: mww
+  models:
+    - okay_nabu
+
+##################################################################################################################################################
+
+# i2c air:
+#   - id: sensor_bus
+#     sda: GPIO46
+#     scl: GPIO45
+    
+# sensor:
+#   - id: sen55
+#     platform: sen5x
+#     i2c_id: sensor_bus
+#     pm_1_0:
+#       name: PM <1µm Weight concentration
+#     pm_2_5:
+#       name: PM <2.5µm Weight concentration
+#     pm_4_0:
+#       name: PM <4µm Weight concentration
+#     pm_10_0:
+#       name: PM <10µm Weight concentration
+#     temperature:
+#       name: Temperature
+#     humidity:
+#       name: Humidity
+#     voc:
+#       name: VOC
+#     nox:
+#       name: NOX

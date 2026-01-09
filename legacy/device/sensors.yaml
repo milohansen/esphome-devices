@@ -1,0 +1,312 @@
+
+sensor:
+  - id: ha_weather_temperature
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: temperature
+    internal: true
+  - id: ha_weather_cloud_coverage
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: cloud_coverage
+    internal: true
+  - id: ha_weather_uv_index
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: uv_index
+    internal: true
+  - id: ha_weather_wind_speed
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: wind_speed
+    internal: true
+  - id: ha_weather_wind_gust
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: wind_gust_speed
+    internal: true
+  - id: ha_weather_humidity
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: humidity
+    internal: true
+  - id: ha_weather_pressure
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: pressure
+    internal: true
+    
+  # - id: sen55
+  #   platform: sen5x
+  #   i2c_id: sensor_bus
+  #   pm_1_0:
+  #     name: PM <1µm Weight concentration
+  #   pm_2_5:
+  #     name: PM <2.5µm Weight concentration
+  #   pm_4_0:
+  #     name: PM <4µm Weight concentration
+  #   pm_10_0:
+  #     name: PM <10µm Weight concentration
+  #   temperature:
+  #     name: Temperature
+  #   humidity:
+  #     name: Humidity
+  #   voc:
+  #     name: VOC
+  #   nox:
+  #     name: NOX
+
+binary_sensor:
+  - id: touch_input
+    platform: template
+    name: "Touch Button"
+    on_click:
+      min_length: 30ms
+      max_length: 600ms
+      then:
+        - if:
+            condition:
+              switch.is_on: timer_ringing
+            then:
+              - switch.turn_off: timer_ringing
+            else:
+              - if:
+                  condition:
+                    lambda: return id(wake_word_engine_location).current_option() == "On device";
+                  then:
+                    - media_player.stop:
+                        id: external_media_player
+                    - if:
+                        condition:
+                          not:
+                            voice_assistant.is_running:
+                        then:
+                          - voice_assistant.start:
+                        else:
+                          - voice_assistant.stop:
+
+  - id: left_button
+    platform: gpio
+    pin:
+      number: 0
+      mode: INPUT_PULLUP
+      # ignore_strapping_warning: true
+      inverted: true
+    on_multi_click:
+      - timing:
+          - ON for 40ms to 400ms
+          - OFF for at least 330ms
+        then:
+          - if:
+              condition:
+                switch.is_on: timer_ringing
+              then:
+                - switch.turn_off: timer_ringing
+              else:
+                - if:
+                    condition:
+                      lambda: return id(wake_word_engine_location).current_option() == "On device";
+                    then:
+                      - media_player.stop:
+                          id: external_media_player
+                      - if:
+                          condition:
+                            not:
+                              voice_assistant.is_running:
+                          then:
+                            - voice_assistant.start:
+                          else:
+                            - voice_assistant.stop:
+      - timing:
+          - ON for at least 1s
+        then:
+          # - switch.toggle: show_battery_status
+          # - component.update: main_display
+
+  - id: timer_ringing_active
+    platform: template
+    name: "Timer Ringing Active"
+    device_class: sound
+    lambda: |-
+      return id(timer_ringing).state;
+
+  - id: swipe_left
+    platform: template
+    name: "Swipe Left"
+    device_class: moving
+    entity_category: diagnostic
+
+  - id: swipe_right
+    platform: template
+    name: "Swipe Right"
+    device_class: moving
+    entity_category: diagnostic
+    
+  - id: swipe_up
+    platform: template
+    name: "Swipe Up"
+    device_class: moving
+    entity_category: diagnostic
+    
+  - id: swipe_down
+    platform: template
+    name: "Swipe Down"
+    device_class: moving
+    entity_category: diagnostic
+
+  - id: has_connected
+    platform: template
+    device_class: connectivity
+    entity_category: diagnostic
+    internal: true
+
+  - id: timer_0_active
+    platform: template
+    entity_category: diagnostic
+    internal: true
+    on_state_change:
+      then:
+        - if:
+            condition:
+              lambda: |-
+                if (x.has_value()) {
+                  return x.value();
+                }
+                return false;
+            then:
+              - lvgl.widget.show: timer_slot_0
+            else:
+              - lvgl.widget.hide: timer_slot_0
+  - id: timer_1_active
+    platform: template
+    entity_category: diagnostic
+    internal: true
+    on_state_change:
+      then:
+        - if:
+            condition:
+              lambda: |-
+                if (x.has_value()) {
+                  return x.value();
+                }
+                return false;
+            then:
+              - lvgl.widget.show: timer_slot_1
+            else:
+              - lvgl.widget.hide: timer_slot_1
+  - id: timer_2_active
+    platform: template
+    entity_category: diagnostic
+    internal: true
+    on_state_change:
+      then:
+        - if:
+            condition:
+              lambda: |-
+                if (x.has_value()) {
+                  return x.value();
+                }
+                return false;
+            then:
+              - lvgl.widget.show: timer_slot_2
+            else:
+              - lvgl.widget.hide: timer_slot_2
+
+  - id: assistant_active
+    platform: template
+    device_class: running
+    entity_category: diagnostic
+    internal: true
+    filters:
+      - delayed_off: 5s
+    on_state_change:
+      then:
+      - lambda: |-
+          if (x.has_value()) {
+            ESP_LOGD("assistant_active", "State changed to %s", x.value() ? "true" : "false");
+            const bool toggle = x.value();
+
+            int start = -6;
+            int end = -42;
+            if (toggle) {
+              start = -42;
+              end = -6;
+            }
+
+            lv_anim_t a;
+            lv_anim_init(&a);
+
+            /*Set the "animator" function*/
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            /*Set target of the animation*/
+            lv_anim_set_var(&a, id(assistant_container));
+
+            /*Length of the animation [ms]*/
+            lv_anim_set_time(&a, 200);
+
+            /*Set start and end values. E.g. 0, 150*/
+            lv_anim_set_values(&a, start, end);
+
+            /*Set path (curve). Default is linear*/
+            // lv_anim_set_path(&a, lv_anim_path_overshoot);
+
+            // ESP_LOGD("custom", "lv_anim_start: from %d to %d", start, end);
+            /*Start the animation*/
+            lv_anim_start(&a);
+          }
+          // x.has_value() ? ESP_LOGD("assistant_active", "New state is %s", ONOFF(x.value())) : ESP_LOGD("assistant_active", "New state is Unknown");
+      # - logger.log:
+      #     format: "Old state was %s"
+      #     args: ['x_previous.has_value() ? ONOFF(x_previous.value()) : "Unknown"']
+      # - logger.log:
+      #     format: "New state is %s"
+      #     args: ['x.has_value() ? ONOFF(x.value()) : "Unknown"']
+
+
+text_sensor:
+  - id: text_request
+    name: "Text Request"
+    platform: template
+    on_value:
+      lambda: |-
+        auto &s = id(text_request).state;
+        // if (s.length() > 30) {
+        //   s.resize(30);
+        //   s += "...";
+        // }
+        lv_label_set_text(id(assistant_request_label), s.c_str());
+
+  - id: text_response
+    name: "Text Response"
+    platform: template
+    on_value:
+      lambda: |-
+        auto &s = id(text_response).state;
+        // if (s.length() > 30) {
+        //   s.resize(30);
+        //   s += "...";
+        // }
+        lv_label_set_text(id(assistant_response_label), s.c_str());
+
+  - id: voice_assistant_phase_sensor
+    platform: template
+    name: "Voice Assistant Phase ID"
+    update_interval: never
+
+  - id: ha_weather_temperature_unit
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: temperature_unit
+    internal: true
+
+  - id: ha_weather_wind_speed_unit
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: wind_speed_unit
+    internal: true
+
+  - id: ha_weather_pressure_unit
+    platform: homeassistant
+    entity_id: ${weather_entity}
+    attribute: pressure_unit
+    internal: true

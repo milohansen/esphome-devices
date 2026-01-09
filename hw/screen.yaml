@@ -1,0 +1,61 @@
+# --- TOUCHSCREEN --------------------------------------------------------------
+touchscreen:
+  - id: my_touchscreen
+    platform: gt911
+    display: main_display
+    i2c_id: bus_a
+    interrupt_pin: GPIO21
+    reset_pin: GPIO22
+
+    # on_touch:
+    #   - lambda: |-
+    #       ESP_LOGI("Touch", "Touch detected at x=%d, y=%d", touch.x, touch.y);
+    # on_update:
+    #   - lambda: |-
+    #         for (auto touch: touches)  {
+    #             if (touch.state <= 2) {
+    #               ESP_LOGI("Touch points:", "id=%d x=%d, y=%d x.raw=%d, y.raw=%d", touch.id, touch.x, touch.y, touch.x_raw, touch.y_raw);
+    #             }
+    #         }  
+    on_release:
+      then:
+        - logger.log: "Touch released"
+        - if:
+            condition: lvgl.is_paused
+            then:
+              - lvgl.resume:
+              - lvgl.widget.redraw:
+
+# --- BACKLIGHT ----------------------------------------------------------------
+output:
+  - id: backlight_output
+    platform: ledc
+    pin: GPIO23
+    frequency: 100Hz
+    inverted: false
+    min_power: 0.0
+    max_power: 0.8
+
+light:
+  - id: Sled
+    platform: monochromatic
+    name: Screen
+    icon: mdi:television
+    entity_category: config
+    output: backlight_output
+    restore_mode: ALWAYS_ON
+    default_transition_length: 250ms
+    gamma_correct: 1.0
+
+# --- DISPLAY DRIVER (MIPI SPI JC3636W518) ------------------------------------
+display:
+  - platform: mipi_dsi
+    id: main_display
+    model: JC1060P470
+    update_interval: never
+    reset_pin:
+      number: GPIO05
+    hsync_pulse_width: 20
+    auto_clear_enabled: false
+    # rotation: ${rotate_display}
+

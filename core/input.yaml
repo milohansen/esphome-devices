@@ -1,0 +1,156 @@
+
+button:
+  - id: factory_reset_btn
+    platform: factory_reset
+    internal: true
+
+  - id: add_timer_btn
+    platform: template
+    name: "Add Timer"
+    on_press:
+      - logger.log: "Add Timer button pressed"
+
+number:
+  - id: image_duration_minutes
+    platform: template
+    name: "Image Display Time"
+    unit_of_measurement: "m"
+    icon: "mdi:timer-sand"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    mode: box
+    min_value: 1
+    max_value: 600
+    step: 1
+    initial_value: 10
+
+
+switch:
+  - id: mute
+    platform: template
+    name: Mute
+    icon: "mdi:microphone-off"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    entity_category: config
+    on_turn_off:
+      - microphone.unmute:
+      - script.execute:
+          id: set_phase
+          phase: ${voice_assist_idle_phase_id}
+      # TODO: remove muted icon from display
+    on_turn_on:
+      - microphone.mute:
+      - script.execute:
+          id: set_phase
+          phase: ${voice_assist_muted_phase_id}
+      # TODO: show muted icon on display
+
+  - id: timer_ringing
+    platform: template
+    optimistic: true
+    internal: true
+    restore_mode: ALWAYS_OFF
+    on_turn_off:
+      - lambda: |-
+          id(external_media_player)
+            ->make_call()
+            .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_OFF)
+            .set_announcement(true)
+            .perform();
+          id(external_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 0);
+      - media_player.stop:
+          announcement: true
+    on_turn_on:
+      - lambda: |-
+          id(external_media_player)
+            ->make_call()
+            .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_ONE)
+            .set_announcement(true)
+            .perform();
+          id(external_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 1000);
+      - media_player.speaker.play_on_device_media_file:
+          media_file: timer_finished_sound
+          announcement: true
+      - delay: 15min
+      - switch.turn_off: timer_ringing
+
+  - id: startup_sound_switch
+    platform: template
+    name: Startup sound
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+  # - id: show_debug
+  #   platform: template
+  #   name: Show Debug
+  #   icon: "mdi:card-text-outline"
+  #   entity_category: config
+  #   optimistic: true
+  #   restore_mode: RESTORE_DEFAULT_OFF
+    # on_turn_on:
+    #   - display.page.show: debug_page
+    #   - component.update: main_display
+    # on_turn_off:
+    #   - display.page.show: default_clock
+    #   - component.update: main_display
+
+  - id: clock_24h
+    platform: template
+    name: "Clock 24h Format"
+    icon: "mdi:clock-time-four-outline"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+  # - id: lvgl_switch
+  #   platform: lvgl
+  #   widget: button_test
+  #   name: "LVGL switch"
+  #   restore_mode: RESTORE_DEFAULT_OFF
+  #   on_turn_off: 
+  #     - logger.log: "LVGL switch turned OFF"
+  #     - lambda: |-
+  #         lv_anim_t a;
+  #         lv_anim_init(&a);
+  #         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_style_set_transform_zoom);
+  #         lv_anim_set_var(&a, id(image_container));
+  #         lv_anim_set_time(&a, 200);
+  #         lv_anim_set_values(&a, 0.8, 1.0);
+  #         lv_anim_start(&a);
+  #     # - lvgl.widget.update:
+  #     #     id: image_container
+  #     #     transform_zoom: 1.0
+  #   on_turn_on:
+  #     - logger.log: "LVGL switch turned ON"
+  #     - lambda: |-
+  #         lv_anim_t a;
+  #         lv_anim_init(&a);
+  #         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_style_set_transform_zoom);
+  #         lv_anim_set_var(&a, id(image_container));
+  #         lv_anim_set_time(&a, 200);
+  #         lv_anim_set_values(&a, 1.0, 0.8);
+  #         lv_anim_start(&a);
+  #     # - lvgl.widget.update:
+  #     #     id: image_container
+  #     #     transform_zoom: 0.8
+        
+
+select:
+  - id: wake_word_engine_location
+    platform: template
+    entity_category: config
+    name: Wake word engine location
+    icon: "mdi:account-voice"
+    optimistic: true
+    restore_value: true
+    options:
+      - In Home Assistant
+      - On device
+    initial_option: On device
+    on_value:
+      - lambda: |-
+          ESP_LOGD("select", "wake_word_engine_location changed: %s", x.c_str());

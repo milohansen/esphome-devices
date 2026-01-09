@@ -1,0 +1,130 @@
+# Example Home Assistant Automations for Material Theme
+
+# ============================================================================
+# Example 1: Extract color when wallpaper path changes
+# ============================================================================
+- id: theme_from_wallpaper
+  alias: "ESPHome: Theme from Wallpaper"
+  description: "Extract color from wallpaper and update ESPHome theme"
+  trigger:
+    - platform: state
+      entity_id: input_text.wallpaper_path
+  action:
+    - service: python_script.extract_dominant_color
+      data:
+        image_path: "{{ states('input_text.wallpaper_path') }}"
+        target_entity: input_text.theme_color
+
+# ============================================================================
+# Example 2: Theme from media player album art
+# ============================================================================
+- id: theme_from_now_playing
+  alias: "ESPHome: Theme from Now Playing"
+  description: "Update ESPHome theme based on current album art"
+  trigger:
+    - platform: state
+      entity_id: media_player.spotify
+      attribute: entity_picture
+  condition:
+    - condition: template
+      value_template: "{{ trigger.to_state.attributes.entity_picture is not none }}"
+    - condition: state
+      entity_id: media_player.spotify
+      state: playing
+  action:
+    - service: python_script.extract_dominant_color
+      data:
+        image_url: "{{ state_attr('media_player.spotify', 'entity_picture') }}"
+        target_entity: input_text.theme_color
+
+# ============================================================================
+# Example 3: Sync with Home Assistant's own theme
+# ============================================================================
+- id: sync_ha_theme_to_esphome
+  alias: "ESPHome: Sync Home Assistant Theme"
+  description: "Match ESPHome theme to Home Assistant frontend theme"
+  trigger:
+    - platform: state
+      entity_id: sensor.primary_color  # Custom sensor from your HA theme
+  action:
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.theme_color
+      data:
+        value: "{{ states('sensor.primary_color') }}"
+
+# ============================================================================
+# Example 4: Time-based theme switching
+# ============================================================================
+- id: theme_day_night
+  alias: "ESPHome: Day/Night Theme"
+  description: "Switch between light and dark themes automatically"
+  trigger:
+    - platform: sun
+      event: sunrise
+    - platform: sun
+      event: sunset
+  action:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.theme_mode
+      data:
+        option: "{{ 'Light' if trigger.event == 'sunrise' else 'Dark' }}"
+
+# ============================================================================
+# Example 5: Manual theme color picker
+# ============================================================================
+- id: manual_theme_color
+  alias: "ESPHome: Manual Color Selection"
+  description: "Allow manual color selection from UI"
+  trigger:
+    - platform: event
+      event_type: call_service
+      event_data:
+        domain: script
+        service: set_esphome_theme_color
+  action:
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.theme_color
+      data:
+        value: "{{ trigger.event.data.service_data.color }}"
+
+# ============================================================================
+# Example 6: Generate theme from camera snapshot
+# ============================================================================
+- id: theme_from_camera
+  alias: "ESPHome: Theme from Camera"
+  description: "Extract color from camera snapshot"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.front_door_motion
+      to: "on"
+  action:
+    - service: camera.snapshot
+      target:
+        entity_id: camera.front_door
+      data:
+        filename: "/config/www/snapshots/front_door_latest.jpg"
+    - delay: "00:00:02"  # Wait for file to be written
+    - service: python_script.extract_dominant_color
+      data:
+        image_path: "snapshots/front_door_latest.jpg"
+        target_entity: input_text.theme_color
+
+# ============================================================================
+# Example 7: Update theme variant when input changes
+# ============================================================================
+- id: theme_variant_change
+  alias: "ESPHome: Theme Variant Changed"
+  description: "Trigger theme regeneration when variant changes"
+  trigger:
+    - platform: state
+      entity_id: input_select.theme_variant
+    - platform: state
+      entity_id: input_select.theme_mode
+    - platform: state
+      entity_id: input_number.theme_contrast
+  action:
+    - service: esphome.guition_p4_70_regenerate_theme_button_press
+      data: {}

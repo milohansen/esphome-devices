@@ -1,0 +1,272 @@
+micro_wake_word:
+  id: !extend mww
+  on_wake_word_detected:
+    - binary_sensor.template.publish:
+        id: assistant_active
+        state: true
+    - voice_assistant.start:
+        wake_word: !lambda return wake_word;
+
+voice_assistant:
+  id: va
+  microphone: box_mic
+  media_player: external_media_player
+  micro_wake_word: mww
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  volume_multiplier: 2.0
+
+  on_listening:
+    - binary_sensor.template.publish:
+        id: assistant_active
+        state: true
+    - script.execute:
+        id: set_phase
+        phase: ${voice_assist_waiting_for_command_phase_id}
+    - text_sensor.template.publish:
+        id: text_request
+        state: "Listening..."
+    - text_sensor.template.publish:
+        id: text_response
+        state: "..."
+    # - script.execute: draw_display
+
+  on_stt_vad_start:
+    - script.execute:
+        id: set_phase
+        phase: ${voice_assist_listening_phase_id}
+
+  on_stt_vad_end:
+    - script.execute:
+        id: set_phase
+        phase: ${voice_assist_thinking_phase_id}
+
+  on_stt_end:
+    - script.execute:
+        id: send_stt_text_event
+        stt_text: !lambda 'return x;'
+    - text_sensor.template.publish:
+        id: text_request
+        state: !lambda return x;
+
+
+  on_tts_start:
+    - script.execute:
+        id: send_tts_text_event
+        tts_text: !lambda 'return x;'
+    - text_sensor.template.publish:
+        id: text_response
+        state: !lambda return x;
+    - script.execute:
+        id: set_phase
+        phase: ${voice_assist_replying_phase_id}
+    - lambda: 'id(playing_internal_sound) = true;'
+
+  on_tts_end:
+    - script.execute:
+        id: send_tts_uri_event
+        tts_uri: !lambda 'return x;'
+
+  on_end:
+    - wait_until:
+        condition:
+          - media_player.is_announcing:
+        timeout: 0.5s
+
+    - wait_until:
+        condition:
+          - and:
+              - not:
+                  media_player.is_announcing:
+              - not:
+                  speaker.is_playing:
+                    id: box_speaker
+
+    # - if:
+    #     condition:
+    #       - lambda: return id(wake_word_engine_location).current_option() == "On device";
+    #     then:
+    #       - lambda: id(va).set_use_wake_word(false);
+    #       - micro_wake_word.start:
+
+    - if:
+        condition:
+          lambda: return id(wake_word_engine_location).current_option() == "On device";
+        then:
+          # On-device wake word: behave like your old good config
+          - lambda: id(va).set_use_wake_word(false);
+          - micro_wake_word.start:
+          - script.execute: set_idle_or_mute_phase
+          # - script.execute: draw_display
+        else:
+          # Continuous (In Home Assistant) mode:
+          # don't mess with wake-word; HA handles it
+          # but we still need to escape replying/thinking
+          - if:
+              condition:
+                lambda: |-
+                  return id(voice_assistant_phase) == ${voice_assist_replying_phase_id}
+                      || id(voice_assistant_phase) == ${voice_assist_thinking_phase_id};
+              then:
+                - script.execute: set_idle_or_mute_phase
+                # - script.execute: draw_display
+
+  on_error:
+    - lambda: |-
+        // if (!id(init_in_progress)) { ... }
+        ESP_LOGD("api", "on_error triggered (suppressed)");
+
+  on_client_connected:
+    - script.execute: start_wake_word
+    - lambda: |-
+        id(init_in_progress) = false;
+        ESP_LOGI("api", "init_in_progress set to false");
+    # - script.execute: draw_display
+
+  on_client_disconnected:
+    - script.execute: stop_wake_word
+    - script.execute:
+        id: set_phase
+        phase: ${voice_assist_not_ready_phase_id}
+
+  on_timer_started:
+    - lambda: |-
+        ESP_LOGD("TIMER_STARTED", timer.to_string().c_str());
+        id(set_timer)->execute(timer, "RUNNING");
+    - script.execute: render_timers
+
+  on_timer_cancelled:
+    - lambda: |-
+        ESP_LOGD("TIMER_CANCELLED", timer.to_string().c_str());
+        id(set_timer)->execute(timer, "CANCELLED");
+    - script.execute: render_timers
+
+  on_timer_updated:
+    - lambda: |-
+        ESP_LOGD("TIMER_UPDATED", timer.to_string().c_str());
+        id(set_timer)->execute(timer, timer.is_active ? "RUNNING" : "PAUSED");
+    - script.execute: render_timers
+        
+
+  on_timer_finished:
+    - lambda: |-
+        ESP_LOGD("TIMER_FINISHED", timer.to_string().c_str());
+        id(set_timer)->execute(timer, "RINGING");
+    - script.execute: render_timers
+    - binary_sensor.template.publish:
+        id: timer_ringing_sensor
+        state: true
+    # - switch.turn_on: timer_ringing
+    # - wait_until:
+    #     condition:
+    #       - media_player.is_announcing:
+    # - script.execute:
+    #     id: set_phase
+    #     phase: ${voice_assist_timer_finished_phase_id}
+    # - script.execute: draw_display
+
+  on_timer_tick:
+    - lambda: |-
+        for (const auto &t : timers)
+        {
+          id(set_timer)->execute(t, "");
+        }
+        // my_va::update_timer_slots_safely(&id(timer_map), id(timer_containers), 
+        //                                   id(timer_arcs), id(timer_labels), id(timer_map).size(), 0);
+    - script.execute: render_timers
+
+
+binary_sensor:
+  - id: assistant_active
+    name: "Assistant Active"
+    platform: template
+    device_class: running
+    entity_category: diagnostic
+    # internal: true
+    filters:
+      - delayed_off: 5s
+    on_state_change:
+      then:
+      - lambda: |-
+          if (x.has_value()) {
+            ESP_LOGD("assistant_active", "State changed to %s", x.value() ? "true" : "false");
+            const bool toggle = x.value();
+
+            int start = -6;
+            int end = -42;
+            if (toggle) {
+              start = -42;
+              end = -6;
+            }
+
+            lv_anim_t a;
+            lv_anim_init(&a);
+
+            /*Set the "animator" function*/
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            /*Set target of the animation*/
+            lv_anim_set_var(&a, id(assistant_container));
+
+            /*Length of the animation [ms]*/
+            lv_anim_set_time(&a, 200);
+
+            /*Set start and end values. E.g. 0, 150*/
+            lv_anim_set_values(&a, start, end);
+
+            /*Set path (curve). Default is linear*/
+            // lv_anim_set_path(&a, lv_anim_path_overshoot);
+
+            // ESP_LOGD("custom", "lv_anim_start: from %d to %d", start, end);
+            /*Start the animation*/
+            lv_anim_start(&a);
+          }
+          // x.has_value() ? ESP_LOGD("assistant_active", "New state is %s", ONOFF(x.value())) : ESP_LOGD("assistant_active", "New state is Unknown");
+      # - logger.log:
+      #     format: "Old state was %s"
+      #     args: ['x_previous.has_value() ? ONOFF(x_previous.value()) : "Unknown"']
+      # - logger.log:
+      #     format: "New state is %s"
+      #     args: ['x.has_value() ? ONOFF(x.value()) : "Unknown"']
+
+  - id: assistant_connected
+    platform: template
+    device_class: running
+    entity_category: diagnostic
+    # internal: true
+    on_state_change:
+      then:
+      - if:
+          condition:
+            lambda: return x.value();
+          then:
+            - lvgl.led.update:
+                id: assistant_connected_led
+                color: status_success_bg
+          else:
+            - lvgl.led.update:
+                id: assistant_connected_led
+                color: status_error_bg
+
+text_sensor:
+  - id: text_request
+    name: "Text Request"
+    platform: template
+    on_value:
+      lambda: |-
+        auto &s = id(text_request).state;
+        lv_label_set_text(id(assistant_request_label), s.c_str());
+        lv_label_set_text(id(home_assistant_request_label), s.c_str());
+
+  - id: text_response
+    name: "Text Response"
+    platform: template
+    on_value:
+      lambda: |-
+        auto &s = id(text_response).state;
+        lv_label_set_text(id(assistant_response_label), s.c_str());
+        lv_label_set_text(id(home_assistant_response_label), s.c_str());
+
+  - id: voice_assistant_phase_sensor
+    platform: template
+    name: "Voice Assistant Phase ID"
+    update_interval: never

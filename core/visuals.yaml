@@ -1,0 +1,173 @@
+
+online_image:
+  - id: placeholder_jpeg
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - logger.log: "Download concluded waiting LVGL display."
+      - lvgl.image.update:
+          id: background_image_1
+          src: placeholder_jpeg
+      - lvgl.widget.redraw: background_image_1
+    on_error:
+      - logger.log: "Image download failed. Showing error placeholder."
+      - lvgl.image.update:
+          id: background_image_1
+          src: landscape
+
+image:
+  - file: DSC_4482.jpg
+    id: landscape
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+  - file: DSC_6532.jpg
+    id: owl
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+  - file: DSC_8007.jpg
+    id: crow
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+
+  - id: image_0
+    # file: "https://placehold.co/900x600/4f46e5/FFFFFF/jpeg"
+    file: "/mnt/g/Photos/Exports/Display/PXL_20251204_051321059.jpg"
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+  - id: image_1
+    # file: "https://placehold.co/900x600/4f46e5/FFFFFF/jpeg"
+    file: "/mnt/g/Photos/Exports/2025/12/DSC_2100.jpg"
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+
+  # - id: placeholder_jpeg
+  #   file: "https://placehold.co/900x600/orange/FFFFFF/jpeg"
+  #   type: RGB565
+  #   byte_order: little_endian
+
+font:
+# Monospace Fonts
+  - id: font_big_clock_mono
+    file:
+      type: gfonts
+      family: Source Code Pro
+    size: 42
+    bpp: 4
+  - id: font_small_clock_mono
+    file:
+      type: gfonts
+      family: Source Code Pro
+    size: 24
+    bpp: 4
+
+# Sans-Serif Fonts
+  - id: font_big_date
+    file:
+      type: gfonts
+      family: DM Sans
+    size: 22
+    bpp: 4
+
+# Serif Fonts
+  - id: font_request_response
+    file: "./fonts/Fraunces-VF-small.ttf"
+    size: 15
+    bpp: 4
+  - id: font_big_clock
+    file: "./fonts/Fraunces-VF-big.ttf"
+    size: 60
+    bpp: 4
+  - id: font_mega_clock
+    file: "./fonts/Fraunces-VF-mega.ttf"
+    size: 240
+    bpp: 4
+
+  - id: font_icons
+    # file: "gfonts://Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&icon_names=wifi,wifi_off,wifi_home,cloud_alert"
+    file: "gfonts://Material+Symbols+Outlined"
+    size: 36
+    bpp: 4
+    glyphs:
+      - "\ue63e"  # wifi
+      - "\ue648"  # wifi_off
+      - "\uf671"  # wifi_home
+      - "\uf3cc"  # cloud_alert
+      - "\uf356"  # ear_sound
+      - "\ue029"  # mic
+      - "\uea1b"  # tea
+      - "\ue5cd"  # close
+      - "\ue88a"  # home
+      - "\ue425"  # timer
+      - " "       # (space for empty)
+
+color:
+  - id: active_timer_color
+    hex: "26ed3a"
+  - id: paused_timer_color
+    hex: "3b89e3"
+
+
+  # Stone Neutrals - Structural elements
+  - id: background_page
+    hex: FBF9F4
+  - id: background_surface
+    hex: F2EDE4
+  - id: border_color
+    hex: E4DED3
+  
+  # Typography Colors
+  - id: text_main
+    hex: 3E3A32
+  - id: text_muted
+    hex: 7D7669
+  - id: text_inverse
+    hex: FBF9F4
+  
+  # # Primary Brand Colors - Terracotta/Clay
+  # - id: primary_base
+  #   hex: C66C49
+  # - id: primary_hover
+  #   hex: D68163
+  # - id: primary_active
+  #   hex: A85535
+  # Primary Brand Colors - Pacific Teal
+  - id: primary_base
+    hex: 2A9D8F
+  - id: primary_hover
+    hex: 52BDB0
+  - id: primary_active
+    hex: 1D7066
+  
+  # Status Colors - Success (Olive Green)
+  - id: status_success_text
+    hex: 4F6D46
+  - id: status_success_bg
+    hex: EAF0E6
+  
+  # Status Colors - Warning (Mustard Gold)
+  - id: status_warning_text
+    hex: 9C781A
+  - id: status_warning_bg
+    hex: FBF4DF
+  
+  # Status Colors - Error (Brick Red)
+  - id: status_error_text
+    hex: B34338
+  - id: status_error_bg
+    hex: FBEAE8
+  
+  # Status Colors - Info (Warm Slate Blue)
+  - id: status_info_text
+    hex: 456F85
+  - id: status_info_bg
+    hex: E7EFF5

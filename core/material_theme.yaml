@@ -1,0 +1,125 @@
+# Material Theme Integration with LVGL
+# Connect Material Design 3 color schemes to LVGL UI
+
+esphome:
+  on_boot:
+    # Register callback after LVGL is initialized
+    - priority: -100
+      then:
+        - lambda: |-
+            ESP_LOGI("material_theme", "Registering Material Theme callback for LVGL integration");
+            
+            // Register callback to apply Material scheme to LVGL when generated
+            id(material_theme_component).add_on_scheme_generated_callback(
+              [](const material_theme::ColorScheme &scheme) {
+                ESP_LOGI("material_theme", "New Material Design 3 color scheme generated!");
+                ESP_LOGI("material_theme", "  Primary: #%s", 
+                         material_theme::MaterialThemeComponent::argb_to_hex(scheme.primary).c_str());
+                ESP_LOGI("material_theme", "  Surface: #%s", 
+                         material_theme::MaterialThemeComponent::argb_to_hex(scheme.surface).c_str());
+                
+                // TODO: LVGL integration requires access to LvglComponent
+                // The main_display ID refers to MIPI_DSI, not LvglComponent
+                // Will need to add ID to lvgl: section in hw/lvgl.yaml
+                // #ifdef USE_LVGL
+                auto *lvgl_comp = id(lvgl_component);  // Need to add this ID
+                if (lvgl_comp) {
+                  material_theme::LVGLThemeApplicator::apply_scheme_to_lvgl(
+                    lvgl_comp, scheme, false
+                  );
+                  ESP_LOGI("material_theme", "Material theme applied to LVGL display");
+                }
+                // #endif
+                // ESP_LOGD("material_theme", "LVGL integration temporarily disabled - need to add lvgl component ID");
+              }
+            );
+            
+            ESP_LOGI("material_theme", "Material Theme integration ready");
+
+# Example: Button to regenerate theme with different color
+button:
+  - platform: template
+    name: "Regenerate Theme"
+    id: regenerate_theme_button
+    on_press:
+      - logger.log:
+          format: "Regenerating Material Theme"
+          level: INFO
+      - material_theme.generate_scheme:
+          id: material_theme_component
+          # Keep current settings, just regenerate
+          # Uncomment below to change color dynamically:
+          # source_color: 0xFF6366F1  # Example: Indigo
+          # variant: VIBRANT
+
+# Home Assistant integration for dynamic theme changes
+# Receives color extracted from images by Home Assistant Python script
+text_sensor:
+  - platform: homeassistant
+    entity_id: input_text.theme_color
+    id: ha_theme_color
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            // Parse hex string from Home Assistant (format: "FF6366F1")
+            std::string color_str(x.c_str());
+            
+            // Remove any # prefix if present
+            if (!color_str.empty() && color_str[0] == '#') {
+              color_str = color_str.substr(1);
+            }
+            
+            // Validate hex string
+            if (color_str.length() != 8 && color_str.length() != 6) {
+              ESP_LOGW("material_theme", "Invalid color format from Home Assistant: %s", x.c_str());
+              return;
+            }
+            
+            // Pad with FF if only RGB provided
+            if (color_str.length() == 6) {
+              color_str = "FF" + color_str;
+            }
+            
+            // Convert hex string to uint32_t
+            uint32_t color = std::stoul(color_str, nullptr, 16);
+            
+            ESP_LOGI("material_theme", "Received color from Home Assistant: #%08X", color);
+            ESP_LOGI("material_theme", "  RGB: #%02X%02X%02X", 
+                     (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+            
+            // Generate new Material Design 3 scheme with extracted color
+            id(material_theme_component).set_source_color(color);
+            id(material_theme_component).generate_scheme();
+
+# Optional: Receive theme variant from Home Assistant
+# text_sensor:
+#   - platform: homeassistant
+#     entity_id: input_select.theme_variant
+#     id: ha_theme_variant
+#     internal: true
+#     on_value:
+#       then:
+#         - lambda: |-
+#             // Map string to variant enum
+#             material_theme::SchemeVariant variant = material_theme::VARIANT_TONAL_SPOT;
+#             if (x == "VIBRANT") variant = material_theme::VARIANT_VIBRANT;
+#             else if (x == "EXPRESSIVE") variant = material_theme::VARIANT_EXPRESSIVE;
+#             else if (x == "CONTENT") variant = material_theme::VARIANT_CONTENT;
+#             else if (x == "MONOCHROME") variant = material_theme::VARIANT_MONOCHROME;
+#             else if (x == "NEUTRAL") variant = material_theme::VARIANT_NEUTRAL;
+#             
+#             id(material_theme_component).set_variant(variant);
+#             id(material_theme_component).generate_scheme();
+
+# Optional: Receive dark mode from Home Assistant
+# binary_sensor:
+#   - platform: homeassistant
+#     entity_id: input_boolean.theme_dark_mode
+#     id: ha_theme_dark_mode
+#     internal: true
+#     on_state:
+#       then:
+#         - lambda: |-
+#             id(material_theme_component).set_is_dark(x);
+#             id(material_theme_component).generate_scheme();

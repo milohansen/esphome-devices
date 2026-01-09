@@ -1,0 +1,51 @@
+# font:
+# Monospace Fonts
+  - id: font_big_clock_mono
+    file:
+      type: gfonts
+      family: Source Code Pro
+    size: 42
+    bpp: 4
+  - id: font_small_clock_mono
+    file:
+      type: gfonts
+      family: Source Code Pro
+    size: 24
+    bpp: 4
+
+# Sans-Serif Fonts
+  - id: font_big_date
+    file:
+      type: gfonts
+      family: Noto Sans
+    size: 22
+    bpp: 4
+
+# Serif Fonts
+  - id: font_request_response
+    file: "./fonts/Fraunces-VF-small.ttf"
+    # file:
+    #   type: gfonts
+    #   family: ${font_family}
+    #   weight: 300
+    size: 15
+    bpp: 4
+  - id: font_big_clock
+    file: "./fonts/Fraunces-VF-big.ttf"
+    # file:
+    #   type: gfonts
+    #   family: ${font_family}
+    size: 60
+    bpp: 4
+  - id: font_mega_clock
+    file: "./fonts/Fraunces-VF-mega.ttf"
+    size: 240
+    bpp: 4
+
+  - id: font_icons
+    # file: "gfonts://Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0&icon_names=wifi,wifi_off,wifi_home,cloud_alert"
+    file: "gfonts://Material+Symbols+Outlined"
+    size: 36
+    bpp: 4
+    glyphs: ["\ue63e", "\ue648", "\uf671", "\uf3cc", "\uf356", "\ue029", " "]
+    # wifi, wifi_off, wifi_home, cloud_alert, ear_sound, mic, (space for empty)

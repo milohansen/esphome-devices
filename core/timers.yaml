@@ -1,0 +1,304 @@
+
+script:
+  - id: update_timer_slots
+    parameters:
+      new_slots: std::vector<std::string>
+    then:
+      - lambda: |-
+          const int new_slot_count = new_slots.size();
+          ESP_LOGD("update_timer_slots", "Updating timer slots. %d slots used", new_slot_count);
+          for (size_t i = 0; i < 3; i++) {
+            if (i < new_slot_count) {
+              ESP_LOGD("update_timer_slots", "Updating slot index %d to %s", i, new_slots[i].c_str());
+              id(timer_slots).set(i, new_slots[i]);
+            } else {
+              ESP_LOGD("update_timer_slots", "Clearing slot index %d", i);
+              id(timer_slots).set(i, "");
+            }
+          }
+
+  - id: cleanup_timers
+    then:
+      - lambda: |-
+          for (const auto [key, t] : id(timer_map)) {
+            const auto state = id(timer_states)[key];
+            if (state == "COMPLETED" || state == "CANCELLED") {
+              // id(timer_map).erase(key);
+              id(timer_states).erase(key);
+              for (size_t i = 0; i < id(number_of_slots); i++) {
+                if (id(timer_animations).get(i) == key) {
+                  id(timer_animations).set(i, "");
+                  break;
+                }
+              }
+              // id(timer_animations).erase(key);
+              ESP_LOGD("cleanup_timers", "Removed timer %s with state %s", key.c_str(), state.c_str());
+            }
+          }
+
+  - id: set_timer
+    parameters:
+      timer: esphome::voice_assistant::Timer
+      state: string
+    then:
+      - lambda: |-
+          id(timer_map)[timer.id] = timer;
+
+          const auto current_state = id(timer_states)[timer.id];
+          if (state != "" && current_state != state && current_state != "CANCELLED" && current_state != "COMPLETED") {
+            id(timer_states)[timer.id] = state;
+
+            if (state == "RINGING") {
+              id(timer_ringing_sensor).publish_state(true);
+            }
+          }
+
+  - id: render_timers
+    then:
+      - lambda: |-
+          const auto map = id(timer_map);
+
+          int i = 0;
+          for (const auto [key, t] : id(timer_map)) {
+            if (i >= id(number_of_slots)) {
+              break;
+            }
+            auto state = id(timer_states)[key];
+            if (state != "RUNNING" && state != "PAUSED" && state != "RINGING") {
+              continue;
+            }
+
+            ESP_LOGD("render_timers", "Rendering timer slot %d: %s", i, key.c_str());
+            id(timer_slots).set(i, key);
+
+            // ESP_LOGD("my_va", "update_timer_slots_safely: updating slot %d with timer %s", i, t.id.c_str());
+            lv_obj_clear_flag(id(timer_containers).get(i), LV_OBJ_FLAG_HIDDEN);
+            
+            int mins = t.seconds_left / 60;
+            int secs = t.seconds_left % 60;
+            lv_label_set_text_fmt(id(timer_labels).get(i), "%d:%02d", mins, secs);
+            
+            if (t.seconds_left <= 0) {
+              lv_arc_set_value(id(timer_arcs).get(i), 0);
+            } else if (id(timer_animations).get(i) != key) {
+              lv_anim_t a;
+              lv_anim_init(&a);
+              lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_arc_set_value);
+              lv_anim_set_var(&a, id(timer_arcs).get(i));
+              lv_anim_set_time(&a, t.seconds_left * 1000);
+              float pct = (float)t.seconds_left / (float)t.total_seconds * 32767.0f;
+              lv_anim_set_values(&a, (int)pct, 0);
+              lv_anim_start(&a);
+              id(timer_animations)[i] = key;
+            }
+            //   lv_anim_t a;
+            //   lv_anim_init(&a);
+            //   lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_arc_set_value);
+            //   lv_anim_set_var(&a, id(timer_arcs).get(i));
+            //   lv_anim_set_time(&a, 1000);
+            //   float pct = (float)t.seconds_left / (float)t.total_seconds * 32767.0f;
+            //   float next_pct = (float)(t.seconds_left - 1) / (float)t.total_seconds * 32767.0f;
+            //   if (next_pct < 0.0f) {
+            //     next_pct = 0.0f;
+            //   }
+            //   lv_anim_set_values(&a, (int)pct, (int)next_pct);
+            //   lv_anim_start(&a);
+            //   id(timer_animations)[key] = a;
+            // }
+            // lv_arc_set_value(id(timer_arcs).get(i), (int)pct);
+            
+            i++;
+          }
+
+          while (i < id(number_of_slots)) {
+            if (id(timer_slots).get(i) != "") {
+              ESP_LOGD("render_timers", "Clearing timer slot %d", i);
+              lv_obj_add_flag(id(timer_containers).get(i), LV_OBJ_FLAG_HIDDEN);
+              id(timer_slots).set(i, "");
+            }
+            i++;
+          }
+
+  - id: cancel_timer_by_slot_index
+    parameters:
+      index: int
+    then:
+      - lambda: |-
+          const std::string &timer_id = id(timer_slots)[index];
+          ESP_LOGD("cancel_timer_by_slot_index", "Cancelling timer at slot index %d with timer ID: %s", index, timer_id.c_str());
+
+          esphome::voice_assistant::Timer timer = id(timer_map)[timer_id];
+          if (timer.id.empty()) {
+            ESP_LOGW("cancel_timer_by_slot_index", "No timer found with ID: %s", timer_id.c_str());
+            return;
+          }
+
+          // Cancel the local timer
+          auto req = esphome::api::VoiceAssistantTimerEventResponse();
+          req.timer_id = timer_id;
+          req.event_type = esphome::api::enums::VOICE_ASSISTANT_TIMER_CANCELLED;
+          
+          id(va).on_timer_event(req);
+
+          // Send cancellation to Home Assistant via conversation
+          std::string timer_name = timer.name;
+          if (timer.name.empty()) {
+            timer_name = "";
+            int hours = timer.total_seconds / 3600;
+            int mins = (timer.total_seconds % 3600) / 60;
+            int secs = timer.total_seconds % 60;
+            if (hours > 0) {
+              timer_name += std::to_string(hours) + " hour";
+              if (hours > 1) {
+                timer_name += "s";
+              }
+              if (mins > 0 || secs > 0) {
+                timer_name += " ";
+              }
+            }
+            if (mins > 0) {
+              timer_name += std::to_string(mins) + " minute";
+              if (mins > 1) {
+                timer_name += "s";
+              }
+              if (secs > 0) {
+                timer_name += " ";;
+              }
+            }
+            if (secs > 0) {
+              timer_name += std::to_string(secs) + " second";
+              if (secs > 1) {
+                timer_name += "s";
+              }
+            }
+          }
+          
+          id(cancel_timer_in_ha)->execute(timer_name);
+
+  - id: cancel_timer_in_ha
+    parameters:
+      timer_name: string
+    then:
+      - homeassistant.action:
+          action: conversation.process
+          data:
+            text: !lambda return "cancel the " + timer_name + " timer";
+          on_success:
+            - logger.log:
+                format: "Successfully sent timer cancellation to HA: %s"
+                args: ['timer_name.c_str()']
+          on_error:
+            - logger.log:
+                level: ERROR
+                format: "Failed to send timer cancellation to HA: %s"
+                args: ['timer_name.c_str()']
+
+# debug:
+#   update_interval: 30s
+
+globals:
+  - id: timer_map
+    type: 'std::map<std::string, esphome::voice_assistant::Timer>'
+    restore_value: no
+  - id: timer_states
+    type: 'std::map<std::string, std::string>'
+    restore_value: no
+      # "RUNNING"
+      # "PAUSED"
+      # "RINGING"
+      # "CANCELLED"
+      # "COMPLETED"
+
+  - id: number_of_slots
+    type: int
+    restore_value: yes
+    initial_value: '3'
+
+mapping:
+  - id: timer_slots
+    from: int
+    to: string
+    entries:
+      0: ""
+      1: ""
+      2: ""
+  - id: timer_animations
+    from: int
+    to: string
+    entries:
+      0: ""
+      1: ""
+      2: ""
+  - id: timer_arcs
+    from: int
+    to: lv_obj_t
+    entries:
+      0: timer_arc_0
+      1: timer_arc_1
+      2: timer_arc_2
+  - id: timer_labels
+    from: int
+    to: lv_obj_t
+    entries:
+      0: timer_label_0
+      1: timer_label_1
+      2: timer_label_2
+  - id: timer_containers
+    from: int
+    to: lv_obj_t
+    entries:
+      0: timer_slot_0
+      1: timer_slot_1
+      2: timer_slot_2
+      # 0: timer_container_0
+      # 1: timer_container_1
+      # 2: timer_container_2
+
+
+binary_sensor:
+  - id: timer_ringing_sensor
+    name: "Timer Ringing"
+    platform: template
+    device_class: sound
+    # entity_category: diagnostic
+    # internal: true
+    on_state_change:
+      - lambda: |-
+          ESP_LOGD("timer_ringing_sensor", "Old state was %s", x_previous.has_value() ? ONOFF(x_previous.value()) : "Unknown");
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.enable: button_stop_ringing
+            - lvgl.button.update:
+                id: button_stop_ringing
+                text: "Timer Ringing!"
+          else:
+            - lvgl.button.update:
+                id: button_stop_ringing
+                text: "No Timer Ringing"
+            - lvgl.widget.disable: button_stop_ringing
+
+  - id: any_timers_running_sensor
+    name: "Any Timers Running"
+    platform: template
+    device_class: running
+    # entity_category: diagnostic
+    # internal: true
+    on_state_change:
+      - lambda: |-
+          ESP_LOGD("any_timers_running_sensor", "Old state was %s, new state is %s", x_previous.has_value() ? ONOFF(x_previous.value()) : "Unknown", ONOFF(x));
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.page.show: timer_page
+          else:
+            - lvgl.page.show: home_page
+          
+          
+
+interval:
+  - interval: 10min
+    then:
+      - script.execute: cleanup_timers
