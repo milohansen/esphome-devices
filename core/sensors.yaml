@@ -194,6 +194,7 @@ text_sensor:
       - lambda: |-
           id(image_slot_retry_count)[0] = 0;
           id(image_slot_loading)[0] = false;
+      - delay: 100ms
       - if:
           condition:
             lambda: |-
@@ -212,6 +213,7 @@ text_sensor:
       - lambda: |-
           id(image_slot_retry_count)[1] = 0;
           id(image_slot_loading)[1] = false;
+      - delay: 100ms
       - if:
           condition:
             lambda: |-
@@ -230,6 +232,7 @@ text_sensor:
       - lambda: |-
           id(image_slot_retry_count)[2] = 0;
           id(image_slot_loading)[2] = false;
+      - delay: 100ms
       - if:
           condition:
             lambda: |-
@@ -248,6 +251,7 @@ text_sensor:
       - lambda: |-
           id(image_slot_retry_count)[3] = 0;
           id(image_slot_loading)[3] = false;
+      - delay: 100ms
       - if:
           condition:
             lambda: |-
@@ -266,6 +270,7 @@ text_sensor:
       - lambda: |-
           id(image_slot_retry_count)[4] = 0;
           id(image_slot_loading)[4] = false;
+      - delay: 100ms
       - if:
           condition:
             lambda: |-
@@ -284,6 +289,7 @@ text_sensor:
       - lambda: |-
           id(image_slot_retry_count)[5] = 0;
           id(image_slot_loading)[5] = false;
+      - delay: 100ms
       - if:
           condition:
             lambda: |-

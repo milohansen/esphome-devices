@@ -106,8 +106,14 @@ script:
                   //   lv_label_set_text(id(debug_last_fetch), ("Fetched: " + id(slideshow_last_fetch_time)).c_str());
                   // }
                   
-                  // Populate first 6 URL slots
-                  for (int i = 0; i < 6 && i < image_ids.size(); i++)
+                  // Initialize component-to-slot mapping for first 4 slots (0-3)
+                  id(component_to_slot)[0] = 0;
+                  id(component_to_slot)[1] = 1;
+                  id(component_to_slot)[2] = 2;
+                  id(component_to_slot)[3] = 3;
+                  
+                  // Populate first 4 URL slots for initial display
+                  for (int i = 0; i < 4 && i < image_ids.size(); i++)
                   {
                     std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_ids[i];
                     url_sensors[i]->publish_state(url);
@@ -118,32 +124,54 @@ script:
     then:
       - lambda: |-
           int current = (int)id(image_index).state;
-          int next = (current + 1) % 6;
+          int old_slot = (current - 1 + 6) % 6;  // Slot we're moving away from
+          int new_lookahead = (current + 3) % 6; // New lookahead slot
           
-          // Check if we need to fetch more images from queue
-          if (id(slideshow_queue_index) < id(slideshow_queue_ids).size() - 6)
+          // Find which component was displaying the old slot and release it
+          for (int comp = 0; comp < 4; comp++)
           {
-            // Load next image from queue into the slot we just left
-            id(slideshow_queue_index)++;
-            int queue_pos = id(slideshow_queue_index) + 5; // Position for lookahead
-            if (queue_pos < id(slideshow_queue_ids).size())
+            if (id(component_to_slot)[comp] == old_slot)
             {
-              std::string image_id = id(slideshow_queue_ids)[queue_pos];
-              std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_id;
+              ESP_LOGI("advance", "Releasing component %d (was slot %d)", comp, old_slot);
               
-              text_sensor::TextSensor* url_sensors[6] = {
-                id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
-                id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+              online_image::OnlineImage* components[4] = {
+                id(online_image_0), id(online_image_1),
+                id(online_image_2), id(online_image_3)
               };
+              components[comp]->release();
               
-              url_sensors[current]->publish_state(url);
-              ESP_LOGI("slideshow", "Loaded queue position %d into slot %d", queue_pos, current);
+              // Reassign this component to the new lookahead slot
+              id(component_to_slot)[comp] = new_lookahead;
+              id(image_slot_success)[old_slot] = false;
+              id(image_slot_loading)[old_slot] = false;
+              id(image_slot_retry_count)[old_slot] = 0;
+              
+              ESP_LOGI("advance", "Component %d now assigned to slot %d", comp, new_lookahead);
+              break;
             }
           }
-          else if (id(slideshow_queue_index) >= id(slideshow_queue_ids).size() - 1)
+          
+          // Load URL for new lookahead slot if available in queue
+          id(slideshow_queue_index)++;
+          int queue_pos = id(slideshow_queue_index) + 2; // Position for 3rd lookahead
+          
+          if (queue_pos < id(slideshow_queue_ids).size())
           {
-            // Queue exhausted, fetch new queue
-            ESP_LOGI("slideshow", "Queue exhausted, fetching new queue");
+            std::string image_id = id(slideshow_queue_ids)[queue_pos];
+            std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_id;
+            
+            text_sensor::TextSensor* url_sensors[6] = {
+              id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+              id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+            };
+            
+            url_sensors[new_lookahead]->publish_state(url);
+            ESP_LOGI("advance", "Loaded queue position %d into slot %d", queue_pos, new_lookahead);
+          }
+          else if (id(slideshow_queue_index) >= id(slideshow_queue_ids).size() - 3)
+          {
+            // Queue running low, fetch new queue
+            ESP_LOGI("advance", "Queue exhausted, fetching new queue");
             id(fetch_slideshow_queue).execute();
           }
       - script.execute: find_next_valid_slot
@@ -291,108 +319,86 @@ script:
       - script.execute: update_online_images
 
   - id: update_online_images
+    mode: single
     then:
       - lambda: |-
           int current = (int)id(image_index).state;
-          int prev = (current - 1 + 6) % 6;
-          int next = (current + 1) % 6;
-          int lookahead = (current + 2) % 6;
           
-          ESP_LOGI("update_images", "Updating images for prev=%d, current=%d, next=%d, lookahead=%d", prev, current, next, lookahead);
+          ESP_LOGI("update_images", "Loading images for current slot %d", current);
           
-          // Get URL text sensors
-          text_sensor::TextSensor* url_sensors[6] = {
-            id(ha_image_url_slot_0),
-            id(ha_image_url_slot_1),
-            id(ha_image_url_slot_2),
-            id(ha_image_url_slot_3),
-            id(ha_image_url_slot_4),
-            id(ha_image_url_slot_5)
+          online_image::OnlineImage* components[4] = {
+            id(online_image_0), id(online_image_1),
+            id(online_image_2), id(online_image_3)
           };
           
-          // Update previous image if not already loading/loaded
-          if (!id(image_slot_loading)[prev] && !id(image_slot_success)[prev])
-          {
-            std::string prev_url = url_sensors[prev]->state;
-            if (!prev_url.empty() && prev_url != "unknown")
-            {
-              ESP_LOGI("update_images", "Setting previous URL: %s", prev_url.c_str());
-              id(online_image_previous)->set_url(prev_url);
-              id(image_slot_loading)[prev] = true;
-              id(online_image_previous)->update();
-            }
-          }
+          text_sensor::TextSensor* url_sensors[6] = {
+            id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+            id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+          };
           
-          // Update current image if not already loading/loaded
-          if (!id(image_slot_loading)[current] && !id(image_slot_success)[current])
+          // Load current + 3 lookahead slots (4 total)
+          for (int offset = 0; offset < 4; offset++)
           {
-            std::string current_url = url_sensors[current]->state;
-            if (!current_url.empty() && current_url != "unknown")
+            int slot = (current + offset) % 6;
+            
+            // Find which component is assigned to this slot
+            int comp = -1;
+            for (int c = 0; c < 4; c++)
             {
-              ESP_LOGI("update_images", "Setting current URL: %s", current_url.c_str());
-              id(online_image_current)->set_url(current_url);
-              id(image_slot_loading)[current] = true;
-              id(online_image_current)->update();
+              if (id(component_to_slot)[c] == slot)
+              {
+                comp = c;
+                break;
+              }
             }
-          }
-          
-          // Update next image if not already loading/loaded
-          if (!id(image_slot_loading)[next] && !id(image_slot_success)[next])
-          {
-            std::string next_url = url_sensors[next]->state;
-            if (!next_url.empty() && next_url != "unknown")
+            
+            if (comp == -1)
             {
-              ESP_LOGI("update_images", "Setting next URL: %s", next_url.c_str());
-              id(online_image_next)->set_url(next_url);
-              id(image_slot_loading)[next] = true;
-              id(online_image_next)->update();
+              ESP_LOGW("update_images", "No component assigned to slot %d", slot);
+              continue;
             }
-          }
-          
-          // Update lookahead image if not already loading/loaded
-          if (!id(image_slot_loading)[lookahead] && !id(image_slot_success)[lookahead])
-          {
-            std::string lookahead_url = url_sensors[lookahead]->state;
-            if (!lookahead_url.empty() && lookahead_url != "unknown")
+            
+            // Load image if not already loading/loaded
+            if (!id(image_slot_loading)[slot] && !id(image_slot_success)[slot])
             {
-              ESP_LOGI("update_images", "Setting lookahead URL: %s", lookahead_url.c_str());
-              id(online_image_lookahead)->set_url(lookahead_url);
-              id(image_slot_loading)[lookahead] = true;
-              id(online_image_lookahead)->update();
+              std::string url = url_sensors[slot]->state;
+              if (!url.empty() && url != "unknown" && url.find("http") == 0)
+              {
+                ESP_LOGI("update_images", "Component %d loading slot %d: %s", comp, slot, url.c_str());
+                components[comp]->set_url(url);
+                id(image_slot_loading)[slot] = true;
+                components[comp]->update();
+              }
             }
           }
       - delay: 500ms
       - lambda: |-
           int current = (int)id(image_index).state;
-          int prev = (current - 1 + 6) % 6;
-          int next = (current + 1) % 6;
-          int lookahead = (current + 2) % 6;
+          
+          online_image::OnlineImage* components[4] = {
+            id(online_image_0), id(online_image_1),
+            id(online_image_2), id(online_image_3)
+          };
           
           lv_obj_t* widgets[6] = {
             id(background_image_0), id(background_image_1), id(background_image_2),
             id(background_image_3), id(background_image_4), id(background_image_5)
           };
           
-          // Update LVGL widgets with successfully loaded images using direct LVGL calls
-          if (id(image_slot_success)[prev])
+          // Update LVGL widgets for successfully loaded slots
+          for (int comp = 0; comp < 4; comp++)
           {
-            ESP_LOGI("update_images", "Updating LVGL widget for previous slot %d", prev);
-            lv_img_set_src(widgets[prev], id(online_image_previous)->get_lv_img_dsc());
-          }
-          if (id(image_slot_success)[current])
-          {
-            ESP_LOGI("update_images", "Updating LVGL widget for current slot %d", current);
-            lv_img_set_src(widgets[current], id(online_image_current)->get_lv_img_dsc());
-          }
-          if (id(image_slot_success)[next])
-          {
-            ESP_LOGI("update_images", "Updating LVGL widget for next slot %d", next);
-            lv_img_set_src(widgets[next], id(online_image_next)->get_lv_img_dsc());
-          }
-          if (id(image_slot_success)[lookahead])
-          {
-            ESP_LOGI("update_images", "Updating LVGL widget for lookahead slot %d", lookahead);
-            lv_img_set_src(widgets[lookahead], id(online_image_lookahead)->get_lv_img_dsc());
+            int slot = id(component_to_slot)[comp];
+            
+            if (id(image_slot_success)[slot] && widgets[slot] != nullptr)
+            {
+              auto img_dsc = components[comp]->get_lv_img_dsc();
+              if (img_dsc != nullptr)
+              {
+                ESP_LOGI("update_images", "Updating LVGL slot %d from component %d", slot, comp);
+                lv_img_set_src(widgets[slot], img_dsc);
+              }
+            }
           }
           
           // // Update debug status panel
@@ -488,6 +494,11 @@ globals:
     type: 'std::map<int, bool>'
     restore_value: no
   - id: image_slot_retry_count
+    type: 'std::map<int, int>'
+    restore_value: no
+  
+  # Component to slot mapping (which online_image component is assigned to which UI slot)
+  - id: component_to_slot
     type: 'std::map<int, int>'
     restore_value: no
   
