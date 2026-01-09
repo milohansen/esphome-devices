@@ -21,17 +21,17 @@ online_image:
           src: landscape
 
 image:
-  - file: DSC_4482.jpg
+  - file: assets/images/DSC_4482.jpg
     id: landscape
     type: RGB565
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
-  - file: DSC_6532.jpg
+  - file: assets/images/DSC_6532.jpg
     id: owl
     type: RGB565
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
-  - file: DSC_8007.jpg
+  - file: assets/images/DSC_8007.jpg
     id: crow
     type: RGB565
     byte_order: little_endian
@@ -80,15 +80,15 @@ font:
 
 # Serif Fonts
   - id: font_request_response
-    file: "./fonts/Fraunces-VF-small.ttf"
+    file: "./assets/fonts/Fraunces-VF-small.ttf"
     size: 15
     bpp: 4
   - id: font_big_clock
-    file: "./fonts/Fraunces-VF-big.ttf"
+    file: "./assets/fonts/Fraunces-VF-big.ttf"
     size: 60
     bpp: 4
   - id: font_mega_clock
-    file: "./fonts/Fraunces-VF-mega.ttf"
+    file: "./assets/fonts/Fraunces-VF-mega.ttf"
     size: 240
     bpp: 4
 
