@@ -1,7 +1,7 @@
 
 online_image:
   - id: online_image_previous
-    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=previous"
     format: JPEG
     type: RGB565
     byte_order: little_endian
@@ -24,7 +24,7 @@ online_image:
       - script.execute: retry_download_with_backoff
 
   - id: online_image_current
-    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=current"
     format: JPEG
     type: RGB565
     byte_order: little_endian
@@ -45,7 +45,7 @@ online_image:
       - script.execute: retry_download_with_backoff
 
   - id: online_image_next
-    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=next"
     format: JPEG
     type: RGB565
     byte_order: little_endian
@@ -68,7 +68,7 @@ online_image:
       - script.execute: retry_download_with_backoff
 
   - id: online_image_lookahead
-    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=lookahead"
     format: JPEG
     type: RGB565
     byte_order: little_endian
