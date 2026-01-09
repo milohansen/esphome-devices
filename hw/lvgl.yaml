@@ -389,7 +389,7 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_1
-                        src: placeholder_jpeg
+                        src: landscape
                         width: ${screenwidth}
                         height: ${screenheight}
                         bg_color: background_surface
@@ -465,40 +465,7 @@ lvgl:
                   y: 60
                   on_click:
                     then:
-                      - lambda: |-
-                          // TODO: Keep one previous image and one next image loaded to allow smooth scrolling
-                          const int map_size = id(image_map).size();
-                          // Increment image index and wrap around
-                          id(image_index) = (id(image_index) + 1) % map_size;
-                          auto img = id(image_map)[id(image_index)];
-                          int width = lv_obj_get_width(img);
-
-                          ESP_LOGD("custom", "Next button clicked, scrolling to index: %d (width: %d)", id(image_index), width);
-
-                          // scroll to the next image
-                          lv_obj_scroll_to_x(id(image_container), width, LV_ANIM_ON);
-
-                      - lvgl.widget.redraw: image_container
-                      - delay: 1s
-                      - lambda: |-
-                          const int map_size = id(image_map).size();
-                          // static int index = 0;
-                          const int index = id(image_index);
-                          ESP_LOGD("custom", "%s: %d", "Next button clicked, current index", index);
-                          
-                          auto img = id(image_map)[index];
-                          // index = (index + 1) % map_size;
-
-                          if (img != nullptr) {
-                              ESP_LOGD("custom", "Found image at index %d: Pointer %p", index, img);
-                          } else {
-                              ESP_LOGE("debug", "Key not found in map!");
-                          }
-                          lv_obj_move_to_index(img, map_size - 1);
-                          lv_obj_scroll_to_x(id(image_container), 0, LV_ANIM_OFF);
-                          id(replace_this_image_index) = index;
-                          // TODO: FIGURE OUT HOW TO REPLACE THE IMAGE HERE
-                      - lvgl.widget.redraw: image_container
+                      - script.execute: find_next_valid_slot
               
               - button:
                   id: button_show_timers

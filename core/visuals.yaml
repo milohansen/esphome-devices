@@ -1,6 +1,6 @@
 
 online_image:
-  - id: placeholder_jpeg
+  - id: online_image_previous
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
     format: JPEG
     type: RGB565
@@ -9,16 +9,86 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - logger.log: "Download concluded waiting LVGL display."
-      - lvgl.image.update:
-          id: background_image_1
-          src: placeholder_jpeg
-      - lvgl.widget.redraw: background_image_1
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int prev = (current - 1 + 6) % 6;
+          ESP_LOGI("online_image", "Previous slot %d downloaded successfully", prev);
+          id(image_slot_success)[prev] = true;
+          id(image_slot_loading)[prev] = false;
+          id(image_slot_retry_count)[prev] = 0;
     on_error:
-      - logger.log: "Image download failed. Showing error placeholder."
-      - lvgl.image.update:
-          id: background_image_1
-          src: landscape
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int prev = (current - 1 + 6) % 6;
+          ESP_LOGW("online_image", "Previous slot %d download failed (attempt %d)", prev, id(image_slot_retry_count)[prev] + 1);
+      - script.execute: retry_download_with_backoff
+
+  - id: online_image_current
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          ESP_LOGI("online_image", "Current slot %d downloaded successfully", current);
+          id(image_slot_success)[current] = true;
+          id(image_slot_loading)[current] = false;
+          id(image_slot_retry_count)[current] = 0;
+    on_error:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          ESP_LOGW("online_image", "Current slot %d download failed (attempt %d)", current, id(image_slot_retry_count)[current] + 1);
+      - script.execute: retry_download_with_backoff
+
+  - id: online_image_next
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int next = (current + 1) % 6;
+          ESP_LOGI("online_image", "Next slot %d downloaded successfully", next);
+          id(image_slot_success)[next] = true;
+          id(image_slot_loading)[next] = false;
+          id(image_slot_retry_count)[next] = 0;
+    on_error:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int next = (current + 1) % 6;
+          ESP_LOGW("online_image", "Next slot %d download failed (attempt %d)", next, id(image_slot_retry_count)[next] + 1);
+      - script.execute: retry_download_with_backoff
+
+  - id: online_image_lookahead
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int lookahead = (current + 2) % 6;
+          ESP_LOGI("online_image", "Lookahead slot %d downloaded successfully", lookahead);
+          id(image_slot_success)[lookahead] = true;
+          id(image_slot_loading)[lookahead] = false;
+          id(image_slot_retry_count)[lookahead] = 0;
+    on_error:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int lookahead = (current + 2) % 6;
+          ESP_LOGW("online_image", "Lookahead slot %d download failed (attempt %d)", lookahead, id(image_slot_retry_count)[lookahead] + 1);
+      - script.execute: retry_download_with_backoff
 
 image:
   - file: assets/images/DSC_4482.jpg

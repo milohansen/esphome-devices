@@ -117,6 +117,166 @@ script:
             node: ${name}
             phase: !lambda return phase;
 
+  - id: retry_download_with_backoff
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int& retry_count = id(image_slot_retry_count)[current];
+          
+          // Calculate exponential backoff: 1s, 2s, 4s, 8s, 16s... capped at 300s (5min)
+          int delay_seconds = std::min(300, (int)pow(2, retry_count));
+          retry_count++;
+          
+          ESP_LOGI("retry", "Scheduling retry for slot %d in %d seconds (attempt %d)", current, delay_seconds, retry_count);
+          id(image_slot_loading)[current] = true;
+      - delay: !lambda |-
+          int current = (int)id(image_index).state;
+          int retry_count = id(image_slot_retry_count)[current] - 1;
+          int delay_seconds = std::min(300, (int)pow(2, retry_count));
+          return delay_seconds * 1000;
+      - script.execute: update_online_images
+
+  - id: update_online_images
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int prev = (current - 1 + 6) % 6;
+          int next = (current + 1) % 6;
+          int lookahead = (current + 2) % 6;
+          
+          ESP_LOGI("update_images", "Updating images for prev=%d, current=%d, next=%d, lookahead=%d", prev, current, next, lookahead);
+          
+          // Get URL text sensors
+          text_sensor::TextSensor* url_sensors[6] = {
+            id(ha_image_url_slot_0),
+            id(ha_image_url_slot_1),
+            id(ha_image_url_slot_2),
+            id(ha_image_url_slot_3),
+            id(ha_image_url_slot_4),
+            id(ha_image_url_slot_5)
+          };
+          
+          // Update previous image if not already loading/loaded
+          if (!id(image_slot_loading)[prev] && !id(image_slot_success)[prev])
+          {
+            std::string prev_url = url_sensors[prev]->state;
+            if (!prev_url.empty() && prev_url != "unknown")
+            {
+              ESP_LOGI("update_images", "Setting previous URL: %s", prev_url.c_str());
+              id(online_image_previous)->set_url(prev_url);
+              id(image_slot_loading)[prev] = true;
+              id(online_image_previous)->update();
+            }
+          }
+          
+          // Update current image if not already loading/loaded
+          if (!id(image_slot_loading)[current] && !id(image_slot_success)[current])
+          {
+            std::string current_url = url_sensors[current]->state;
+            if (!current_url.empty() && current_url != "unknown")
+            {
+              ESP_LOGI("update_images", "Setting current URL: %s", current_url.c_str());
+              id(online_image_current)->set_url(current_url);
+              id(image_slot_loading)[current] = true;
+              id(online_image_current)->update();
+            }
+          }
+          
+          // Update next image if not already loading/loaded
+          if (!id(image_slot_loading)[next] && !id(image_slot_success)[next])
+          {
+            std::string next_url = url_sensors[next]->state;
+            if (!next_url.empty() && next_url != "unknown")
+            {
+              ESP_LOGI("update_images", "Setting next URL: %s", next_url.c_str());
+              id(online_image_next)->set_url(next_url);
+              id(image_slot_loading)[next] = true;
+              id(online_image_next)->update();
+            }
+          }
+          
+          // Update lookahead image if not already loading/loaded
+          if (!id(image_slot_loading)[lookahead] && !id(image_slot_success)[lookahead])
+          {
+            std::string lookahead_url = url_sensors[lookahead]->state;
+            if (!lookahead_url.empty() && lookahead_url != "unknown")
+            {
+              ESP_LOGI("update_images", "Setting lookahead URL: %s", lookahead_url.c_str());
+              id(online_image_lookahead)->set_url(lookahead_url);
+              id(image_slot_loading)[lookahead] = true;
+              id(online_image_lookahead)->update();
+            }
+          }
+      - delay: 500ms
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int prev = (current - 1 + 6) % 6;
+          int next = (current + 1) % 6;
+          int lookahead = (current + 2) % 6;
+          
+          lv_obj_t* widgets[6] = {
+            id(background_image_0), id(background_image_1), id(background_image_2),
+            id(background_image_3), id(background_image_4), id(background_image_5)
+          };
+          
+          // Update LVGL widgets with successfully loaded images using direct LVGL calls
+          if (id(image_slot_success)[prev])
+          {
+            ESP_LOGI("update_images", "Updating LVGL widget for previous slot %d", prev);
+            lv_img_set_src(widgets[prev], id(online_image_previous)->get_lv_img_dsc());
+          }
+          if (id(image_slot_success)[current])
+          {
+            ESP_LOGI("update_images", "Updating LVGL widget for current slot %d", current);
+            lv_img_set_src(widgets[current], id(online_image_current)->get_lv_img_dsc());
+          }
+          if (id(image_slot_success)[next])
+          {
+            ESP_LOGI("update_images", "Updating LVGL widget for next slot %d", next);
+            lv_img_set_src(widgets[next], id(online_image_next)->get_lv_img_dsc());
+          }
+          if (id(image_slot_success)[lookahead])
+          {
+            ESP_LOGI("update_images", "Updating LVGL widget for lookahead slot %d", lookahead);
+            lv_img_set_src(widgets[lookahead], id(online_image_lookahead)->get_lv_img_dsc());
+          }
+
+  - id: find_next_valid_slot
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int attempts = 0;
+          int next_slot = (current + 1) % 6;
+          
+          // Search for next successful slot (max 6 attempts to avoid infinite loop)
+          while (attempts < 6)
+          {
+            if (id(image_slot_success)[next_slot])
+            {
+              ESP_LOGI("find_next", "Found valid slot %d", next_slot);
+              id(image_index).publish_state(next_slot);
+              
+              // Calculate scroll position and animation
+              lv_coord_t target_x = next_slot * ${screenwidth};
+              lv_anim_enable_t anim = (next_slot == (current + 1) % 6) ? LV_ANIM_ON : LV_ANIM_OFF;
+              
+              lv_obj_scroll_to_x(id(image_container), target_x, anim);
+              
+              // Move viewed container to end
+              lv_obj_t* viewed = id(image_map)[current];
+              const int map_size = id(image_map).size();
+              lv_obj_move_to_index(viewed, map_size - 1);
+              lv_obj_scroll_to_x(id(image_container), 0, LV_ANIM_OFF);
+              
+              return;
+            }
+            next_slot = (next_slot + 1) % 6;
+            attempts++;
+          }
+          
+          ESP_LOGW("find_next", "No valid slots found!");
+          // Stay on current slot if no valid images exist
+
 # debug:
 #   update_interval: 30s
 
@@ -144,12 +304,20 @@ globals:
   - id: image_map
     type: 'std::map<int, lv_obj_t*>'
     restore_value: no
-  - id: image_index
-    type: int
-    restore_value: no
-    initial_value: "-1"
+
   - id: replace_this_image_index
     type: int
     restore_value: no
     initial_value: "-1"
+  
+  # Image slot state tracking
+  - id: image_slot_success
+    type: 'std::map<int, bool>'
+    restore_value: no
+  - id: image_slot_loading
+    type: 'std::map<int, bool>'
+    restore_value: no
+  - id: image_slot_retry_count
+    type: 'std::map<int, int>'
+    restore_value: no
     

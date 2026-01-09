@@ -25,6 +25,22 @@ number:
     step: 1
     initial_value: 10
 
+  - id: image_index
+    platform: template
+    name: "Current Image Index"
+    icon: "mdi:image-multiple"
+    entity_category: diagnostic
+    optimistic: true
+    restore_value: false
+    internal: true
+    mode: box
+    min_value: 0
+    max_value: 5
+    step: 1
+    initial_value: 0
+    on_value:
+      - script.execute: update_online_images
+
 
 switch:
   - id: mute

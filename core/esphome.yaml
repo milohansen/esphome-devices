@@ -32,7 +32,15 @@ wifi:
   ap:
     password: "RZ7D3EzJdPM6"
   on_connect: 
-    - component.update: placeholder_jpeg
+    - lambda: |-
+        id(image_index).publish_state(0);
+    - delay: 2s
+    - lambda: |-
+        // Trigger updates for slots 1 and 2 (next and lookahead) by briefly changing index
+        id(image_index).publish_state(1);
+    - delay: 1s
+    - lambda: |-
+        id(image_index).publish_state(0);
 
 captive_portal:
 
