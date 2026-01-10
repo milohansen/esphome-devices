@@ -241,7 +241,7 @@ binary_sensor:
           then:
             - lvgl.led.update:
                 id: assistant_connected_led
-                color: status_success_bg
+                color: primary_base
           else:
             - lvgl.led.update:
                 id: assistant_connected_led

@@ -216,26 +216,8 @@ color:
   - id: primary_active
     hex: 1D7066
   
-  # Status Colors - Success (Olive Green)
-  - id: status_success_text
-    hex: 4F6D46
-  - id: status_success_bg
-    hex: EAF0E6
-  
-  # Status Colors - Warning (Mustard Gold)
-  - id: status_warning_text
-    hex: 9C781A
-  - id: status_warning_bg
-    hex: FBF4DF
-  
   # Status Colors - Error (Brick Red)
   - id: status_error_text
     hex: B34338
   - id: status_error_bg
     hex: FBEAE8
-  
-  # Status Colors - Info (Warm Slate Blue)
-  - id: status_info_text
-    hex: 456F85
-  - id: status_info_bg
-    hex: E7EFF5
