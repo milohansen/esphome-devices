@@ -1,19 +1,30 @@
 # --- WIDGET TEMPLATING -------------------------------------------------------
   
 # ESPHome hidden items for widget templates
+# IMAGES
 .image_container_template: &image_container_template
   height: ${screenheight}
-  width: SIZE_CONTENT
+  width: ${screenwidth}
   snappable: true
+  clip_corner: true
+  bg_color: black
+  bg_opa: COVER
+  layout:
+    type: flex
+    flex_flow: row
+    flex_align_main: center
+    flex_align_cross: center
+    pad_column: 4
 
 .image_template: &image_template
   height: ${screenheight}
-  clip_corner: true
 
 .image_label_template: &image_label_template
   text_font: "montserrat_42"
+  text_color: white
   floating: true
 
+# TIMERS
 .timer_container_template: &timer_container_template
   # height: SIZE_CONTENT
   width: 300px
@@ -379,6 +390,10 @@ lvgl:
                         <<: *image_template
                         id: background_image_0
                         src: image_1
+                    - image:
+                        <<: *image_template
+                        id: test_pairing
+                        src: image_1
                     - label:
                         <<: *image_label_template
                         text: "0"
@@ -390,9 +405,6 @@ lvgl:
                         <<: *image_template
                         id: background_image_1
                         src: landscape
-                        width: ${screenwidth}
-                        height: ${screenheight}
-                        bg_color: background_surface
                     - label:
                         <<: *image_label_template
                         text: "1"
@@ -703,7 +715,7 @@ lvgl:
             align: TOP_RIGHT
             y: 60
             x: -60
-            color: status_info_bg
+            color: text_muted
 
     
 
