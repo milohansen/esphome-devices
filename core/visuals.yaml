@@ -88,6 +88,94 @@ online_image:
           id(image_slot_loading)[slot] = false;
       - script.execute: retry_download_with_backoff
 
+  - id: online_image_4
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+4"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int slot = id(component_to_slot)[4];
+          ESP_LOGI("online_image", "Component 4 -> Slot %d downloaded successfully", slot);
+          id(image_slot_success)[slot] = true;
+          id(image_slot_loading)[slot] = false;
+          id(image_slot_retry_count)[slot] = 0;
+    on_error:
+      - lambda: |-
+          int slot = id(component_to_slot)[4];
+          ESP_LOGW("online_image", "Component 4 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
+          id(image_slot_loading)[slot] = false;
+      - script.execute: retry_download_with_backoff
+
+  - id: online_image_5
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+5"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int slot = id(component_to_slot)[5];
+          ESP_LOGI("online_image", "Component 5 -> Slot %d downloaded successfully", slot);
+          id(image_slot_success)[slot] = true;
+          id(image_slot_loading)[slot] = false;
+          id(image_slot_retry_count)[slot] = 0;
+    on_error:
+      - lambda: |-
+          int slot = id(component_to_slot)[5];
+          ESP_LOGW("online_image", "Component 5 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
+          id(image_slot_loading)[slot] = false;
+      - script.execute: retry_download_with_backoff
+
+  - id: online_image_6
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int slot = id(component_to_slot)[6];
+          ESP_LOGI("online_image", "Component 6 -> Slot %d downloaded successfully", slot);
+          id(image_slot_success)[slot] = true;
+          id(image_slot_loading)[slot] = false;
+          id(image_slot_retry_count)[slot] = 0;
+    on_error:
+      - lambda: |-
+          int slot = id(component_to_slot)[6];
+          ESP_LOGW("online_image", "Component 6 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
+          id(image_slot_loading)[slot] = false;
+      - script.execute: retry_download_with_backoff
+
+  - id: online_image_7
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+7"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: ${screenwidth}x${screenheight}
+    update_interval: never
+    placeholder: landscape
+    on_download_finished:
+      - lambda: |-
+          int slot = id(component_to_slot)[7];
+          ESP_LOGI("online_image", "Component 7 -> Slot %d downloaded successfully", slot);
+          id(image_slot_success)[slot] = true;
+          id(image_slot_loading)[slot] = false;
+          id(image_slot_retry_count)[slot] = 0;
+    on_error:
+      - lambda: |-
+          int slot = id(component_to_slot)[7];
+          ESP_LOGW("online_image", "Component 7 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
+          id(image_slot_loading)[slot] = false;
+      - script.execute: retry_download_with_backoff
+
 image:
   - file: assets/images/DSC_4482.jpg
     id: landscape
