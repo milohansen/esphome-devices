@@ -39,6 +39,7 @@ number:
     step: 1
     initial_value: 0
     on_value:
+      - script.execute: apply_image_colors
       - script.execute: update_online_images
       - script.stop: slideshow_timer
       - script.execute: slideshow_timer

@@ -120,7 +120,7 @@ lvgl:
       pressed:
         bg_color: primary_active
       checked:
-        bg_color: status_success_text
+        bg_color: secondary_base
         text_color: text_inverse
       disabled:
         bg_color: border_color
@@ -136,7 +136,7 @@ lvgl:
         pressed:
           bg_color: primary_active
         checked:
-          bg_color: status_success_text
+          bg_color: secondary_base
           text_color: text_inverse
     
     # Checkbox styling
@@ -145,15 +145,15 @@ lvgl:
       border_color: primary_base
       radius: 4
       checked:
-        bg_color: status_success_text
-        border_color: status_success_text
+        bg_color: primary_base
+        border_color: primary_base
     
     # Switch styling  
     switch:
       bg_color: border_color
       border_color: primary_base
       indicator:
-        bg_color: status_success_text
+        bg_color: primary_base
     
     # Slider styling
     slider:
@@ -161,7 +161,7 @@ lvgl:
       main:
         bg_color: primary_base
       indicator:
-        bg_color: status_success_text
+        bg_color: secondary_base
       knob:
         bg_color: background_page
         border_color: primary_base
@@ -200,7 +200,7 @@ lvgl:
     spinner:
       arc_color: primary_base
       indicator:
-        arc_color: status_success_text
+        arc_color: secondary_base
     
     # Textarea styling
     textarea:
@@ -233,7 +233,7 @@ lvgl:
       bg_color: background_surface
       border_color: border_color
       indicator:
-        line_color: status_success_text
+        line_color: secondary_base
         arc_color: primary_base
 
 
