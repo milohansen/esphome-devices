@@ -41,84 +41,92 @@ script:
                     return;
                   }
                   
-                  ESP_LOGI("slideshow_api", "Queue response: %s", body.c_str());
+                  ESP_LOGI("slideshow_api", "Parsing JSON response...");
                   
-                  // Parse JSON and extract image IDs (simplified parser)
-                  std::vector<std::string> image_ids;
-                  size_t pos = 0;
-                  while ((pos = body.find("\"imageId\":\"", pos)) != std::string::npos)
-                  {
-                    pos += 11; // Length of "imageId":"
-                    size_t end = body.find("\"", pos);
-                    if (end != std::string::npos)
-                    {
-                      image_ids.push_back(body.substr(pos, end - pos));
-                      pos = end;
-                    }
-                  }
-                  
-                  ESP_LOGI("slideshow_api", "Found %d images in queue", image_ids.size());
-                  
-                  // Store image IDs and construct URLs for first 6 slots
                   text_sensor::TextSensor* url_sensors[6] = {
                     id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
                     id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
                   };
                   
                   id(slideshow_queue_ids).clear();
-                  for (size_t i = 0; i < image_ids.size(); i++)
-                  {
-                    id(slideshow_queue_ids).push_back(image_ids[i]);
-                  }
-                  id(slideshow_queue_index) = 0;
+                  id(slot_source_colors).clear();
                   
-                  // Record fetch time and status
-                  if (id(homeassistant_time).now().is_valid())
-                  {
-                    auto now = id(homeassistant_time).now();
-                    char time_str[6];
-                    int hour = now.hour % 12;
-                    if (hour == 0) hour = 12;
-                    snprintf(time_str, sizeof(time_str), "%d:%02d", hour, now.minute);
-                    id(slideshow_last_fetch_time) = time_str;
-                  }
-                  else
-                  {
-                    id(slideshow_last_fetch_time) = "Pending";
-                  }
-                  
-                  if (image_ids.size() > 0)
-                  {
-                    id(slideshow_queue_status) = "OK (" + std::to_string(image_ids.size()) + " images)";
-                  }
-                  else
-                  {
-                    id(slideshow_queue_status) = "Empty queue";
-                  }
-                  
-                  // // Update LVGL labels only if they're initialized
-                  // if (id(debug_queue_status) != nullptr)
-                  // {
-                  //   lv_label_set_text(id(debug_queue_status), id(slideshow_queue_status).c_str());
-                  // }
-                  // if (id(debug_last_fetch) != nullptr)
-                  // {
-                  //   lv_label_set_text(id(debug_last_fetch), ("Fetched: " + id(slideshow_last_fetch_time)).c_str());
-                  // }
-                  
-                  // Initialize component-to-slot mapping for first 4 slots (0-3)
-                  id(component_to_slot)[0] = 0;
-                  id(component_to_slot)[1] = 1;
-                  id(component_to_slot)[2] = 2;
-                  id(component_to_slot)[3] = 3;
-                  
-                  // Populate first 4 URL slots for initial display
-                  for (int i = 0; i < 4 && i < image_ids.size(); i++)
-                  {
-                    std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_ids[i];
-                    url_sensors[i]->publish_state(url);
-                    ESP_LOGI("slideshow_api", "Slot %d URL: %s", i, url.c_str());
-                  }
+                  // Use ESPHome's JSON parser - for arrays, parse_json provides the array content
+                  json::parse_json(body, [url_sensors](JsonObject root) -> bool {
+                    int item_index = 0;
+                    
+                    // Iterate through the array items (root represents array elements)
+                    for (JsonPair kv : root)
+                    {
+                      JsonObject item = kv.value();
+                      
+                      // Extract imageId
+                      if (item["imageId"].is<const char*>())
+                      {
+                        const char* image_id = item["imageId"];
+                        id(slideshow_queue_ids).push_back(std::string(image_id));
+                        
+                        // Extract sourceColor if present
+                        if (item["sourceColor"].is<const char*>())
+                        {
+                          const char* source_color = item["sourceColor"];
+                          id(slot_source_colors)[item_index] = std::string(source_color);
+                          ESP_LOGI("slideshow_api", "Item %d: imageId=%s, sourceColor=%s", 
+                                   item_index, image_id, source_color);
+                        }
+                        else
+                        {
+                          ESP_LOGD("slideshow_api", "Item %d: imageId=%s (no color)", 
+                                   item_index, image_id);
+                        }
+                        
+                        item_index++;
+                      }
+                    }
+                    
+                    ESP_LOGI("slideshow_api", "Found %d images in queue", id(slideshow_queue_ids).size());
+                    id(slideshow_queue_index) = 0;
+                    
+                    // Record fetch time and status
+                    if (id(homeassistant_time).now().is_valid())
+                    {
+                      auto now = id(homeassistant_time).now();
+                      char time_str[6];
+                      int hour = now.hour % 12;
+                      if (hour == 0) hour = 12;
+                      snprintf(time_str, sizeof(time_str), "%d:%02d", hour, now.minute);
+                      id(slideshow_last_fetch_time) = time_str;
+                    }
+                    else
+                    {
+                      id(slideshow_last_fetch_time) = "Pending";
+                    }
+                    
+                    if (id(slideshow_queue_ids).size() > 0)
+                    {
+                      id(slideshow_queue_status) = "OK (" + std::to_string(id(slideshow_queue_ids).size()) + " images)";
+                    }
+                    else
+                    {
+                      id(slideshow_queue_status) = "Empty queue";
+                    }
+                    
+                    // Initialize component-to-slot mapping for first 4 slots (0-3)
+                    id(component_to_slot)[0] = 0;
+                    id(component_to_slot)[1] = 1;
+                    id(component_to_slot)[2] = 2;
+                    id(component_to_slot)[3] = 3;
+                    
+                    // Populate first 4 URL slots for initial display
+                    for (int i = 0; i < 4 && i < id(slideshow_queue_ids).size(); i++)
+                    {
+                      std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + id(slideshow_queue_ids)[i];
+                      url_sensors[i]->publish_state(url);
+                      ESP_LOGI("slideshow_api", "Slot %d URL: %s", i, url.c_str());
+                    }
+                    
+                    return true;
+                  });
 
   - id: advance_slideshow
     then:
@@ -181,6 +189,53 @@ script:
     then:
       - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
       - script.execute: advance_slideshow
+
+  - id: apply_image_colors
+    then:
+      - lambda: |-
+          int slot = (int)id(image_index).state;
+          
+          // Check if we have a source color for this slot
+          if (id(slot_source_colors).count(slot))
+          {
+            std::string color_str = id(slot_source_colors)[slot];
+            
+            // Remove # prefix if present
+            if (!color_str.empty() && color_str[0] == '#')
+            {
+              color_str = color_str.substr(1);
+            }
+            
+            // Validate hex string (expecting 6 or 8 chars)
+            if (color_str.length() == 6 || color_str.length() == 8)
+            {
+              // Pad with FF alpha if only RGB provided
+              if (color_str.length() == 6)
+              {
+                color_str = "FF" + color_str;
+              }
+              
+              // Convert hex string to uint32_t ARGB
+              uint32_t color = std::stoul(color_str, nullptr, 16);
+              
+              ESP_LOGI("apply_colors", "Applying color palette for slot %d", slot);
+              ESP_LOGI("apply_colors", "  Source color: #%s -> 0x%08X", 
+                       id(slot_source_colors)[slot].c_str(), color);
+              
+              // Generate new Material Design 3 scheme with image's source color
+              id(material_theme_component).set_source_color(color);
+              id(material_theme_component).generate_scheme();
+            }
+            else
+            {
+              ESP_LOGW("apply_colors", "Invalid color format for slot %d: %s", 
+                       slot, color_str.c_str());
+            }
+          }
+          else
+          {
+            ESP_LOGD("apply_colors", "No source color available for slot %d", slot);
+          }
 
   - id: start_wake_word
     then:
@@ -471,6 +526,11 @@ globals:
     type: bool
     restore_value: no
     initial_value: "false"
+  
+  # Source colors for Material Design theme generation
+  - id: slot_source_colors
+    type: 'std::map<int, std::string>'
+    restore_value: no
 
   - id: boot_sound_played
     type: bool

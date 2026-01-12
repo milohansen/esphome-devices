@@ -216,6 +216,22 @@ color:
   - id: primary_active
     hex: 1D7066
   
+  # Secondary Accent Colors
+  - id: secondary_base
+    hex: E76F51
+  - id: secondary_hover
+    hex: F08A72
+  - id: secondary_active
+    hex: D15A3E
+  
+  # Tertiary Accent Colors
+  - id: tertiary_base
+    hex: F4A261
+  - id: tertiary_hover
+    hex: F6B885
+  - id: tertiary_active
+    hex: E8924E
+  
   # Status Colors - Error (Brick Red)
   - id: status_error_text
     hex: B34338
