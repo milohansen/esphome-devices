@@ -1,0 +1,1376 @@
+Processing guition-p4-70 (board: esp32-p4-evboard; framework: espidf; platform: https://github.com/pioarduino/platform-espressif32/releases/download/55.03.31-2/platform-espressif32.zip)
+--------------------------------------------------------------------------------
+HARDWARE: ESP32P4 360MHz, 500KB RAM, 16MB Flash
+ - contrib-piohome @ 3.4.4 
+ - framework-espidf @ 3.50501.0 (5.5.1) 
+ - tool-cmake @ 4.0.3 
+ - tool-esp-rom-elfs @ 2024.10.11 
+ - tool-esptoolpy @ 5.1.0 
+ - tool-mklittlefs @ 3.2.0 
+ - tool-ninja @ 1.13.1 
+ - tool-scons @ 4.40801.0 (4.8.1) 
+ - toolchain-riscv32-esp @ 14.2.0+20241119
+Reading CMake configuration...
+Dependency Graph
+|-- ArduinoJson @ 7.4.2
+|-- JPEGDEC @ 1.2.7+sha.ca1e0f2
+|-- lvgl @ 8.4.0
+|-- esp-audio-libs @ 2.0.1
+|-- ESPMicroSpeechFeatures @ 1.1.0
+Compiling .pioenvs/guition-p4-70/src/main.cpp.o
+Linking .pioenvs/guition-p4-70/firmware.elf
+                            Memory Type Usage Summary                             
+┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Memory Type/Section ┃ Used [bytes] ┃ Used [%] ┃ Remain [bytes] ┃ Total [bytes] ┃
+┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ External RAM        │      7787104 │      5.8 │      126430592 │     134217696 │
+│    .rodata          │      6477248 │     4.83 │                │               │
+│    .text            │      1309280 │     0.98 │                │               │
+│    .init_array      │          320 │      0.0 │                │               │
+│    .appdesc         │          256 │      0.0 │                │               │
+│ DIRAM               │       101274 │    17.57 │         475190 │        576464 │
+│    .text            │        68966 │    11.96 │                │               │
+│    .bss             │        18664 │     3.24 │                │               │
+│    .data            │        13644 │     2.37 │                │               │
+│ HP core RAM         │          104 │     1.27 │           8088 │          8192 │
+│    .data            │           60 │     0.73 │                │               │
+│    .text            │           44 │     0.54 │                │               │
+│ LP RAM              │            0 │      0.0 │          32768 │         32768 │
+└─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
+RAM:   [=         ]   6.3% (used 32308 bytes from 512000 bytes)
+Flash: [==========]  96.8% (used 7869138 bytes from 8126464 bytes)
+Building .pioenvs/guition-p4-70/firmware.bin
+Creating ESP32P4 image...
+Successfully created ESP32P4 image.
+merge_factory_bin([".pioenvs/guition-p4-70/firmware.bin"], [".pioenvs/guition-p4-70/firmware.elf"])
+Info: bootloader.bin not found - skipping
+Info: partition-table.bin not found - skipping
+Info: ota_data_initial.bin not found - skipping
+Info: guition-p4-70.bin not found - skipping
+Using FLASH_EXTRA_IMAGES from PlatformIO environment
+Merging binaries into /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin
+Merging binaries with esptool
+SHA digest in image updated.
+Wrote 0x791610 bytes to file '/home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin', ready to flash to offset 0x0.
+Successfully created /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin
+esp32_copy_ota_bin([".pioenvs/guition-p4-70/firmware.bin"], [".pioenvs/guition-p4-70/firmware.elf"])
+Copied firmware to /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.ota.bin
+========================= [SUCCESS] Took 23.58 seconds =========================
+
+==============================================================================================================================
+                                                  Component Memory Analysis                                                   
+==============================================================================================================================
+
+Component                     |   Flash (text) |   Flash (data) |   RAM (data) |    RAM (bss) |     Total Flash |    Total RAM
+------------------------------+----------------+----------------+--------------+--------------+-----------------+-------------
+app_framework                 |       56,316 B |    5,907,278 B |         84 B |          0 B |     5,963,594 B |         84 B
+other                         |      192,946 B |      223,801 B |     14,974 B |          0 B |       416,747 B |     14,974 B
+rom_functions                 |      110,536 B |       10,064 B |        588 B |          0 B |       120,600 B |        588 B
+esp_system                    |       60,698 B |       16,289 B |         73 B |          0 B |        76,987 B |         73 B
+libc                          |       70,318 B |        1,225 B |        820 B |          0 B |        71,543 B |        820 B
+wifi_config                   |       61,320 B |          404 B |         36 B |          0 B |        61,724 B |         36 B
+network_stack                 |       59,112 B |        1,783 B |      1,663 B |          0 B |        60,895 B |      1,663 B
+cpp_anonymous                 |       56,136 B |           88 B |         36 B |          0 B |        56,224 B |         36 B
+crypto                        |       48,802 B |        1,325 B |         17 B |          0 B |        50,127 B |         17 B
+wifi_stack                    |       10,904 B |       27,078 B |        530 B |          0 B |        37,982 B |        530 B
+misc_system                   |       34,588 B |        2,902 B |        634 B |          0 B |        37,490 B |        634 B
+[esphome]api                  |       32,048 B |        2,468 B |         12 B |          0 B |        34,516 B |         12 B
+interrupt_handlers            |       32,686 B |        1,099 B |        566 B |          0 B |        33,785 B |        566 B
+[esphome]core                 |       30,196 B |        2,060 B |        849 B |          0 B |        32,256 B |        849 B
+mdns_lib                      |       27,886 B |          376 B |        376 B |          0 B |        28,262 B |        376 B
+crypto_math                   |       25,770 B |          728 B |         56 B |          0 B |        26,498 B |         56 B
+math_lib                      |       24,678 B |        1,375 B |        553 B |          0 B |        26,053 B |        553 B
+freertos                      |       23,340 B |          692 B |        692 B |          0 B |        24,032 B |        692 B
+sdmmc_driver                  |       18,530 B |            8 B |          0 B |          0 B |        18,538 B |          0 B
+cpp_runtime                   |       17,990 B |          302 B |        212 B |          0 B |        18,292 B |        212 B
+memory_mgmt                   |       14,634 B |          435 B |        177 B |          0 B |        15,069 B |        177 B
+[esphome]voice_assistant      |       14,186 B |          344 B |          4 B |          0 B |        14,530 B |          4 B
+hal_layer                     |       13,368 B |            8 B |          8 B |          0 B |        13,376 B |          8 B
+dhcp                          |       11,046 B |        2,056 B |         60 B |          0 B |        13,102 B |         60 B
+[esphome]wifi                 |       12,516 B |          117 B |         53 B |          0 B |        12,633 B |         53 B
+error_handling                |       11,464 B |        1,076 B |        206 B |          0 B |        12,540 B |        206 B
+time_lib                      |       11,352 B |        1,028 B |        280 B |          0 B |        12,380 B |        280 B
+spi_flash                     |       10,354 B |           20 B |         20 B |          0 B |        10,374 B |         20 B
+uart_driver                   |        8,956 B |          488 B |        368 B |          0 B |         9,444 B |        368 B
+timer                         |        9,120 B |          280 B |        280 B |          0 B |         9,400 B |        280 B
+i2s_driver                    |        9,240 B |            4 B |          4 B |          0 B |         9,244 B |          4 B
+[esphome]light                |        9,026 B |          190 B |          0 B |          0 B |         9,216 B |          0 B
+gpio_driver                   |        8,820 B |          232 B |         40 B |          0 B |         9,052 B |         40 B
+rtc                           |        8,728 B |          272 B |         52 B |          0 B |         9,000 B |         52 B
+hw_crypto                     |        8,802 B |            0 B |          0 B |          0 B |         8,802 B |          0 B
+[esphome]speaker              |        7,966 B |          200 B |          0 B |          0 B |         8,166 B |          0 B
+http_server                   |        7,872 B |            0 B |          0 B |          0 B |         7,872 B |          0 B
+[esphome]http_request         |        6,832 B |          256 B |          0 B |          0 B |         7,088 B |          0 B
+xtensa                        |        6,628 B |          110 B |         96 B |          0 B |         6,738 B |         96 B
+nvs                           |        6,478 B |          152 B |         16 B |          0 B |         6,630 B |         16 B
+[esphome]web_server_idf       |        6,398 B |           84 B |         12 B |          0 B |         6,482 B |         12 B
+i2c_driver                    |        6,414 B |           28 B |         28 B |          0 B |         6,442 B |         28 B
+flash_ops                     |        6,000 B |          411 B |        407 B |          0 B |         6,411 B |        407 B
+wifi_crypto                   |        5,008 B |        1,276 B |          0 B |          0 B |         6,284 B |          0 B
+[esphome]audio                |        5,870 B |          104 B |          0 B |          0 B |         5,974 B |          0 B
+[esphome]i2s_audio            |        5,552 B |          308 B |         16 B |          0 B |         5,860 B |         16 B
+[esphome]online_image         |        5,450 B |          140 B |          0 B |          0 B |         5,590 B |          0 B
+[esphome]micro_wake_word      |        5,060 B |          144 B |          0 B |          0 B |         5,204 B |          0 B
+clock_mgmt                    |        5,154 B |           16 B |         16 B |          0 B |         5,170 B |         16 B
+[esphome]ota                  |        4,838 B |          113 B |          4 B |          0 B |         4,951 B |          4 B
+logging                       |        4,032 B |          496 B |        228 B |          0 B |         4,528 B |        228 B
+heap                          |        4,166 B |            0 B |          0 B |          0 B |         4,166 B |          0 B
+memory_alloc                  |        4,068 B |            4 B |          4 B |          0 B |         4,072 B |          4 B
+power_mgmt                    |        4,024 B |            1 B |          1 B |          0 B |         4,025 B |          1 B
+[esphome]captive_portal       |        2,334 B |        1,582 B |          4 B |          0 B |         3,916 B |          4 B
+http_lib                      |        3,620 B |           76 B |          4 B |          0 B |         3,696 B |          4 B
+[esphome]lvgl                 |        3,370 B |          284 B |          8 B |          0 B |         3,654 B |          8 B
+[external]material_theme      |        3,318 B |           92 B |          0 B |          0 B |         3,410 B |          0 B
+[esphome]logger               |        3,254 B |          115 B |          4 B |          0 B |         3,369 B |          4 B
+threading                     |        3,328 B |           28 B |         28 B |          0 B |         3,356 B |         28 B
+ota                           |        2,338 B |          820 B |         16 B |          0 B |         3,158 B |         16 B
+cache_mgmt                    |        2,642 B |          483 B |        464 B |          0 B |         3,125 B |        464 B
+[esphome]binary_sensor        |        2,798 B |          304 B |          0 B |          0 B |         3,102 B |          0 B
+json_lib                      |        2,910 B |          192 B |          0 B |          0 B |         3,102 B |          0 B
+phy_radio                     |        2,088 B |          932 B |        460 B |          0 B |         3,020 B |        460 B
+partition                     |        2,936 B |            8 B |          8 B |          0 B |         2,944 B |          8 B
+[esphome]es8311               |        1,228 B |        1,600 B |          0 B |          0 B |         2,828 B |          0 B
+wifi_phy_pp                   |          786 B |        2,022 B |         10 B |          0 B |         2,808 B |         10 B
+[esphome]template             |        2,186 B |          488 B |          0 B |          0 B |         2,674 B |          0 B
+psram                         |        2,590 B |           66 B |         66 B |          0 B |         2,656 B |         66 B
+[esphome]mipi_dsi             |        2,504 B |          112 B |          0 B |          0 B |         2,616 B |          0 B
+cpp_stdlib                    |          974 B |        1,603 B |         96 B |          0 B |         2,577 B |         96 B
+spi_driver                    |        2,412 B |            0 B |          0 B |          0 B |         2,412 B |          0 B
+[esphome]esp32                |        2,302 B |          109 B |         13 B |          0 B |         2,411 B |         13 B
+[esphome]touchscreen          |        2,284 B |           80 B |          0 B |          0 B |         2,364 B |          0 B
+[esphome]resampler            |        2,174 B |          168 B |          0 B |          0 B |         2,342 B |          0 B
+[esphome]i2c                  |        2,164 B |          152 B |          8 B |          0 B |         2,316 B |          8 B
+rate_control                  |        2,254 B |            0 B |          0 B |          0 B |         2,254 B |          0 B
+pwm_driver                    |        2,108 B |           36 B |         36 B |          0 B |         2,144 B |         36 B
+[esphome]script               |        1,522 B |          448 B |          0 B |          0 B |         1,970 B |          0 B
+[esphome]es7210               |        1,454 B |          488 B |          0 B |          0 B |         1,942 B |          0 B
+[esphome]media_player         |        1,864 B |           40 B |          0 B |          0 B |         1,904 B |          0 B
+[esphome]time                 |        1,678 B |          204 B |          0 B |          0 B |         1,882 B |          0 B
+esp_event                     |        1,832 B |            0 B |          0 B |          0 B |         1,832 B |          0 B
+igmp                          |        1,764 B |            0 B |          0 B |          0 B |         1,764 B |          0 B
+[esphome]display              |        1,696 B |           24 B |          0 B |          0 B |         1,720 B |          0 B
+file_io                       |        1,436 B |          196 B |        196 B |          0 B |         1,632 B |        196 B
+[esphome]microphone           |        1,492 B |           84 B |          0 B |          0 B |         1,576 B |          0 B
+synchronization               |        1,120 B |          433 B |        433 B |          0 B |         1,553 B |        433 B
+static_init                   |        1,522 B |            0 B |          0 B |          0 B |         1,522 B |          0 B
+[esphome]select               |        1,468 B |           16 B |          0 B |          0 B |         1,484 B |          0 B
+vfs                           |        1,200 B |          272 B |         12 B |          0 B |         1,472 B |         12 B
+[esphome]ledc                 |        1,324 B |          109 B |          1 B |          0 B |         1,433 B |          1 B
+[esphome]font                 |        1,412 B |           16 B |          0 B |          0 B |         1,428 B |          0 B
+[esphome]image                |        1,386 B |           20 B |          0 B |          0 B |         1,406 B |          0 B
+[esphome]gpio                 |        1,178 B |          200 B |          0 B |          0 B |         1,378 B |          0 B
+[esphome]web_server           |        1,276 B |          100 B |          0 B |          0 B |         1,376 B |          0 B
+[esphome]switch               |        1,254 B |           56 B |          0 B |          0 B |         1,310 B |          0 B
+peripherals                   |        1,098 B |          164 B |         17 B |          0 B |         1,262 B |         17 B
+[esphome]number               |        1,204 B |           12 B |          0 B |          0 B |         1,216 B |          0 B
+[esphome]homeassistant        |          982 B |          208 B |          4 B |          0 B |         1,190 B |          4 B
+console_io                    |        1,082 B |           92 B |          0 B |          0 B |         1,174 B |          0 B
+usb                           |        1,148 B |            5 B |          5 B |          0 B |         1,153 B |          5 B
+ipc                           |          968 B |          184 B |        184 B |          0 B |         1,152 B |        184 B
+[esphome]json                 |        1,124 B |           28 B |          8 B |          0 B |         1,152 B |          8 B
+[esphome]socket               |        1,046 B |          104 B |          0 B |          0 B |         1,150 B |          0 B
+efuse                         |        1,068 B |           36 B |         36 B |          0 B |         1,104 B |         36 B
+[esphome]rx8130               |          960 B |          134 B |          0 B |          0 B |         1,094 B |          0 B
+[esphome]mdns                 |          900 B |          168 B |          0 B |          0 B |         1,068 B |          0 B
+[esphome]mapping              |        1,064 B |            0 B |          0 B |          0 B |         1,064 B |          0 B
+[esphome]gt911                |          946 B |           91 B |          0 B |          0 B |         1,037 B |          0 B
+authentication                |          872 B |            0 B |          0 B |          0 B |           872 B |          0 B
+[esphome]safe_mode            |          792 B |           64 B |          0 B |          0 B |           856 B |          0 B
+wrapper_functions             |          848 B |            0 B |          0 B |          0 B |           848 B |          0 B
+[esphome]text_sensor          |          728 B |           84 B |          0 B |          0 B |           812 B |          0 B
+[esphome]sensor               |          732 B |            0 B |          0 B |          0 B |           732 B |          0 B
+boot_startup                  |          710 B |           16 B |          8 B |          0 B |           726 B |          8 B
+random                        |          718 B |            0 B |          0 B |          0 B |           718 B |          0 B
+[esphome]globals              |          194 B |          512 B |          0 B |          0 B |           706 B |          0 B
+can_driver                    |          572 B |            0 B |          0 B |          0 B |           572 B |          0 B
+bluetooth_rom                 |          504 B |            0 B |          0 B |          0 B |           504 B |          0 B
+exception_handling            |          412 B |            0 B |          0 B |          0 B |           412 B |          0 B
+[esphome]button               |          372 B |           12 B |          0 B |          0 B |           384 B |          0 B
+[esphome]esp_ldo              |          314 B |           64 B |          0 B |          0 B |           378 B |          0 B
+entry_management              |          364 B |            0 B |          0 B |          0 B |           364 B |          0 B
+[esphome]web_server_base      |          294 B |           68 B |          4 B |          0 B |           362 B |          4 B
+watchdog                      |          280 B |           13 B |         13 B |          0 B |           293 B |         13 B
+character_class               |            0 B |          256 B |          0 B |          0 B |           256 B |          0 B
+base_node                     |          248 B |            0 B |          0 B |          0 B |           248 B |          0 B
+[esphome]output               |          216 B |           32 B |          0 B |          0 B |           248 B |          0 B
+arp                           |            0 B |          240 B |        240 B |          0 B |           240 B |        240 B
+[esphome]preferences          |          140 B |           64 B |          0 B |          0 B |           204 B |          0 B
+[esphome]psram                |          130 B |           64 B |          0 B |          0 B |           194 B |          0 B
+esp_ota                       |          192 B |            0 B |          0 B |          0 B |           192 B |          0 B
+[esphome]interval             |          116 B |           76 B |          0 B |          0 B |           192 B |          0 B
+[esphome]factory_reset        |          108 B |           80 B |          0 B |          0 B |           188 B |          0 B
+[esphome]monochromatic        |           84 B |           28 B |          0 B |          0 B |           112 B |          0 B
+[esphome]md5                  |           80 B |           32 B |          0 B |          0 B |           112 B |          0 B
+esp_system_utils              |          110 B |            0 B |          0 B |          0 B |           110 B |          0 B
+brownout                      |          104 B |            4 B |          4 B |          0 B |           108 B |          4 B
+[esphome]network              |          104 B |            0 B |          0 B |          0 B |           104 B |          0 B
+weak_symbols                  |          102 B |            0 B |          0 B |          0 B |           102 B |          0 B
+bluetooth                     |           68 B |            0 B |          0 B |          0 B |            68 B |          0 B
+[esphome]watchdog             |           60 B |            0 B |          0 B |          0 B |            60 B |          0 B
+filesystem                    |            0 B |           36 B |         36 B |          0 B |            36 B |         36 B
+[esphome]audio_dac            |            0 B |           28 B |          0 B |          0 B |            28 B |          0 B
+esp32_sdk                     |            0 B |           24 B |         24 B |          0 B |            24 B |         24 B
+arduino_core                  |            8 B |            8 B |          8 B |          0 B |            16 B |          8 B
+[esphome]audio_adc            |            0 B |           16 B |          0 B |          0 B |            16 B |          0 B
+touch_driver                  |            0 B |            4 B |          4 B |          0 B |             4 B |          4 B
+------------------------------+----------------+----------------+--------------+--------------+-----------------+-------------
+TOTAL                         |                |                |              |              |     7,606,015 B |     27,613 B
+
+Top Flash Consumers:
+1. app_framework (5,963,594 B) - 78.4% of analyzed flash
+2. other (416,747 B) - 5.5% of analyzed flash
+3. rom_functions (120,600 B) - 1.6% of analyzed flash
+4. esp_system (76,987 B) - 1.0% of analyzed flash
+5. libc (71,543 B) - 0.9% of analyzed flash
+6. wifi_config (61,724 B) - 0.8% of analyzed flash
+7. network_stack (60,895 B) - 0.8% of analyzed flash
+8. cpp_anonymous (56,224 B) - 0.7% of analyzed flash
+9. crypto (50,127 B) - 0.7% of analyzed flash
+10. wifi_stack (37,982 B) - 0.5% of analyzed flash
+11. misc_system (37,490 B) - 0.5% of analyzed flash
+12. [esphome]api (34,516 B) - 0.5% of analyzed flash
+13. interrupt_handlers (33,785 B) - 0.4% of analyzed flash
+14. [esphome]core (32,256 B) - 0.4% of analyzed flash
+15. mdns_lib (28,262 B) - 0.4% of analyzed flash
+16. crypto_math (26,498 B) - 0.3% of analyzed flash
+17. math_lib (26,053 B) - 0.3% of analyzed flash
+18. freertos (24,032 B) - 0.3% of analyzed flash
+19. sdmmc_driver (18,538 B) - 0.2% of analyzed flash
+20. cpp_runtime (18,292 B) - 0.2% of analyzed flash
+21. memory_mgmt (15,069 B) - 0.2% of analyzed flash
+22. [esphome]voice_assistant (14,530 B) - 0.2% of analyzed flash
+23. hal_layer (13,376 B) - 0.2% of analyzed flash
+24. dhcp (13,102 B) - 0.2% of analyzed flash
+25. [esphome]wifi (12,633 B) - 0.2% of analyzed flash
+
+Top RAM Consumers:
+1. other (14,974 B) - 54.2% of analyzed RAM
+2. network_stack (1,663 B) - 6.0% of analyzed RAM
+3. [esphome]core (849 B) - 3.1% of analyzed RAM
+4. libc (820 B) - 3.0% of analyzed RAM
+5. freertos (692 B) - 2.5% of analyzed RAM
+6. misc_system (634 B) - 2.3% of analyzed RAM
+7. rom_functions (588 B) - 2.1% of analyzed RAM
+8. interrupt_handlers (566 B) - 2.0% of analyzed RAM
+9. math_lib (553 B) - 2.0% of analyzed RAM
+10. wifi_stack (530 B) - 1.9% of analyzed RAM
+11. cache_mgmt (464 B) - 1.7% of analyzed RAM
+12. phy_radio (460 B) - 1.7% of analyzed RAM
+13. synchronization (433 B) - 1.6% of analyzed RAM
+14. flash_ops (407 B) - 1.5% of analyzed RAM
+15. mdns_lib (376 B) - 1.4% of analyzed RAM
+16. uart_driver (368 B) - 1.3% of analyzed RAM
+17. time_lib (280 B) - 1.0% of analyzed RAM
+18. timer (280 B) - 1.0% of analyzed RAM
+19. arp (240 B) - 0.9% of analyzed RAM
+20. logging (228 B) - 0.8% of analyzed RAM
+21. cpp_runtime (212 B) - 0.8% of analyzed RAM
+22. error_handling (206 B) - 0.7% of analyzed RAM
+23. file_io (196 B) - 0.7% of analyzed RAM
+24. ipc (184 B) - 0.7% of analyzed RAM
+25. memory_mgmt (177 B) - 0.6% of analyzed RAM
+
+Note: This analysis covers symbols in the ELF file. Some runtime allocations may not be included.
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]core Detailed Analysis                                                
+==============================================================================================================================
+
+Subcategory                    |         Size |  Count |  % of Core
+-------------------------------+--------------+--------+-----------
+Other Core                     |     16,461 B |    307 |      51.0%
+Component Framework            |      5,564 B |     76 |      17.2%
+C++ STL                        |      3,072 B |     66 |       9.5%
+Application Core               |      2,836 B |     23 |       8.8%
+Scheduler                      |      2,336 B |     16 |       7.2%
+C++ Runtime (vtables/RTTI)     |      1,204 B |     36 |       3.7%
+String Utilities               |        454 B |      5 |       1.4%
+Sensor Framework               |        180 B |      3 |       0.6%
+Light Framework                |         74 B |      2 |       0.2%
+Switch Framework               |         60 B |      1 |       0.2%
+I/O Utilities                  |         15 B |      2 |       0.0%
+
+[esphome]core Symbols > 100 B (79 symbols):
+1. esphome::mixer_speaker::MixerSpeaker::audio_mixer_task(void*) (1,432 B)
+2. esphome::App (808 B)
+3. esphome::Scheduler::set_timer_common_(esphome::Component*, esphome::Scheduler::SchedulerItem::Type, bool, void const*, unsigned long, std::function<void ()>, bool, bool) (650 B)
+4. esphome::ComponentIterator::advance() (548 B)
+5. esphome::mixer_speaker::SourceSpeaker::start_() (548 B)
+6. esphome::Scheduler::set_retry_common_(esphome::Component*, bool, void const*, unsigned long, unsigned char, std::function<esphome::RetryResult (unsigned char)>, float) (502 B)
+7. esphome::Application::setup() (448 B)
+8. [global constructor for: esphome::Application::register_component_(esphome::Component*)] (400 B)
+9. esphome::Scheduler::call(unsigned long) (358 B)
+10. esphome::ESPTime::recalc_timestamp_utc(bool) (346 B)
+11. esphome::Application::loop() (322 B)
+12. esphome::(anonymous namespace)::store_component_error_message(esphome::Component const*, char const*, bool) (312 B)
+13. esphome::mixer_speaker::SourceSpeaker::duck_samples(short*, unsigned long, signed char*, unsigned long*, unsigned long, signed char) (310 B)
+14. esphome::Application::teardown_components(unsigned long) (304 B)
+15. esphome::Application::setup_wake_loop_threadsafe_() (302 B)
+16. esphome::mixer_speaker::MixerSpeaker::loop() (302 B)
+17. esphome::Scheduler::full_cleanup_removed_items_() (272 B)
+18. esphome::ESPTime::increment_second() (256 B)
+19. esphome::Application::yield_with_select_(unsigned long) (228 B)
+20. esphome::Scheduler::millis_64_(unsigned long) (224 B)
+21. esphome::mixer_speaker::SourceSpeaker::loop() (222 B)
+22. std::_Rb_tree_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > > std::_Rb_tree<int const, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > >, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > >, std::less<int const>, esphome::RAMAllocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > > >::_M_emplace_hint_unique<std::piecewise_construct_t const&, std::tuple<int const&&>, std::tuple<> >(std::_Rb_tree_const_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > >, std::piecewise_construct_t const&, std::tuple<int const&&>&&, std::tuple<>&&) (214 B)
+23. std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > >::_M_default_append(unsigned int) (202 B)
+24. void std::__adjust_heap<__gnu_cxx::__normal_iterator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >*, std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > > >, int, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, __gnu_cxx::__ops::_Iter_comp_iter<bool (*)(std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&)> >(__gnu_cxx::__normal_iterator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >*, std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > > >, int, int, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, __gnu_cxx::__ops::_Iter_comp_iter<bool (*)(std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&)>) (200 B)
+25. esphome::retry_handler(std::shared_ptr<esphome::RetryArgs> const&) (196 B)
+26. std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> >::_M_replace_cold(char*, unsigned int, char const*, unsigned int, unsigned int) (190 B)
+27. void std::vector<std::function<void (esphome::optional<bool>, esphome::optional<bool>)>, std::allocator<std::function<void (esphome::optional<bool>, esphome::optional<bool>)> > >::_M_realloc_append<std::function<void (esphome::optional<bool>, esphome::optional<bool>)> >(std::function<void (esphome::optional<bool>, esphome::optional<bool>)>&&) (186 B)
+28. esphome::mixer_speaker::MixerSpeaker::mix_audio_samples(short const*, esphome::audio::AudioStreamInfo, short const*, esphome::audio::AudioStreamInfo, short*, esphome::audio::AudioStreamInfo, unsigned long) (180 B)
+29. esphome::Application::enable_pending_loops_() (178 B)
+30. void std::vector<esphome::mixer_speaker::SourceSpeaker*, std::allocator<esphome::mixer_speaker::SourceSpeaker*> >::_M_realloc_append<esphome::mixer_speaker::SourceSpeaker* const&>(esphome::mixer_speaker::SourceSpeaker* const&) (174 B)
+31. esphome::Scheduler::process_defer_queue_(unsigned long&) (170 B)
+32. esphome::RingBuffer::create(unsigned int) (164 B)
+33. std::_Rb_tree<int const, std::pair<int const, _lv_obj_t*>, std::_Select1st<std::pair<int const, _lv_obj_t*> >, std::less<int const>, esphome::RAMAllocator<std::pair<int const, _lv_obj_t*> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<int const, _lv_obj_t*> >, int const&) (158 B)
+34. std::_Rb_tree<int const, std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > >, std::_Select1st<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > >, std::less<int const>, esphome::RAMAllocator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<int const, std::__cxx11::basic_string<char, std::char_traits<char>, esphome::RAMAllocator<char> > > >, int const&) (158 B)
+35. esphome::WaitUntilAction<>::play_complex() (158 B)
+36. esphome::Scheduler::process_to_add() (154 B)
+37. esphome::Component::call() (152 B)
+38. void std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > >::_M_realloc_append<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > >(std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >&&) (152 B)
+39. esphome::TemplatableValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >>::TemplatableValue(esphome::TemplatableValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >> const&) (148 B)
+40. esphome::log_update_interval(char const*, esphome::PollingComponent*) (148 B)
+41. esphome::Color::gradient(esphome::Color const&, unsigned char) (146 B)
+42. esphome::WaitUntilAction<>::process_queue_(unsigned long) (146 B)
+43. esphome::StatelessLambdaAction<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::play(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (144 B)
+44. esphome::mixer_speaker::MixerSpeaker::start(esphome::audio::AudioStreamInfo&) (142 B)
+45. esphome::TemplatableValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::value(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (140 B)
+46. setup()::{lambda(esphome::optional<bool>, esphome::optional<bool>)#6}::_FUN(esphome::optional<bool>, esphome::optional<bool>) (138 B)
+47. esphome::WarnIfComponentBlockingGuard::finish() (136 B)
+48. esphome::parse_hex(char const*, unsigned int, unsigned char*, unsigned int) (132 B)
+49. esphome::Component::status_set_error(esphome::LogString const*) (132 B)
+50. esphome::Application::add_looping_components_by_state_(bool) (132 B)
+51. vtable for esphome::mixer_speaker::SourceSpeaker (132 B)
+52. std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > >::~vector() (130 B)
+53. esphome::Scheduler::pop_raw_locked_() (130 B)
+54. esphome::TemplatableValue<char const*>::TemplatableValue(esphome::TemplatableValue<char const*> const&) (130 B)
+55. esphome::RingBuffer::read(void*, unsigned int, unsigned long) (128 B)
+56. esphome::Application::register_component_(esphome::Component*) (128 B)
+57. esphome::mixer_speaker::SourceSpeaker::play(unsigned char const*, unsigned int, unsigned long) (126 B)
+58. esphome::ESPTime::from_c_tm(tm*, long long) (126 B)
+59. esphome::str_snake_case(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (126 B)
+60. void std::__push_heap<__gnu_cxx::__normal_iterator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >*, std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > > >, int, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, __gnu_cxx::__ops::_Iter_comp_val<bool (*)(std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&)> >(__gnu_cxx::__normal_iterator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >*, std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > > >, int, int, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, __gnu_cxx::__ops::_Iter_comp_val<bool (*)(std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&, std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&)>&) (124 B)
+61. esphome::Component::call_dump_config() (122 B)
+62. esphome::Scheduler::cleanup_defer_queue_locked_() (122 B)
+63. esphome::Application::calculate_looping_components_() (116 B)
+64. esphome::Scheduler::cancel_item_locked_(esphome::Component*, char const*, esphome::Scheduler::SchedulerItem::Type, bool) (116 B)
+65. esphome::mixer_speaker::MixerSpeaker::start_task_() (116 B)
+66. esphome::mixer_speaker::MixerSpeaker::copy_frames(short const*, esphome::audio::AudioStreamInfo, short*, esphome::audio::AudioStreamInfo, unsigned long) (114 B)
+67. std::__shared_ptr<esphome::RingBuffer, (__gnu_cxx::_Lock_policy)1>::__shared_ptr(std::__weak_ptr<esphome::RingBuffer, (__gnu_cxx::_Lock_policy)1> const&, std::nothrow_t) (114 B)
+68. esphome::Scheduler::cleanup_() (108 B)
+69. esphome::TemplatableValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int>::value(int) (108 B)
+70. esphome::DelayAction<>::play_complex() (106 B)
+71. esphome::mixer_speaker::SourceSpeaker::dump_config() (106 B)
+72. esphome::Application::disable_component_loop_(esphome::Component*) (106 B)
+73. esphome::Scheduler::matches_item_locked_(std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > const&, esphome::Component*, char const*, esphome::Scheduler::SchedulerItem::Type, bool, bool) const [clone .isra.0] (104 B)
+74. unsigned int esphome::Scheduler::mark_matching_items_removed_locked_<std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > > >(std::vector<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> >, std::allocator<std::unique_ptr<esphome::Scheduler::SchedulerItem, std::default_delete<esphome::Scheduler::SchedulerItem> > > >&, esphome::Component*, char const*, esphome::Scheduler::SchedulerItem::Type, bool) [clone .isra.0] (104 B)
+75. esphome::Application::unregister_socket_fd(int) (104 B)
+76. esphome::ESPTime::fields_in_range() const (104 B)
+77. vtable for esphome::WaitUntilAction<> (104 B)
+78. [global constructor for: esphome::mixer_speaker::SourceSpeaker::dump_config()] (102 B)
+79. esphome::TemplatableValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >>::value() (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                                [esphome]api Detailed Analysis                                                
+==============================================================================================================================
+
+Total symbols: 555
+Total size: 34,516 B
+
+[esphome]api Symbols > 100 B (97 symbols):
+1. esphome::api::APIServerConnectionBase::read_message(unsigned long, unsigned long, unsigned char const*) (1,360 B)
+2. esphome::api::APIConnection::loop() (692 B)
+3. esphome::api::APIConnection::process_batch_() (632 B)
+4. esphome::api::APIPlaintextFrameHelper::write_protobuf_packets(esphome::api::ProtoWriteBuffer, std::span<esphome::api::PacketInfo const, 4294967295u>) (556 B)
+5. esphome::api::APIServer::loop() (532 B)
+6. esphome::api::APIPlaintextFrameHelper::try_read_frame_() (520 B)
+7. esphome::api::APIConnection::send_voice_assistant_get_configuration_response(esphome::api::VoiceAssistantConfigurationRequest const&) (384 B)
+8. esphome::api::APIServer::setup() (374 B)
+9. esphome::api::HomeAssistantServiceCallAction<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::play(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (346 B)
+10. esphome::api::APIConnection::try_send_media_player_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (336 B)
+11. esphome::api::APIConnection::send_device_info_response(esphome::api::DeviceInfoRequest const&) (324 B)
+12. esphome::api::APIConnection::try_send_light_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (320 B)
+13. void std::vector<esphome::api::VoiceAssistantExternalWakeWord, std::allocator<esphome::api::VoiceAssistantExternalWakeWord> >::_M_realloc_append<>() (308 B)
+14. esphome::api::APIConnection::light_command(esphome::api::LightCommandRequest const&) (296 B)
+15. void std::vector<esphome::api::APIConnection::DeferredBatch::BatchItem, std::allocator<esphome::api::APIConnection::DeferredBatch::BatchItem> >::_M_realloc_append<esphome::EntityBase*&, esphome::api::APIConnection::MessageCreator&, unsigned char&, unsigned char&>(esphome::EntityBase*&, esphome::api::APIConnection::MessageCreator&, unsigned char&, unsigned char&) (290 B)
+16. esphome::api::LightCommandRequest::decode_varint(unsigned long, esphome::api::ProtoVarInt) (286 B)
+17. esphome::api::APIConnection::APIConnection(std::unique_ptr<esphome::socket::Socket, std::default_delete<esphome::socket::Socket> >, esphome::api::APIServer*) (270 B)
+18. esphome::api::APIConnection::encode_message_to_buffer(esphome::api::ProtoMessage&, unsigned char, esphome::api::APIConnection*, unsigned long, bool) (262 B)
+19. esphome::api::APIFrameHelper::buffer_data_from_iov_(iovec const*, int, unsigned short, unsigned short) (260 B)
+20. void std::vector<esphome::api::MediaPlayerSupportedFormat, std::allocator<esphome::api::MediaPlayerSupportedFormat> >::_M_realloc_append<>() (258 B)
+21. esphome::api::api_error_to_logstr(esphome::api::APIError) (256 B)
+22. esphome::api::HomeAssistantServiceCallAction<int>::play(int const&) (254 B)
+23. void std::vector<esphome::api::VoiceAssistantWakeWord, std::allocator<esphome::api::VoiceAssistantWakeWord> >::_M_realloc_append<>() (250 B)
+24. esphome::api::ProtoDecodableMessage::decode(unsigned char const*, unsigned int) (244 B)
+25. esphome::api::APIServer::APIServer() (238 B)
+26. void std::vector<esphome::api::VoiceAssistantEventData, std::allocator<esphome::api::VoiceAssistantEventData> >::_M_realloc_append<>() (234 B)
+27. void std::vector<esphome::api::APIServer::PendingActionResponse, std::allocator<esphome::api::APIServer::PendingActionResponse> >::_M_realloc_append<esphome::api::APIServer::PendingActionResponse>(esphome::api::APIServer::PendingActionResponse&&) (228 B)
+28. vtable for esphome::api::APIConnection (228 B)
+29. esphome::api::ProtoWriteBuffer::encode_message(unsigned long, esphome::api::ProtoMessage const&, bool) [clone .isra.0] (224 B)
+30. esphome::api::APIServer::handle_action_response(unsigned long, bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (222 B)
+31. esphome::api::APIConnection::try_send_number_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (216 B)
+32. esphome::api::APIConnection::try_send_light_state(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (216 B)
+33. esphome::api::APIConnection::fill_and_encode_entity_info(esphome::EntityBase*, esphome::api::InfoResponseProtoMessage&, unsigned char, esphome::api::APIConnection*, unsigned long, bool) (214 B)
+34. esphome::api::ListEntitiesLightResponse::encode(esphome::api::ProtoWriteBuffer) const (214 B)
+35. esphome::api::ProtoVarInt::parse(unsigned char const*, unsigned long, unsigned long*) (208 B)
+36. void std::vector<esphome::api::APIServer::HomeAssistantStateSubscription, std::allocator<esphome::api::APIServer::HomeAssistantStateSubscription> >::_M_realloc_append<esphome::api::APIServer::HomeAssistantStateSubscription>(esphome::api::APIServer::HomeAssistantStateSubscription&&) (206 B)
+37. esphome::api::ListEntitiesSensorResponse::encode(esphome::api::ProtoWriteBuffer) const (206 B)
+38. esphome::api::APIConnection::media_player_command(esphome::api::MediaPlayerCommandRequest const&) (196 B)
+39. esphome::api::ListEntitiesLightResponse::calculate_size(esphome::api::ProtoSize&) const (194 B)
+40. void std::vector<std::unique_ptr<esphome::api::APIConnection, std::default_delete<esphome::api::APIConnection> >, std::allocator<std::unique_ptr<esphome::api::APIConnection, std::default_delete<esphome::api::APIConnection> > > >::_M_realloc_append<esphome::api::APIConnection*&>(esphome::api::APIConnection*&) (188 B)
+41. esphome::api::APIConnection::process_state_subscriptions_() (184 B)
+42. esphome::api::LightStateResponse::encode(esphome::api::ProtoWriteBuffer) const (180 B)
+43. esphome::api::APIConnection::try_send_sensor_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (180 B)
+44. esphome::api::ListEntitiesNumberResponse::encode(esphome::api::ProtoWriteBuffer) const (176 B)
+45. esphome::api::APIFrameHelper::try_send_tx_buf_() (174 B)
+46. esphome::api::HomeassistantActionRequest::encode(esphome::api::ProtoWriteBuffer) const (174 B)
+47. esphome::api::APIConnection::start() (170 B)
+48. esphome::api::VoiceAssistantExternalWakeWord::decode_length(unsigned long, esphome::api::ProtoLengthDelimited) (164 B)
+49. esphome::api::APIConnection::try_send_select_state(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (162 B)
+50. esphome::api::APIConnection::try_send_binary_sensor_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (160 B)
+51. esphome::api::ListEntitiesMediaPlayerResponse::encode(esphome::api::ProtoWriteBuffer) const (156 B)
+52. esphome::api::ListEntitiesSelectResponse::encode(esphome::api::ProtoWriteBuffer) const (154 B)
+53. esphome::api::LightStateResponse::calculate_size(esphome::api::ProtoSize&) const (152 B)
+54. vtable for esphome::api::APIServer (152 B)
+55. esphome::api::ListEntitiesSensorResponse::calculate_size(esphome::api::ProtoSize&) const (150 B)
+56. esphome::api::APIConnection::try_send_switch_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (150 B)
+57. esphome::api::APIFrameHelper::write_raw_(iovec const*, int, unsigned short) (148 B)
+58. esphome::api::APIConnection::send_message_smart_(esphome::EntityBase*, unsigned short (*)(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool), unsigned char, unsigned char) [clone .isra.0] (144 B)
+59. esphome::api::APIConnection::DeferredBatch::add_item_front(esphome::EntityBase*, esphome::api::APIConnection::MessageCreator, unsigned char, unsigned char) (144 B)
+60. esphome::api::ListEntitiesMediaPlayerResponse::calculate_size(esphome::api::ProtoSize&) const (142 B)
+61. esphome::api::ListEntitiesNumberResponse::calculate_size(esphome::api::ProtoSize&) const (142 B)
+62. esphome::api::APIConnection::send_hello_response(esphome::api::HelloRequest const&) (142 B)
+63. esphome::api::APIConnection::on_home_assistant_state_response(esphome::api::HomeAssistantStateResponse const&) (140 B)
+64. esphome::api::APIConnection::switch_command(esphome::api::SwitchCommandRequest const&) (138 B)
+65. void esphome::api::HomeAssistantServiceCallAction<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::populate_service_map<esphome::FixedVector<esphome::api::HomeassistantServiceMap>, esphome::FixedVector<esphome::api::TemplatableKeyValuePair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >(esphome::FixedVector<esphome::api::HomeassistantServiceMap>&, esphome::FixedVector<esphome::api::TemplatableKeyValuePair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (136 B)
+66. esphome::api::ListEntitiesSelectResponse::calculate_size(esphome::api::ProtoSize&) const (136 B)
+67. esphome::api::DeviceInfoResponse::encode(esphome::api::ProtoWriteBuffer) const (130 B)
+68. esphome::api::APIServer::on_shutdown() (130 B)
+69. esphome::api::APIConnection::try_send_button_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (128 B)
+70. esphome::api::ListEntitiesBinarySensorResponse::encode(esphome::api::ProtoWriteBuffer) const (126 B)
+71. esphome::api::ListEntitiesSwitchResponse::encode(esphome::api::ProtoWriteBuffer) const (126 B)
+72. esphome::api::APIFrameHelper::~APIFrameHelper() (126 B)
+73. void esphome::api::HomeAssistantServiceCallAction<int>::populate_service_map<esphome::FixedVector<esphome::api::HomeassistantServiceMap>, esphome::FixedVector<esphome::api::TemplatableKeyValuePair<int> > >(esphome::FixedVector<esphome::api::HomeassistantServiceMap>&, esphome::FixedVector<esphome::api::TemplatableKeyValuePair<int> >&, int) (122 B)
+74. esphome::api::APIConnection::select_command(esphome::api::SelectCommandRequest const&) (120 B)
+75. esphome::api::LightCommandRequest::decode_32bit(unsigned long, esphome::api::Proto32Bit) (118 B)
+76. esphome::api::APIConnection::number_command(esphome::api::NumberCommandRequest const&) (118 B)
+77. esphome::api::APIConnection::on_voice_assistant_response(esphome::api::VoiceAssistantResponse const&) (116 B)
+78. esphome::api::ListEntitiesTextSensorResponse::encode(esphome::api::ProtoWriteBuffer) const (112 B)
+79. esphome::api::ListEntitiesButtonResponse::encode(esphome::api::ProtoWriteBuffer) const (112 B)
+80. esphome::api::HomeAssistantServiceCallAction<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::HomeAssistantServiceCallAction(esphome::api::APIServer*, bool) (112 B)
+81. esphome::api::APIConnection::try_send_media_player_state(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (112 B)
+82. std::_Function_handler<void (esphome::api::ActionResponse const&), esphome::api::HomeAssistantServiceCallAction<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::play(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)::{lambda(esphome::api::ActionResponse const&)#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+83. esphome::api::APIConnection::try_to_clear_buffer(bool) (110 B)
+84. esphome::api::MediaPlayerCommandRequest::decode_varint(unsigned long, esphome::api::ProtoVarInt) (110 B)
+85. esphome::api::ProtoVarInt::encode(std::vector<unsigned char, std::allocator<unsigned char> >&) (108 B)
+86. esphome::api::APIConnection::try_send_select_info(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (108 B)
+87. esphome::api::ProtoWriteBuffer::encode_string(unsigned long, char const*, unsigned int, bool) (106 B)
+88. esphome::api::APIPlaintextFrameHelper::read_packet(esphome::api::ReadPacketBuffer*) (106 B)
+89. std::_Function_handler<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > (std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >), esphome::api::TemplatableStringValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::TemplatableStringValue<setup()::{lambda(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)#14}, 0>(setup()::{lambda(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)#14})::{lambda(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)#1}>::_M_invoke(std::_Any_data const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) (104 B)
+90. esphome::api::ListEntitiesSwitchResponse::calculate_size(esphome::api::ProtoSize&) const (104 B)
+91. esphome::api::ListEntitiesBinarySensorResponse::calculate_size(esphome::api::ProtoSize&) const (104 B)
+92. esphome::api::APIConnection::DeferredBatch::add_item(esphome::EntityBase*, esphome::api::APIConnection::MessageCreator, unsigned char, unsigned char) (104 B)
+93. esphome::api::APIConnection::button_command(esphome::api::ButtonCommandRequest const&) (104 B)
+94. esphome::api::ProtoWriteBuffer::encode_fixed32(unsigned long, unsigned long, bool) (104 B)
+95. esphome::api::VoiceAssistantRequest::calculate_size(esphome::api::ProtoSize&) const (104 B)
+96. esphome::api::APIConnection::complete_authentication_() (102 B)
+97. esphome::api::APIConnection::try_send_binary_sensor_state(esphome::EntityBase*, esphome::api::APIConnection*, unsigned long, bool) (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                          [esphome]voice_assistant Detailed Analysis                                          
+==============================================================================================================================
+
+Total symbols: 136
+Total size: 14,530 B
+
+[esphome]voice_assistant Symbols > 100 B (41 symbols):
+1. esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&) (2,276 B)
+2. esphome::voice_assistant::VoiceAssistant::loop() (1,414 B)
+3. esphome::voice_assistant::VoiceAssistant::timer_tick_() (556 B)
+4. esphome::voice_assistant::VoiceAssistant::VoiceAssistant() (526 B)
+5. esphome::voice_assistant::VoiceAssistant::on_timer_event(esphome::api::VoiceAssistantTimerEventResponse const&) (404 B)
+6. esphome::voice_assistant::VoiceAssistant::get_configuration() (304 B)
+7. std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_insert_unique_node(unsigned int, unsigned int, std::__detail::_Hash_node<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, true>*, unsigned int) (300 B)
+8. esphome::voice_assistant::VoiceAssistant::allocate_buffers_() (294 B)
+9. esphome::voice_assistant::VoiceAssistant::start_udp_socket_() (274 B)
+10. std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_erase(std::integral_constant<bool, true>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [clone .isra.0] (244 B)
+11. esphome::voice_assistant::VoiceAssistant::on_announce(esphome::api::VoiceAssistantAnnounceRequest const&) (232 B)
+12. std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, esphome::voice_assistant::Timer, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> > >::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (224 B)
+13. setup()::{lambda(esphome::voice_assistant::Timer, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)#1}::_FUN(esphome::voice_assistant::Timer, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (220 B)
+14. esphome::voice_assistant::voice_assistant_state_to_string(esphome::voice_assistant::State) (214 B)
+15. void std::vector<esphome::voice_assistant::WakeWord, std::allocator<esphome::voice_assistant::WakeWord> >::_M_realloc_append<esphome::voice_assistant::WakeWord>(esphome::voice_assistant::WakeWord&&) (206 B)
+16. std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (204 B)
+17. esphome::voice_assistant::VoiceAssistant::on_set_configuration(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (196 B)
+18. esphome::voice_assistant::VoiceAssistant::client_subscription(esphome::api::APIConnection*, bool) (180 B)
+19. esphome::voice_assistant::VoiceAssistant::request_stop() (170 B)
+20. esphome::voice_assistant::VoiceAssistant::start_streaming(sockaddr_storage*, unsigned short) (170 B)
+21. esphome::voice_assistant::VoiceAssistant::write_speaker_() (154 B)
+22. std::_Rb_tree_node<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >* std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> > >::_M_copy<false, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> > >::_Alloc_node>(std::_Rb_tree_node<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >*, std::_Rb_tree_node_base*, std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> > >::_Alloc_node&) [clone .isra.0] (150 B)
+23. std::__detail::_Map_base<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true>, true>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (150 B)
+24. setup()::{lambda(esphome::voice_assistant::Timer)#2}::_FUN(esphome::voice_assistant::Timer) (130 B)
+25. esphome::voice_assistant::VoiceAssistant::on_audio(esphome::api::VoiceAssistantAudio const&) (126 B)
+26. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#11}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (124 B)
+27. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#12}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (124 B)
+28. std::vector<esphome::voice_assistant::Timer, std::allocator<esphome::voice_assistant::Timer> >::vector(std::vector<esphome::voice_assistant::Timer, std::allocator<esphome::voice_assistant::Timer> > const&) (122 B)
+29. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#9}>::_M_invoke(std::_Any_data const&) (120 B)
+30. esphome::voice_assistant::VoiceAssistant::signal_stop_() (120 B)
+31. setup()::{lambda(esphome::voice_assistant::Timer)#4}::_FUN(esphome::voice_assistant::Timer) (114 B)
+32. setup()::{lambda(esphome::voice_assistant::Timer)#3}::_FUN(esphome::voice_assistant::Timer) (114 B)
+33. setup()::{lambda(esphome::voice_assistant::Timer)#1}::_FUN(esphome::voice_assistant::Timer) (114 B)
+34. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#9}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+35. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#8}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+36. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#6}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+37. std::_Function_handler<void (), esphome::voice_assistant::VoiceAssistant::on_event(esphome::api::VoiceAssistantEventResponse const&)::{lambda()#4}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+38. esphome::voice_assistant::VoiceAssistant::failed_to_start() (110 B)
+39. setup()::{lambda(std::vector<esphome::voice_assistant::Timer, std::allocator<esphome::voice_assistant::Timer> >)#1}::_FUN(std::vector<esphome::voice_assistant::Timer, std::allocator<esphome::voice_assistant::Timer> >) (106 B)
+40. std::_Rb_tree<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::_Select1st<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> > >::_M_get_insert_unique_pos(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (106 B)
+41. std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, esphome::voice_assistant::Timer> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_find_before_node(unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned int) const (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]wifi Detailed Analysis                                                
+==============================================================================================================================
+
+Total symbols: 102
+Total size: 12,633 B
+
+[esphome]wifi Symbols > 100 B (32 symbols):
+1. esphome::wifi::WiFiComponent::wifi_process_event_(esphome::wifi::IDFWiFiEvent*) (982 B)
+2. esphome::wifi::WiFiComponent::check_scanning_finished() (824 B)
+3. esphome::wifi::get_disconnect_reason_str(unsigned char) (594 B)
+4. esphome::wifi::WiFiComponent::wifi_sta_connect_(esphome::wifi::WiFiAP const&) (542 B)
+5. esphome::wifi::WiFiComponent::check_connecting_finished() (490 B)
+6. esphome::wifi::WiFiComponent::wifi_pre_setup_() (468 B)
+7. esphome::wifi::WiFiComponent::print_connect_params_() (468 B)
+8. esphome::wifi::WiFiComponent::wifi_ap_ip_config_(esphome::optional<esphome::wifi::ManualIP> const&) (464 B)
+9. esphome::wifi::WiFiComponent::loop() (434 B)
+10. esphome::wifi::WiFiComponent::log_and_adjust_priority_for_failed_connect_() (390 B)
+11. esphome::wifi::WiFiComponent::start() (374 B)
+12. esphome::wifi::WiFiComponent::wifi_start_ap_(esphome::wifi::WiFiAP const&) (346 B)
+13. esphome::wifi::WiFiComponent::build_params_for_current_phase_() (288 B)
+14. esphome::wifi::event_handler(void*, char const*, long, void*) (272 B)
+15. esphome::wifi::WiFiComponent::set_sta_priority(std::array<unsigned char, 6u>, signed char) (268 B)
+16. esphome::wifi::WiFiComponent::wifi_sta_ip_config_(esphome::optional<esphome::wifi::ManualIP> const&) (266 B)
+17. esphome::wifi::WiFiComponent::transition_to_phase_(esphome::wifi::WiFiRetryPhase) (252 B)
+18. esphome::wifi::WiFiComponent::setup_ap_config_() (248 B)
+19. esphome::wifi::WiFiComponent::start_connecting(esphome::wifi::WiFiAP const&) (236 B)
+20. esphome::wifi::WiFiComponent::WiFiComponent() (224 B)
+21. esphome::wifi::WiFiComponent::wifi_mode_(esphome::optional<bool>, esphome::optional<bool>) (222 B)
+22. esphome::wifi::WiFiComponent::find_next_hidden_sta_(signed char) (218 B)
+23. esphome::wifi::WiFiComponent::advance_to_next_target_or_increment_retry_() (212 B)
+24. esphome::wifi::WiFiComponent::determine_next_phase_() (198 B)
+25. esphome::wifi::WiFiComponent::save_wifi_sta(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (176 B)
+26. esphome::wifi::log_scan_result(esphome::wifi::WiFiScanResult const&) (172 B)
+27. esphome::wifi::WiFiComponent::start_initial_connection_() (120 B)
+28. esphome::wifi::WiFiComponent::wifi_scan_start_(bool) (114 B)
+29. esphome::wifi::WiFiComponent::ssid_was_seen_in_scan_(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const (110 B)
+30. esphome::wifi::WiFiComponent::wifi_sta_ip_addresses() (108 B)
+31. esphome::wifi::WiFiScanResult::matches(esphome::wifi::WiFiAP const&) const (106 B)
+32. esphome::wifi::WiFiComponent::retry_connect() (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]light Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 98
+Total size: 9,216 B
+
+[esphome]light Symbols > 100 B (20 symbols):
+1. esphome::light::LightCall::validate_() (1,778 B)
+2. esphome::light::LightCall::perform() (928 B)
+3. esphome::light::LightTransitionTransformer::apply() (490 B)
+4. esphome::light::LightState::setup() (444 B)
+5. esphome::light::LightCall::compute_color_mode_() (336 B)
+6. esphome::light::LightCall::transform_parameters_() (280 B)
+7. esphome::light::LightState::dump_config() (256 B)
+8. esphome::light::LightState::loop() (222 B)
+9. esphome::light::LightTransitionTransformer::start() (220 B)
+10. esphome::light::LightCall::get_suitable_color_modes_mask_() (212 B)
+11. esphome::light::LightState::LightState(esphome::light::LightOutput*) (210 B)
+12. esphome::light::LightCall::set_effect(char const*, unsigned int) (190 B)
+13. esphome::light::LightFlashTransformer::apply() (184 B)
+14. esphome::light::LightState::start_flash_(esphome::light::LightColorValues const&, unsigned long, bool) (182 B)
+15. esphome::light::clamp_and_log_if_invalid(char const*, float&, esphome::LogString const*, float, float) (170 B)
+16. esphome::light::color_mode_to_human(esphome::light::ColorMode) (162 B)
+17. esphome::light::LightState::save_remote_values_() (146 B)
+18. esphome::light::LightState::add_effects(std::initializer_list<esphome::light::LightEffect*> const&) (106 B)
+19. esphome::light::LightState::start_transition_(esphome::light::LightColorValues const&, unsigned long, bool) (104 B)
+20. esphome::light::LightState::set_immediately_(esphome::light::LightColorValues const&, bool) (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]speaker Detailed Analysis                                              
+==============================================================================================================================
+
+Total symbols: 75
+Total size: 8,166 B
+
+[esphome]speaker Symbols > 100 B (21 symbols):
+1. esphome::speaker::SpeakerMediaPlayer::watch_media_commands_() (1,054 B)
+2. esphome::speaker::AudioPipeline::process_state() (624 B)
+3. esphome::speaker::AudioPipeline::decode_task(void*) (604 B)
+4. esphome::speaker::SpeakerMediaPlayer::loop() (576 B)
+5. esphome::speaker::AudioPipeline::read_task(void*) (530 B)
+6. esphome::speaker::SpeakerMediaPlayer::setup() (394 B)
+7. std::deque<esphome::speaker::PlaylistItem, std::allocator<esphome::speaker::PlaylistItem> >::_M_reserve_map_at_back(unsigned int) (282 B)
+8. esphome::speaker::AudioPipeline::start_tasks_() (270 B)
+9. std::deque<esphome::speaker::PlaylistItem, std::allocator<esphome::speaker::PlaylistItem> >::_M_default_append(unsigned int) (260 B)
+10. esphome::speaker::AudioPipeline::AudioPipeline(esphome::speaker::Speaker*, unsigned int, bool, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int) (216 B)
+11. esphome::speaker::SpeakerMediaPlayer::control(esphome::media_player::MediaPlayerCall const&) (210 B)
+12. std::deque<esphome::speaker::PlaylistItem, std::allocator<esphome::speaker::PlaylistItem> >::_M_erase_at_end(std::_Deque_iterator<esphome::speaker::PlaylistItem, esphome::speaker::PlaylistItem&, esphome::speaker::PlaylistItem*>) (172 B)
+13. esphome::speaker::SpeakerMediaPlayer::set_volume_(float, bool) (164 B)
+14. std::__detail::_MakeUniq<esphome::speaker::AudioPipeline>::__single_object std::make_unique<esphome::speaker::AudioPipeline, esphome::speaker::Speaker*&, unsigned int&, bool&, char const (&) [4], unsigned int const&>(esphome::speaker::Speaker*&, unsigned int&, bool&, char const (&) [4], unsigned int const&) (164 B)
+15. esphome::speaker::SpeakerMediaPlayer::get_traits() (140 B)
+16. std::deque<esphome::speaker::PlaylistItem, std::allocator<esphome::speaker::PlaylistItem> >::push_back(esphome::speaker::PlaylistItem const&) (132 B)
+17. esphome::speaker::AudioPipeline::start_url(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (128 B)
+18. esphome::speaker::SpeakerMediaPlayer::set_mute_state_(bool) (126 B)
+19. std::_Deque_base<esphome::speaker::PlaylistItem, std::allocator<esphome::speaker::PlaylistItem> >::_Deque_base() (112 B)
+20. std::_Deque_iterator<esphome::speaker::PlaylistItem, esphome::speaker::PlaylistItem&, esphome::speaker::PlaylistItem*>::operator+=(int) [clone .isra.0] (110 B)
+21. esphome::speaker::PlayOnDeviceMediaAction<>::play() (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                           [esphome]http_request Detailed Analysis                                            
+==============================================================================================================================
+
+Total symbols: 54
+Total size: 7,088 B
+
+[esphome]http_request Symbols > 100 B (13 symbols):
+1. esphome::http_request::HttpRequestIDF::perform(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::list<esphome::http_request::Header, std::allocator<esphome::http_request::Header> > const&, std::set<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (1,222 B)
+2. setup()::{lambda(std::shared_ptr<esphome::http_request::HttpContainer>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int)#1}::operator()(std::shared_ptr<esphome::http_request::HttpContainer>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int) const [clone .constprop.0] (858 B)
+3. esphome::http_request::HttpRequestSendAction<int>::play(int const&) (832 B)
+4. esphome::http_request::HttpRequestSendAction<>::play() (674 B)
+5. esphome::http_request::HttpContainer::get_response_header(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (530 B)
+6. esphome::http_request::HttpRequestSendAction<int>::encode_json_(int, ArduinoJson::V742HB22::JsonObject) (252 B)
+7. esphome::http_request::HttpRequestComponent::start(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::list<esphome::http_request::Header, std::allocator<esphome::http_request::Header> > const&, std::set<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (226 B)
+8. esphome::http_request::HttpRequestIDF::http_event_handler(esp_http_client_event*) (222 B)
+9. esphome::http_request::HttpRequestSendAction<>::add_json(char const*, esphome::TemplatableValue<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >>) (170 B)
+10. esphome::http_request::HttpRequestSendAction<>::add_request_header(char const*, esphome::TemplatableValue<char const*>) (164 B)
+11. esphome::http_request::HttpRequestSendAction<>::encode_json_(ArduinoJson::V742HB22::JsonObject) (130 B)
+12. esphome::http_request::HttpContainerIDF::read(unsigned char*, unsigned int) (128 B)
+13. esphome::http_request::HttpRequestComponent::dump_config() (108 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                          [esphome]web_server_idf Detailed Analysis                                           
+==============================================================================================================================
+
+Total symbols: 67
+Total size: 6,482 B
+
+[esphome]web_server_idf Symbols > 100 B (22 symbols):
+1. esphome::web_server_idf::AsyncWebServer::handle_multipart_upload_(httpd_req*, char const*) (844 B)
+2. esphome::web_server_idf::AsyncWebServer::request_post_handler(httpd_req*) (378 B)
+3. esphome::web_server_idf::AsyncWebServerRequest::getParam(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (334 B)
+4. esphome::web_server_idf::extract_header_param(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (316 B)
+5. esphome::web_server_idf::MultipartReader::process_header_(char const*, unsigned int) (258 B)
+6. esphome::web_server_idf::MultipartReader::MultipartReader(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (218 B)
+7. esphome::web_server_idf::AsyncWebServerRequest::beginResponse(int, char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (206 B)
+8. esphome::web_server_idf::MultipartReader::on_header_field(multipart_parser*, char const*, unsigned int) (202 B)
+9. std::_Function_handler<void (unsigned char const*, unsigned int), esphome::web_server_idf::AsyncWebServer::handle_multipart_upload_(httpd_req*, char const*)::{lambda(unsigned char const*, unsigned int)#1}>::_M_invoke(std::_Any_data const&, unsigned char const*&&, unsigned int&&) (198 B)
+10. esphome::web_server_idf::query_key_value(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (190 B)
+11. esphome::web_server_idf::AsyncWebServerRequest::init_response_(esphome::web_server_idf::AsyncWebServerResponse*, int, char const*) (188 B)
+12. esphome::web_server_idf::parse_multipart_boundary(char const*, char const**, unsigned int*) (188 B)
+13. esphome::web_server_idf::AsyncWebServer::begin() (182 B)
+14. void std::vector<esphome::web_server_idf::AsyncWebHandler*, std::allocator<esphome::web_server_idf::AsyncWebHandler*> >::_M_realloc_append<esphome::web_server_idf::AsyncWebHandler* const&>(esphome::web_server_idf::AsyncWebHandler* const&) (174 B)
+15. void std::vector<esphome::web_server_idf::AsyncWebParameter*, std::allocator<esphome::web_server_idf::AsyncWebParameter*> >::_M_realloc_append<esphome::web_server_idf::AsyncWebParameter* const&>(esphome::web_server_idf::AsyncWebParameter* const&) (174 B)
+16. esphome::web_server_idf::str_trim(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (172 B)
+17. esphome::web_server_idf::request_get_url_query[abi:cxx11](httpd_req*) (158 B)
+18. esphome::web_server_idf::request_get_header[abi:cxx11](httpd_req*, char const*) (136 B)
+19. esphome::web_server_idf::AsyncWebServerRequest::~AsyncWebServerRequest() (116 B)
+20. esphome::web_server_idf::AsyncResponseStream::printf(char const*, ...) (112 B)
+21. esphome::web_server_idf::url_decode(char*) (110 B)
+22. esphome::web_server_idf::MultipartReader::on_part_data_end(multipart_parser*) (104 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]audio Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 69
+Total size: 5,974 B
+
+[esphome]audio Symbols > 100 B (17 symbols):
+1. esphome::audio::AudioReader::start(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, esphome::audio::AudioFileType&) (764 B)
+2. esphome::audio::AudioDecoder::decode(bool) (368 B)
+3. esphome::audio::AudioResampler::start(esphome::audio::AudioStreamInfo&, esphome::audio::AudioStreamInfo&, unsigned short, unsigned short) (316 B)
+4. esphome::audio::AudioResampler::resample(bool, long*) (308 B)
+5. esphome::audio::AudioDecoder::decode_wav_() (238 B)
+6. esphome::audio::AudioDecoder::decode_flac_() (222 B)
+7. esphome::audio::AudioResampler::AudioResampler(unsigned int, unsigned int) (222 B)
+8. esphome::audio::AudioDecoder::decode_mp3_() (206 B)
+9. esphome::audio::AudioDecoder::start(esphome::audio::AudioFileType) (206 B)
+10. esphome::audio::AudioDecoder::AudioDecoder(unsigned int, unsigned int) (194 B)
+11. esphome::audio::AudioReader::http_read_() (192 B)
+12. esphome::audio::AudioReader::get_audio_type(char const*) (148 B)
+13. setup()::{lambda(bool, esphome::audio::AudioFile*)#1}::_FUN(bool, esphome::audio::AudioFile*) (146 B)
+14. esphome::audio::AudioReader::add_sink(std::weak_ptr<esphome::RingBuffer> const&) (120 B)
+15. esphome::audio::AudioSinkTransferBuffer::transfer_data_to_sink(unsigned long, bool) (110 B)
+16. esphome::audio::AudioSinkTransferBuffer::create(unsigned int) (106 B)
+17. std::default_delete<esphome::audio::AudioResampler>::operator()(esphome::audio::AudioResampler*) const [clone .part.0] (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                             [esphome]i2s_audio Detailed Analysis                                             
+==============================================================================================================================
+
+Total symbols: 44
+Total size: 5,860 B
+
+[esphome]i2s_audio Symbols > 100 B (14 symbols):
+1. esphome::i2s_audio::I2SAudioSpeaker::speaker_task(void*) (1,198 B)
+2. esphome::i2s_audio::I2SAudioSpeaker::loop() (594 B)
+3. esphome::i2s_audio::I2SAudioSpeaker::start_i2s_driver_(esphome::audio::AudioStreamInfo&) (576 B)
+4. esphome::i2s_audio::I2SAudioMicrophone::start_driver_() (504 B)
+5. esphome::i2s_audio::I2SAudioMicrophone::loop() (406 B)
+6. esphome::i2s_audio::I2SAudioMicrophone::mic_task(void*) (286 B)
+7. esphome::i2s_audio::I2SAudioMicrophone::fix_dc_offset_(std::vector<unsigned char, std::allocator<unsigned char> >&) (246 B)
+8. esphome::i2s_audio::I2SAudioSpeaker::play(unsigned char const*, unsigned int, unsigned long) (186 B)
+9. vtable for esphome::i2s_audio::I2SAudioSpeaker (136 B)
+10. esphome::i2s_audio::I2SAudioMicrophone::setup() (130 B)
+11. esphome::i2s_audio::I2SAudioMicrophone::read_(unsigned char*, unsigned int, unsigned long) (124 B)
+12. esphome::i2s_audio::I2SAudioMicrophone::stop_driver_() (120 B)
+13. [global constructor for: esphome::i2s_audio::I2SAudioSpeaker::setup()] (106 B)
+14. esphome::i2s_audio::I2SAudioSpeaker::dump_config() (106 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                           [esphome]online_image Detailed Analysis                                            
+==============================================================================================================================
+
+Total symbols: 39
+Total size: 5,590 B
+
+[esphome]online_image Symbols > 100 B (12 symbols):
+1. esphome::online_image::OnlineImage::update() (1,256 B)
+2. esphome::online_image::OnlineImage::draw_pixel_(int, int, esphome::Color) (640 B)
+3. esphome::online_image::OnlineImage::loop() (420 B)
+4. esphome::online_image::OnlineImage::OnlineImage(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int, int, esphome::online_image::ImageFormat, esphome::image::ImageType, esphome::image::Transparency, unsigned long, bool) (364 B)
+5. esphome::online_image::JpegDecoder::decode(unsigned char*, unsigned int) (318 B)
+6. esphome::online_image::OnlineImage::resize_(int, int) (278 B)
+7. esphome::online_image::ImageDecoder::draw(int, int, int, int, esphome::Color const&) (260 B)
+8. esphome::online_image::draw_callback(jpeg_draw_tag*) (222 B)
+9. esphome::online_image::ImageDecoder::set_size(int, int) (168 B)
+10. esphome::online_image::OnlineImage::validate_url_(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (160 B)
+11. std::_Rb_tree<int const, std::pair<int const, esphome::online_image::OnlineImage*>, std::_Select1st<std::pair<int const, esphome::online_image::OnlineImage*> >, std::less<int const>, esphome::RAMAllocator<std::pair<int const, esphome::online_image::OnlineImage*> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<int const, esphome::online_image::OnlineImage*> >, int const&) (158 B)
+12. esphome::online_image::DownloadBuffer::resize(unsigned int) (152 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                          [esphome]micro_wake_word Detailed Analysis                                          
+==============================================================================================================================
+
+Total symbols: 39
+Total size: 5,204 B
+
+[esphome]micro_wake_word Symbols > 100 B (11 symbols):
+1. esphome::micro_wake_word::MicroWakeWord::loop() (866 B)
+2. esphome::micro_wake_word::MicroWakeWord::inference_task(void*) (646 B)
+3. esphome::micro_wake_word::StreamingModel::register_streaming_ops_(tflite::MicroMutableOpResolver<20u>&) (586 B)
+4. esphome::micro_wake_word::StreamingModel::load_model_() (460 B)
+5. esphome::micro_wake_word::WakeWordModel::WakeWordModel(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned char const*, unsigned char, unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned int, bool, bool) (336 B)
+6. esphome::micro_wake_word::MicroWakeWord::setup() (322 B)
+7. esphome::micro_wake_word::StreamingModel::perform_streaming_inference(signed char const*) (294 B)
+8. void std::vector<esphome::micro_wake_word::WakeWordModel*, std::allocator<esphome::micro_wake_word::WakeWordModel*> >::_M_realloc_append<esphome::micro_wake_word::WakeWordModel* const&>(esphome::micro_wake_word::WakeWordModel* const&) (174 B)
+9. esphome::micro_wake_word::MicroWakeWord::start() (132 B)
+10. std::_Function_handler<void (std::vector<unsigned char, std::allocator<unsigned char> > const&), esphome::micro_wake_word::MicroWakeWord::setup()::{lambda(std::vector<unsigned char, std::allocator<unsigned char> > const&)#1}>::_M_invoke(std::_Any_data const&, std::vector<unsigned char, std::allocator<unsigned char> > const&) (120 B)
+11. esphome::micro_wake_word::WakeWordModel::determine_detected() (118 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                                [esphome]ota Detailed Analysis                                                
+==============================================================================================================================
+
+Total symbols: 53
+Total size: 4,951 B
+
+[esphome]ota Symbols > 100 B (11 symbols):
+1. esphome::ESPHomeOTAComponent::handle_data_() (906 B)
+2. esphome::ESPHomeOTAComponent::handle_handshake_() (556 B)
+3. esphome::ESPHomeOTAComponent::readall_(unsigned char*, unsigned int) (240 B)
+4. esphome::ESPHomeOTAComponent::setup() (224 B)
+5. esphome::ESPHomeOTAComponent::writeall_(unsigned char const*, unsigned int) (210 B)
+6. void std::vector<std::function<void (esphome::ota::OTAState, float, unsigned char, esphome::ota::OTAComponent*)>, std::allocator<std::function<void (esphome::ota::OTAState, float, unsigned char, esphome::ota::OTAComponent*)> > >::_M_realloc_append<std::function<void (esphome::ota::OTAState, float, unsigned char, esphome::ota::OTAComponent*)> >(std::function<void (esphome::ota::OTAState, float, unsigned char, esphome::ota::OTAComponent*)>&&) (186 B)
+7. void std::vector<std::function<void (esphome::ota::OTAState, float, unsigned char)>, std::allocator<std::function<void (esphome::ota::OTAState, float, unsigned char)> > >::_M_realloc_append<std::function<void (esphome::ota::OTAState, float, unsigned char)> >(std::function<void (esphome::ota::OTAState, float, unsigned char)>&&) (186 B)
+8. esphome::ota::IDFOTABackend::end() (174 B)
+9. esphome::ota::IDFOTABackend::begin(unsigned int) (148 B)
+10. esphome::ota::OTAComponent::StateCallbackManager::call_deferred(esphome::ota::OTAState, float, unsigned char) (106 B)
+11. esphome::ota::make_ota_backend() (104 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                          [esphome]captive_portal Detailed Analysis                                           
+==============================================================================================================================
+
+Total symbols: 27
+Total size: 3,916 B
+
+[esphome]captive_portal Symbols > 100 B (10 symbols):
+1. esphome::captive_portal::INDEX_GZ (1,462 B)
+2. esphome::captive_portal::DNSServer::process_next_request() (468 B)
+3. esphome::captive_portal::CaptivePortal::handle_wifisave(esphome::web_server_idf::AsyncWebServerRequest*) (390 B)
+4. esphome::captive_portal::CaptivePortal::handle_config(esphome::web_server_idf::AsyncWebServerRequest*) (378 B)
+5. esphome::captive_portal::CaptivePortal::handleRequest(esphome::web_server_idf::AsyncWebServerRequest*) (210 B)
+6. esphome::captive_portal::DNSServer::start(esphome::network::IPAddress const&) (192 B)
+7. esphome::captive_portal::CaptivePortal::end() (134 B)
+8. std::_Function_handler<void (), esphome::captive_portal::CaptivePortal::handle_wifisave(esphome::web_server_idf::AsyncWebServerRequest*)::{lambda()#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (122 B)
+9. esphome::captive_portal::CaptivePortal::start() (118 B)
+10. vtable for esphome::captive_portal::CaptivePortal (116 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]lvgl Detailed Analysis                                                
+==============================================================================================================================
+
+Total symbols: 61
+Total size: 3,654 B
+
+[esphome]lvgl Symbols > 100 B (6 symbols):
+1. esphome::lvgl::LvglComponent::draw_buffer_(lv_area_t const*, lv_color16_t*) (446 B)
+2. esphome::lvgl::LvglComponent::setup() (378 B)
+3. esphome::lvgl::LvglComponent::write_random_() (336 B)
+4. esphome::lvgl::LvglComponent::LvglComponent(std::vector<esphome::display::Display*, std::allocator<esphome::display::Display*> >, float, bool, int, bool, bool) (314 B)
+5. void std::vector<esphome::lvgl::LvPageType*, std::allocator<esphome::lvgl::LvPageType*> >::_M_realloc_append<esphome::lvgl::LvPageType* const&>(esphome::lvgl::LvPageType* const&) (174 B)
+6. esphome::lvgl::LVTouchListener::LVTouchListener(unsigned short, unsigned short, esphome::lvgl::LvglComponent*) (126 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]logger Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 28
+Total size: 3,369 B
+
+[esphome]logger Symbols > 100 B (10 symbols):
+1. esphome::logger::Logger::write_header_to_buffer_(unsigned char, char const*, int, char const*, char*, unsigned short*, unsigned short) [clone .isra.0] (562 B)
+2. esphome::logger::Logger::log_vprintf_(unsigned char, char const*, int, char const*, void*) (334 B)
+3. esphome::logger::TaskLogBuffer::send_message_thread_safe(unsigned char, char const*, unsigned short, tskTaskControlBlock*, char const*, void*) (312 B)
+4. esphome::logger::Logger::format_log_to_buffer_with_terminator_(unsigned char, char const*, int, char const*, void*, char*, unsigned short*, unsigned short) (248 B)
+5. esphome::logger::Logger::pre_setup() (224 B)
+6. esphome::logger::Logger::process_messages_() (222 B)
+7. esphome::logger::Logger::write_ansi_color_for_level(char*, unsigned short&, unsigned char) (174 B)
+8. void std::vector<esphome::logger::LogListener*, std::allocator<esphome::logger::LogListener*> >::_M_realloc_append<esphome::logger::LogListener* const&>(esphome::logger::LogListener* const&) (174 B)
+9. esphome::logger::Logger::dump_config() (144 B)
+10. esphome::logger::Logger::Logger(unsigned long, unsigned int) (118 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                           [esphome]binary_sensor Detailed Analysis                                           
+==============================================================================================================================
+
+Total symbols: 54
+Total size: 3,102 B
+
+[esphome]binary_sensor Symbols > 100 B (10 symbols):
+1. esphome::binary_sensor::MultiClickTrigger::on_state_(bool) (330 B)
+2. esphome::binary_sensor::BinarySensor::set_new_state(esphome::optional<bool> const&) (318 B)
+3. esphome::binary_sensor::MultiClickTrigger::MultiClickTrigger(esphome::binary_sensor::BinarySensor*, std::initializer_list<esphome::binary_sensor::MultiClickTriggerEvent>) (152 B)
+4. esphome::binary_sensor::BinarySensorPublishAction<esphome::voice_assistant::Timer>::play(esphome::voice_assistant::Timer const&) (118 B)
+5. esphome::binary_sensor::BinarySensorPublishAction<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::play(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (118 B)
+6. esphome::binary_sensor::log_binary_sensor(char const*, char const*, char const*, esphome::binary_sensor::BinarySensor*) (116 B)
+7. esphome::binary_sensor::DelayedOffFilter::new_value(bool) (114 B)
+8. esphome::binary_sensor::MultiClickTrigger::schedule_cooldown_() (112 B)
+9. esphome::binary_sensor::StateChangeTrigger::StateChangeTrigger(esphome::binary_sensor::BinarySensor*) (108 B)
+10. esphome::binary_sensor::MultiClickTrigger::setup() (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]es8311 Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 17
+Total size: 2,828 B
+
+[esphome]es8311 Symbols > 100 B (5 symbols):
+1. esphome::es8311::ES8311_COEFFICIENTS (1,500 B)
+2. esphome::es8311::ES8311::configure_clock_() (398 B)
+3. esphome::es8311::ES8311::setup() (196 B)
+4. esphome::es8311::ES8311::dump_config() (142 B)
+5. esphome::es8311::ES8311::configure_format_() (102 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                             [esphome]template Detailed Analysis                                              
+==============================================================================================================================
+
+Total symbols: 50
+Total size: 2,674 B
+
+[esphome]template Symbols > 100 B (8 symbols):
+1. esphome::template_::TemplateSelect::dump_config() (232 B)
+2. esphome::template_::TemplateSelect::control(unsigned int) (192 B)
+3. esphome::template_::TemplateSelect::setup() (180 B)
+4. esphome::template_::TemplateNumber::TemplateNumber() (132 B)
+5. esphome::template_::TemplateSwitch::setup() (126 B)
+6. vtable for esphome::template_::TemplateSelect (108 B)
+7. esphome::template_::TemplateNumber::dump_config() (106 B)
+8. vtable for esphome::template_::TemplateNumber (104 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                             [esphome]mipi_dsi Detailed Analysis                                              
+==============================================================================================================================
+
+Total symbols: 16
+Total size: 2,616 B
+
+[esphome]mipi_dsi Symbols > 100 B (9 symbols):
+1. esphome::mipi_dsi::MIPI_DSI::setup() (716 B)
+2. esphome::mipi_dsi::MIPI_DSI::draw_pixel_at(int, int, esphome::Color) (400 B)
+3. esphome::mipi_dsi::MIPI_DSI::dump_config() (336 B)
+4. esphome::mipi_dsi::MIPI_DSI::fill(esphome::Color) (246 B)
+5. esphome::mipi_dsi::MIPI_DSI::write_to_display_(int, int, int, int, unsigned char const*, int, int, int) (232 B)
+6. esphome::mipi_dsi::MIPI_DSI::update() (156 B)
+7. esphome::mipi_dsi::MIPI_DSI::draw_pixels_at(int, int, int, int, unsigned char const*, esphome::display::ColorOrder, esphome::display::ColorBitness, bool, int, int, int) (140 B)
+8. esphome::mipi_dsi::MIPI_DSI::check_buffer_() (114 B)
+9. vtable for esphome::mipi_dsi::MIPI_DSI (112 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]esp32 Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 31
+Total size: 2,411 B
+
+[esphome]esp32 Symbols > 100 B (10 symbols):
+1. esphome::esp32::ESP32Preferences::sync() (428 B)
+2. void std::vector<esphome::esp32::NVSData, std::allocator<esphome::esp32::NVSData> >::_M_realloc_append<esphome::esp32::NVSData>(esphome::esp32::NVSData&&) (188 B)
+3. esphome::esp32::ESP32InternalGPIOPin::attach_interrupt(void (*)(void*), void*, esphome::gpio::InterruptType) const (184 B)
+4. esphome::esp32::ESP32PreferenceBackend::save(unsigned char const*, unsigned int) (174 B)
+5. esphome::esp32::ESP32PreferenceBackend::load(unsigned char*, unsigned int) (156 B)
+6. esphome::esp32::ESP32InternalGPIOPin::dump_summary[abi:cxx11]() const (134 B)
+7. esphome::esp32::ESP32Preferences::reset() (116 B)
+8. esphome::esp32::ESP32Preferences::open() (112 B)
+9. esphome::esp32::ESP32Preferences::make_preference(unsigned int, unsigned long) (112 B)
+10. esphome::esp32::NVSData::NVSData(esphome::esp32::NVSData&&) (106 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                            [esphome]touchscreen Detailed Analysis                                            
+==============================================================================================================================
+
+Total symbols: 19
+Total size: 2,364 B
+
+[esphome]touchscreen Symbols > 100 B (6 symbols):
+1. esphome::touchscreen::Touchscreen::send_touches_() (576 B)
+2. esphome::touchscreen::Touchscreen::add_raw_touch_position_(unsigned char, short, short, short) (440 B)
+3. esphome::touchscreen::Touchscreen::loop() (274 B)
+4. std::map<unsigned char, esphome::touchscreen::TouchPoint, std::less<unsigned char>, std::allocator<std::pair<unsigned char const, esphome::touchscreen::TouchPoint> > >::operator[](unsigned char const&) (186 B)
+5. void std::vector<esphome::touchscreen::TouchListener*, std::allocator<esphome::touchscreen::TouchListener*> >::_M_realloc_append<esphome::touchscreen::TouchListener* const&>(esphome::touchscreen::TouchListener* const&) (174 B)
+6. std::_Rb_tree<unsigned char, std::pair<unsigned char const, esphome::touchscreen::TouchPoint>, std::_Select1st<std::pair<unsigned char const, esphome::touchscreen::TouchPoint> >, std::less<unsigned char>, std::allocator<std::pair<unsigned char const, esphome::touchscreen::TouchPoint> > >::_M_get_insert_hint_unique_pos(std::_Rb_tree_const_iterator<std::pair<unsigned char const, esphome::touchscreen::TouchPoint> >, unsigned char const&) (168 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                             [esphome]resampler Detailed Analysis                                             
+==============================================================================================================================
+
+Total symbols: 36
+Total size: 2,342 B
+
+[esphome]resampler Symbols > 100 B (8 symbols):
+1. esphome::resampler::ResamplerSpeaker::resample_task(void*) (532 B)
+2. esphome::resampler::ResamplerSpeaker::loop() (486 B)
+3. vtable for esphome::resampler::ResamplerSpeaker (168 B)
+4. esphome::resampler::ResamplerSpeaker::play(unsigned char const*, unsigned int, unsigned long) (156 B)
+5. std::_Function_handler<void (unsigned long, long long), esphome::resampler::ResamplerSpeaker::setup()::{lambda(unsigned long, long long)#1}>::_M_invoke(std::_Any_data const&, unsigned long&&, long long&&) (132 B)
+6. esphome::resampler::ResamplerSpeaker::setup() (132 B)
+7. esphome::resampler::ResamplerSpeaker::start_() (126 B)
+8. esphome::resampler::ResamplerSpeaker::start_task_() (124 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                                [esphome]i2c Detailed Analysis                                                
+==============================================================================================================================
+
+Total symbols: 24
+Total size: 2,316 B
+
+[esphome]i2c Symbols > 100 B (6 symbols):
+1. esphome::i2c::IDFI2CBus::recover_() (400 B)
+2. esphome::i2c::IDFI2CBus::write_readv(unsigned char, unsigned char const*, unsigned int, unsigned char*, unsigned int) (372 B)
+3. esphome::i2c::IDFI2CBus::setup() (368 B)
+4. esphome::i2c::IDFI2CBus::dump_config() (322 B)
+5. esphome::i2c::I2CBus::i2c_scan_() (208 B)
+6. esphome::i2c::I2CDevice::write_register(unsigned char, unsigned char const*, unsigned int) const (158 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]script Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 54
+Total size: 1,970 B
+
+[esphome]script Symbols > 100 B (2 symbols):
+1. esphome::script::ScriptExecuteAction<esphome::script::Script<int>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::play(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (168 B)
+2. esphome::script::ScriptExecuteAction<esphome::script::Script<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::play(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (142 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]es7210 Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 13
+Total size: 1,942 B
+
+[esphome]es7210 Symbols > 100 B (5 symbols):
+1. esphome::es7210::ES7210::setup() (410 B)
+2. esphome::es7210::ES7210_COEFFICIENTS (400 B)
+3. esphome::es7210::ES7210::configure_mic_gain_() (374 B)
+4. esphome::es7210::ES7210::configure_sample_rate_() (224 B)
+5. esphome::es7210::ES7210::configure_i2s_format_() (126 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                           [esphome]media_player Detailed Analysis                                            
+==============================================================================================================================
+
+Total symbols: 26
+Total size: 1,904 B
+
+[esphome]media_player Symbols > 100 B (6 symbols):
+1. void std::vector<esphome::media_player::MediaPlayerSupportedFormat, std::allocator<esphome::media_player::MediaPlayerSupportedFormat> >::_M_realloc_append<esphome::media_player::MediaPlayerSupportedFormat const&>(esphome::media_player::MediaPlayerSupportedFormat const&) (310 B)
+2. esphome::media_player::MediaPlayerCall::perform() (232 B)
+3. esphome::media_player::media_player_command_to_string(esphome::media_player::MediaPlayerCommand) (228 B)
+4. esphome::media_player::MediaPlayerCall::set_media_url(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (200 B)
+5. esphome::media_player::MediaPlayerCall::validate_() (130 B)
+6. esphome::media_player::media_player_state_to_string(esphome::media_player::MediaPlayerState) (120 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                               [esphome]time Detailed Analysis                                                
+==============================================================================================================================
+
+Total symbols: 28
+Total size: 1,882 B
+
+[esphome]time Symbols > 100 B (4 symbols):
+1. esphome::time::CronTrigger::loop() (474 B)
+2. esphome::time::RealTimeClock::synchronize_epoch_(unsigned long) (212 B)
+3. esphome::time::CronTrigger::matches(esphome::ESPTime const&) (154 B)
+4. esphome::time::SyncTrigger::SyncTrigger(esphome::time::RealTimeClock*) (116 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]display Detailed Analysis                                              
+==============================================================================================================================
+
+Total symbols: 13
+Total size: 1,720 B
+
+[esphome]display Symbols > 100 B (2 symbols):
+1. esphome::display::Display::test_card() (752 B)
+2. esphome::display::Display::draw_pixels_at(int, int, int, int, unsigned char const*, esphome::display::ColorOrder, esphome::display::ColorBitness, bool, int, int, int) (422 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                            [esphome]microphone Detailed Analysis                                             
+==============================================================================================================================
+
+Total symbols: 19
+Total size: 1,576 B
+
+[esphome]microphone Symbols > 100 B (7 symbols):
+1. esphome::microphone::MicrophoneSource::process_audio_(std::vector<unsigned char, std::allocator<unsigned char> > const&, std::vector<unsigned char, std::allocator<unsigned char> >&) (458 B)
+2. std::_Function_handler<void (std::vector<unsigned char, std::allocator<unsigned char> > const&), esphome::microphone::MicrophoneSource::add_data_callback(std::function<void (std::vector<unsigned char, std::allocator<unsigned char> > const&)>&&)::{lambda(std::vector<unsigned char, std::allocator<unsigned char> > const&)#1}>::_M_invoke(std::_Any_data const&, std::vector<unsigned char, std::allocator<unsigned char> > const&) (184 B)
+3. std::_Function_handler<void (std::vector<unsigned char, std::allocator<unsigned char> > const&), esphome::microphone::Microphone::add_data_callback(std::function<void (std::vector<unsigned char, std::allocator<unsigned char> > const&)>&&)::{lambda(std::vector<unsigned char, std::allocator<unsigned char> > const&)#1}>::_M_invoke(std::_Any_data const&, std::vector<unsigned char, std::allocator<unsigned char> > const&) (130 B)
+4. esphome::microphone::Microphone::add_data_callback(std::function<void (std::vector<unsigned char, std::allocator<unsigned char> > const&)>&&) (124 B)
+5. esphome::microphone::MicrophoneSource::add_data_callback(std::function<void (std::vector<unsigned char, std::allocator<unsigned char> > const&)>&&) (122 B)
+6. std::_Function_handler<void (std::vector<unsigned char, std::allocator<unsigned char> > const&), esphome::microphone::Microphone::add_data_callback(std::function<void (std::vector<unsigned char, std::allocator<unsigned char> > const&)>&&)::{lambda(std::vector<unsigned char, std::allocator<unsigned char> > const&)#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+7. std::_Function_handler<void (std::vector<unsigned char, std::allocator<unsigned char> > const&), esphome::microphone::MicrophoneSource::add_data_callback(std::function<void (std::vector<unsigned char, std::allocator<unsigned char> > const&)>&&)::{lambda(std::vector<unsigned char, std::allocator<unsigned char> > const&)#1}>::_M_manager(std::_Any_data&, std::_Any_data const&, std::_Manager_operation) (110 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                              [esphome]select Detailed Analysis                                               
+==============================================================================================================================
+
+Total symbols: 21
+Total size: 1,484 B
+
+[esphome]select Symbols > 100 B (3 symbols):
+1. esphome::select::SelectCall::perform() (410 B)
+2. esphome::select::Select::publish_state(unsigned int) (366 B)
+3. esphome::select::Select::index_of(char const*, unsigned int) const (114 B)
+==============================================================================================================================
+
+==============================================================================================================================
+                                          [external]material_theme Detailed Analysis                                          
+==============================================================================================================================
+
+Total symbols: 17
+Total size: 3,410 B
+
+[external]material_theme Symbols > 100 B (7 symbols):
+1. esphome::material_theme::MaterialThemeComponent::generate_scheme(unsigned long, bool, float, esphome::material_theme::SchemeVariant) (1,562 B)
+2. esphome::material_theme::MaterialThemeComponent::dump_config() (398 B)
+3. esphome::material_theme::GenerateSchemeAction<>::play() (356 B)
+4. void std::vector<std::function<void (esphome::material_theme::ColorScheme const&)>, std::allocator<std::function<void (esphome::material_theme::ColorScheme const&)> > >::_M_realloc_append<std::function<void (esphome::material_theme::ColorScheme const&)> const&>(std::function<void (esphome::material_theme::ColorScheme const&)> const&) (234 B)
+5. esphome::material_theme::LVGLThemeApplicator::apply_scheme_to_lvgl(esphome::lvgl::LvglComponent*, esphome::material_theme::ColorScheme const&, bool) (174 B)
+6. std::_Function_handler<void (esphome::material_theme::ColorScheme const&), setup()::{lambda()#9}::operator()() const::{lambda(esphome::material_theme::ColorScheme const&)#1}>::_M_invoke(std::_Any_data const&, esphome::material_theme::ColorScheme const&) (162 B)
+7. esphome::material_theme::MaterialThemeComponent::argb_to_hex[abi:cxx11](unsigned long) (112 B)
+==============================================================================================================================
+
+================================================================================
+                          RAM Strings Analysis (ESP32)                          
+================================================================================
+
+SECTION ANALYSIS
+--------------------------------------------------------------------------------
+Section              Address      Size         Location
+--------------------------------------------------------------------------------
+.dram0.data          0x4ff10d80      13644 B   RAM
+.dram0.bss           0x4ff142d0      18664 B   RAM
+--------------------------------------------------------------------------------
+Total RAM sections size: 32,308 bytes
+Total Flash sections size: 7,786,528 bytes
+
+================================================================================
+STRINGS IN RAM SECTIONS
+================================================================================
+Note: .bss sections contain uninitialized data (no strings to extract)
+
+Section: .dram0.data
+----------------------------------------
+  0x4ff111ad: "%uH %uH$%uH(%uH,%uH" (len=19)
+  0x4ff12198: "esp_psram" (len=9)
+  0x4ff122f4: "Tasks currently running:" (len=24)
+  0x4ff1245b: "Ospi_flash" (len=10)
+  0x4ff1260b: "Hmspi_timing_psram_select_best_tuning_delayline" (len=47)
+  0x4ff1263c: "mspi_timing_config_psram_set_tuning_delayline" (len=45)
+  0x4ff12670: "_timing_psram_select_best_tuning_phase" (len=38)
+  0x4ff12698: "mspi_timing_config_psram_prepare_reference_data" (len=47)
+  0x4ff12980: "mspi_timing_config_set_psram_clock" (len=34)
+  0x4ff129a4: "pmu_power_domain_force_default" (len=30)
+  0x4ff129c4: "pmu_lp_system_init_default" (len=26)
+  0x4ff129e0: "pmu_hp_system_init_default" (len=26)
+  0x4ff129fc: "pmu_lp_system_init" (len=18)
+  0x4ff12a10: "pmu_hp_system_init" (len=18)
+  0x4ff12a3c: "pmu_lp_system_analog_param_default" (len=34)
+  0x4ff12a78: "pmu_lp_system_power_param_default" (len=33)
+  0x4ff12ab4: "pmu_hp_system_retention_param_default" (len=37)
+  0x4ff12b00: "pmu_hp_system_analog_param_default" (len=34)
+  0x4ff12b2f: "1pmu_hp_system_digital_param_default" (len=36)
+  0x4ff12b83: "0pmu_hp_system_clock_param_default" (len=34)
+  0x4ff12bcc: "pmu_hp_system_power_param_default" (len=33)
+  0x4ff12bf0: "get_lp_hp_gap" (len=13)
+  0x4ff12c00: "pmu_sleep_disable_regdma_backup" (len=31)
+  0x4ff12c20: "pmu_sleep_enable_regdma_backup" (len=30)
+  0x4ff12c40: "integer >= 1 && integer <= HP_SYS_CLKRST_REG_CPU_CLK_DIV_NUM_V" (len=62)
+  0x4ff12c84: "/IDF/components/hal/esp32p4/include/hal/clk_tree_ll.h" (len=53)
+  0x4ff12cbc: "numerator <= HP_SYS_CLKRST_REG_CPU_CLK_DIV_NUMERATOR_V" (len=54)
+  0x4ff12cf4: "denominator <= HP_SYS_CLKRST_REG_CPU_CLK_DIV_DENOMINATOR_V" (len=58)
+  0x4ff12d30: "xtal_freq_mhz == SOC_XTAL_FREQ_40M" (len=34)
+  0x4ff12ddc: "PMU_instance()->hal" (len=19)
+  0x4ff12df0: "//IDF/components/esp_hw_support/port/esp32p4/pmu_sleep.c" (len=56)
+  0x4ff12e2c: "(lp_hp_gap >= -15) && (lp_hp_gap <= 7)" (len=38)
+  0x4ff12e54: "//IDF/components/esp_hw_support/port/esp32p4/pmu_pvt.c" (len=54)
+  0x4ff12e8c: "len == MSPI_TIMING_TEST_DATA_LEN" (len=32)
+  0x4ff12eb0: "//IDF/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/mspi_timing_by_dqs.c" (len=90)
+  0x4ff12f24: "s_psram_best_phase != MSPI_LL_DQS_PHASE_MAX" (len=43)
+  0x4ff12f50: "consecutive_length <= 32" (len=24)
+  0x4ff12f6c: "ctx->hal" (len=8)
+  0x4ff12f78: "//IDF/components/esp_hw_support/port/esp32p4/pmu_init.c" (len=55)
+  0x4ff12fb4: "freqdiv > 0" (len=11)
+  0x4ff12fc0: "//IDF/components/esp_hw_support/mspi_timing_tuning/port/esp32p4/mspi_timing_config.c" (len=84)
+  0x4ff13018: "mode < ARRAY_SIZE(hp_power)" (len=27)
+  0x4ff13034: "//IDF/components/esp_hw_support/port/esp32p4/pmu_param.c" (len=56)
+  0x4ff13070: "mode < ARRAY_SIZE(hp_clock)" (len=27)
+  0x4ff1308c: "mode < ARRAY_SIZE(hp_digital)" (len=29)
+  0x4ff130ac: "mode < ARRAY_SIZE(hp_analog)" (len=28)
+  0x4ff130cc: "mode < ARRAY_SIZE(hp_retention)" (len=31)
+  0x4ff130ec: "mode < ARRAY_SIZE(lp_power)" (len=27)
+  0x4ff13108: "mode < ARRAY_SIZE(lp_analog)" (len=28)
+  0x4ff13350: "F/components/esp_mm/esp_cache_msync.c" (len=37)
+  0x4ff133bc: "hex_psram" (len=9)
+  0x4ff133f4: "actual_mapped_len == CONFIG_MMU_PAGE_SIZE" (len=41)
+  0x4ff13420: "//IDF/components/esp_psram/xip_impl/mmu_psram_flash_v2.c" (len=56)
+  0x4ff13470: "_UP_BY(size, CONFIG_MMU_PAGE_SIZE)" (len=34)
+  0x4ff13494: "mmu_psram" (len=9)
+  0x4ff1355c: "is_mapped" (len=9)
+  0x4ff13568: "target == MMU_TARGET_PSRAM0" (len=27)
+  0x4ff13584: "%s failed: esp_err_t 0x%x" (len=25)
+  0x4ff135e0: "ESP_ERROR_CHECK_WITHOUT_ABORT" (len=29)
+  0x4ff13600: "ESP_ERROR_CHECK" (len=15)
+  0x4ff13610: "image_process" (len=13)
+  0x4ff13728: "cnt == 2" (len=8)
+  0x4ff13734: "//IDF/components/esp_system/port/image_process.c" (len=48)
+  0x4ff13768: "out_drom_paddr_start && out_irom_paddr_start" (len=44)
+  0x4ff13820: "/IDF/components/hal/esp32p4/include/hal/mmu_ll.h" (len=48)
+  0x4ff13854: "mmu_ll_check_valid_paddr_region(mmu_id, paddr, 1)" (len=49)
+  0x4ff13888: "/IDF/components/hal/mmu_hal.c" (len=29)
+  0x4ff138a8: "vaddr % page_size_in_bytes == 0" (len=31)
+  0x4ff138c8: "paddr % page_size_in_bytes == 0" (len=31)
+  0x4ff138e8: "mmu_ll_check_valid_paddr_region(mmu_id, paddr, len)" (len=51)
+  0x4ff1391c: "mmu_hal_check_valid_ext_vaddr_region(mmu_id, vaddr, len, MMU_VADDR_DATA | MMU_VADDR_INSTRUCTION)" (len=96)
+  0x4ff13980: "mmu_hal_check_valid_ext_vaddr_region(mmu_id, vaddr, 1, MMU_VADDR_DATA | MMU_VADDR_INSTRUCTION)" (len=94)
+  0x4ff139e4: "cache_level && (cache_level <= CACHE_LL_LEVEL_NUMS)" (len=51)
+  0x4ff13a18: "/IDF/components/hal/cache_hal.c" (len=31)
+  0x4ff13a38: "cache_level <= CACHE_LL_LEVEL_NUMS" (len=34)
+  0x4ff13a84: "/IDF/components/hal/esp32p4/include/hal/cache_ll.h" (len=50)
+  0x4ff13ab8: "range < SOC_LEDC_GAMMA_CURVE_FADE_RANGE_MAX" (len=43)
+  0x4ff13ae8: "/IDF/components/hal/esp32p4/include/hal/ledc_ll.h" (len=49)
+  0x4ff13b1c: "abort() was called at PC 0x" (len=27)
+  0x4ff13b38: " on core " (len=9)
+  0x4ff13b44: "<cached disabled>" (len=17)
+  0x4ff13b5c: "assert failed: " (len=15)
+  0x4ff13bfc: "out_write_protect!=NULL" (len=23)
+  0x4ff13c14: "//IDF/components/spi_flash/spi_flash_chip_generic.c" (len=51)
+  0x4ff13c64: "start_address < 0x1000000" (len=25)
+  0x4ff13c80: "//IDF/components/spi_flash/memspi_host_driver.c" (len=47)
+  0x4ff13cc0: " <= 0x1000000" (len=13)
+  0x4ff13cd0: "plaintext_offs + size <= SOC_FLASH_ENCRYPTED_XTS_AES_BLOCK_MAX" (len=62)
+  0x4ff13d10: "/IDF/components/hal/esp32p4/include/hal/spi_flash_encrypted_ll.h" (len=64)
+  0x4ff13d54: "clk_ll_mpll_set_config" (len=22)
+  0x4ff13d6c: "clk_ll_cpll_set_config" (len=22)
+  0x4ff13d84: "clk_ll_cpu_set_divider" (len=22)
+  0x4ff13ddf: ">esp_cache_get_alignment" (len=24)
+  0x4ff13df8: "s_c2m_ops" (len=9)
+  0x4ff13e04: "esp_cache_msync" (len=15)
+  0x4ff13e14: "esp_cache_msync" (len=15)
+  0x4ff13e54: "mmu_xip_psram_flash_vaddr_to_paddr" (len=34)
+  0x4ff13e78: "s_do_load_from_flash" (len=20)
+  0x4ff13e90: "process_image_header" (len=20)
+  0x4ff13eb8: "process_segments" (len=16)
+  0x4ff13ecc: "process_segments" (len=16)
+  0x4ff13ee0: "image_process_get_flash_segments_info" (len=37)
+  0x4ff13f08: "cache_ll_get_line_size" (len=22)
+  0x4ff13f30: "che_line_size" (len=13)
+  0x4ff13f54: "cache_hal_suspend" (len=17)
+  0x4ff13f68: "s_get_cache_state" (len=17)
+  0x4ff13f94: "mmu_ll_vaddr_to_id" (len=18)
+  0x4ff13fa8: "mmu_ll_find_entry_id_based_on_map_value" (len=39)
+  0x4ff13fd0: "mmu_hal_paddr_to_vaddr" (len=22)
+  0x4ff13fe8: "mmu_ll_get_entry_target" (len=23)
+  0x4ff14000: "mmu_ll_check_entry_valid" (len=24)
+  0x4ff1401c: "mmu_hal_vaddr_to_paddr" (len=22)
+  0x4ff14034: "mmu_hal_unmap_region" (len=20)
+  0x4ff1404c: "mmu_ll_write_entry" (len=18)
+  0x4ff14060: "mmu_ll_check_valid_paddr_region" (len=31)
+  0x4ff14080: "mmu_hal_map_region" (len=18)
+  0x4ff14094: "mmu_ll_set_entry_invalid" (len=24)
+  0x4ff140b0: "spi_flash_encrypt_ll_plaintext_save" (len=35)
+  0x4ff140d4: "memspi_host_program_page" (len=24)
+  0x4ff140f0: "memspi_host_erase_block" (len=23)
+  0x4ff14108: "memspi_host_erase_sector" (len=24)
+  0x4ff14204: "spi_flash_chip_generic_get_write_protect" (len=40)
+  0x4ff142ab: "Ogeneric" (len=8)
+  0x4ff142b4: "chip_generic" (len=12)
+
+================================================================================
+LARGE DATA SYMBOLS IN RAM (>= 50 bytes)
+================================================================================
+
+Symbol                                             Type   Size       Section
+--------------------------------------------------------------------------------
+xIsrStack                                          B          3072 B  .dram0.bss
+s_retention                                        d          2008 B  .dram0.data
+packet.19                                          b          1460 B  .dram0.bss
+dns_table                                          b          1104 B  .dram0.bss
+esphome::App                                       B           808 B  .dram0.bss
+s_intr_handlers                                    b           512 B  .dram0.bss
+s_test_data                                        d           512 B  .dram0.data
+pxReadyTasksLists                                  b           500 B  .dram0.bss
+g_wifi_osi_funcs                                   B           480 B  .dram0.bss
+mdns_task_buffer.14                                b           340 B  .dram0.bss
+uart_context                                       d           336 B  .dram0.data
+__sf                                               B           312 B  .dram0.bss
+_on_exit_args_instance                             b           264 B  .dram0.bss
+n.21                                               b           263 B  .dram0.bss
+opa_table.0                                        b           256 B  .dram0.bss
+s_dma_desc                                         d           256 B  .dram0.data
+s_log_cache                                        b           248 B  .dram0.bss
+_impure_data                                       D           240 B  .dram0.data
+arp_table                                          b           240 B  .dram0.bss
+supported_ciphersuites                             b           236 B  .dram0.bss
+g_hosted_osi_funcs                                 D           228 B  .dram0.data
+diag_cmds                                          d           224 B  .dram0.data
+sockets                                            b           220 B  .dram0.bss
+s_fd_table                                         d           192 B  .dram0.data
+s_host_ctx                                         d           184 B  .dram0.data
+s_test_delayline_config                            d           184 B  .dram0.data
+s_ipc_ack_buffer                                   d           168 B  .dram0.data
+s_ipc_mutex_buffer                                 d           168 B  .dram0.data
+ucStaticTimerQueueStorage.15                       b           160 B  .dram0.bss
+s_stub_table                                       d           156 B  .dram0.data
+s_config                                           d           144 B  .dram0.data
+__atexit0                                          B           140 B  .dram0.bss
+socket_ipv4_multicast_memberships                  b           132 B  .dram0.bss
+_lv_draw_mask_list                                 B           128 B  .dram0.bss
+lv_mem_buf                                         B           128 B  .dram0.bss
+esp_flash_chip_gd                                  D           124 B  .dram0.data
+esp_flash_chip_generic                             D           124 B  .dram0.data
+_lv_circle_cache                                   B           112 B  .dram0.bss
+esp_flash_default_host                             d            88 B  .dram0.data
+esp_flash_gpspi_host                               d            88 B  .dram0.data
+s_mmu_ctx                                          b            88 B  .dram0.bss
+s_transport_config                                 b            88 B  .dram0.bss
+tzinfo                                             d            88 B  .dram0.data
+__lock___arc4random_mutex                          B            84 B  .dram0.bss
+__lock___at_quick_exit_mutex                       B            84 B  .dram0.bss
+__lock___atexit_recursive_mutex                    B            84 B  .dram0.bss
+__lock___dd_hash_mutex                             B            84 B  .dram0.bss
+__lock___env_recursive_mutex                       B            84 B  .dram0.bss
+__lock___malloc_recursive_mutex                    B            84 B  .dram0.bss
+__lock___sfp_recursive_mutex                       B            84 B  .dram0.bss
+__lock___sinit_recursive_mutex                     B            84 B  .dram0.bss
+__lock___tz_mutex                                  B            84 B  .dram0.bss
+loop_netif                                         b            84 B  .dram0.bss
+op_sem_buf.1                                       b            84 B  .dram0.bss
+op_sem_buf.3                                       b            84 B  .dram0.bss
+s_common_mutex                                     b            84 B  .dram0.bss
+s_common_recursive_mutex                           b            84 B  .dram0.bss
+xStaticTimerQueue.14                               b            84 B  .dram0.bss
+rpc_evt_cb_table                                   b            80 B  .dram0.bss
+context                                            b            76 B  .dram0.bss
+__c.9                                              d            75 B  .dram0.data
+buf.18                                             b            65 B  .dram0.bss
+buf.20                                             b            65 B  .dram0.bss
+idle_cb                                            b            64 B  .dram0.bss
+input                                              b            64 B  .dram0.bss
+s_ldo_channels                                     d            64 B  .dram0.data
+tick_cb                                            b            64 B  .dram0.bss
+__c.5                                              d            62 B  .dram0.data
+esp_audio_libs::flac::FIXED_COEFFICIENTS           b            60 B  .dram0.bss
+async_rsp_table                                    b            60 B  .dram0.bss
+__c.2                                              d            59 B  .dram0.data
+__c.4                                              d            59 B  .dram0.data
+ref_counts                                         b            57 B  .dram0.bss
+ecp_supported_grp_id                               b            52 B  .dram0.bss
+s_psram_ctx                                        b            52 B  .dram0.bss
+s_tuning_cfg_drv                                   b            52 B  .dram0.bss
+
+================================================================================
+SUMMARY
+================================================================================
+Total strings found in RAM: 124
+Total bytes used by strings: 4,068
+
+================================================================================
+POTENTIAL OPTIMIZATION TARGETS
+================================================================================
+
+Repeated strings (could be deduplicated):
+  "process_segments" - appears 2 times (potential savings: 17 bytes)
+  "esp_cache_msync" - appears 2 times (potential savings: 16 bytes)
+
+Long strings in DRAM (>= 20 chars):
+Note: ESP32 DRAM strings may be required for interrupt/early-boot contexts
+  .dram0.data @ 0x4ff1391c: "mmu_hal_check_valid_ext_vaddr_region(mmu_id, vaddr, len, MMU..." (96 bytes)
+  .dram0.data @ 0x4ff13980: "mmu_hal_check_valid_ext_vaddr_region(mmu_id, vaddr, 1, MMU_V..." (94 bytes)
+  .dram0.data @ 0x4ff12eb0: "//IDF/components/esp_hw_support/mspi_timing_tuning/tuning_sc..." (90 bytes)
+  .dram0.data @ 0x4ff12fc0: "//IDF/components/esp_hw_support/mspi_timing_tuning/port/esp3..." (84 bytes)
+  .dram0.data @ 0x4ff13d10: "/IDF/components/hal/esp32p4/include/hal/spi_flash_encrypted_..." (64 bytes)
+  .dram0.data @ 0x4ff12c40: "integer >= 1 && integer <= HP_SYS_CLKRST_REG_CPU_CLK_DIV_NUM..." (62 bytes)
+  .dram0.data @ 0x4ff13cd0: "plaintext_offs + size <= SOC_FLASH_ENCRYPTED_XTS_AES_BLOCK_M..." (62 bytes)
+  .dram0.data @ 0x4ff12cf4: "denominator <= HP_SYS_CLKRST_REG_CPU_CLK_DIV_DENOMINATOR_V" (58 bytes)
+  .dram0.data @ 0x4ff12df0: "//IDF/components/esp_hw_support/port/esp32p4/pmu_sleep.c" (56 bytes)
+  .dram0.data @ 0x4ff13034: "//IDF/components/esp_hw_support/port/esp32p4/pmu_param.c" (56 bytes)
+

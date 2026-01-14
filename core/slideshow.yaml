@@ -44,11 +44,16 @@ script:
                     return;
                   }
 
-                  id(slideshow_queue_ids).clear();
-                  id(slot_source_colors_map).clear();
+                  // 1. Capture state before appending
+                  // We track this so we know if we need to 'start' the slideshow or just 'extend' it.
+                  bool was_empty = id(slideshow_queue_ids).empty();
+                  size_t previous_size = id(slideshow_queue_ids).size();
+                  // id(slideshow_queue_ids).clear();
+                  // id(slot_source_colors_map).clear();
 
                   // Parse Packed JSON: Root is an Array of batches
                   // [[[ "url", "color" ], ...], ...]
+                  // Logic: Loop through the JSON and push_back to the existing vector.
                   auto doc = json::parse_json(body);
                   
                   if (!doc.is<JsonArray>()) {
@@ -58,19 +63,20 @@ script:
 
                   JsonArray root = doc.as<JsonArray>();
 
-                  // Iterate through the structure (flattening the batches)
                   for (JsonArray batch : root) {
                     for (JsonArray item : batch) {
-                       // item is an array of image variants (we usually take the first one)
+                       // item is an array of variants, take the first one
                        if (item.size() > 0) {
                          JsonArray img_data = item[0].as<JsonArray>();
                          
                          // img_data[0] = URL, img_data[1] = Color
                          if (img_data.size() > 0) {
                            std::string url = img_data[0].as<std::string>();
+                           
+                           // APPEND to the list
                            id(slideshow_queue_ids).push_back(url);
 
-                           // Store color if present
+                           // Map color to the NEW index
                            if (img_data.size() > 1) {
                              int q_idx = id(slideshow_queue_ids).size() - 1;
                              id(slot_source_colors_map)[q_idx] = img_data[1].as<std::string>();
@@ -80,43 +86,50 @@ script:
                     }
                   }
                   
+                  // Log the result
+                  size_t added_count = id(slideshow_queue_ids).size() - previous_size;
+                  ESP_LOGI("slideshow_api", "Appended %d images. Total: %d", added_count, id(slideshow_queue_ids).size());
                   id(slideshow_queue_status).publish_state("OK (" + to_string(id(slideshow_queue_ids).size()) + " imgs)");
-                  ESP_LOGI("slideshow_api", "Packed queue fetched. Total images: %d", id(slideshow_queue_ids).size());
 
-                  // Reset logic to start
-                  id(slideshow_queue_index) = 0;
-                  id(image_index).publish_state(0); 
+                  // 3. Reset Logic
+                  // Only reset the index to 0 if the queue was empty (i.e. first load).
+                  // If we are just appending more images, we let the user keep their place.
+                  if (was_empty && !id(slideshow_queue_ids).empty()) {
+                    id(slideshow_queue_index) = 0;
+                    id(image_index).publish_state(0); 
+                  }
                   
-                  // Trigger initial load
+                  // 4. Trigger Memory Manager
+                  // This is crucial: if we were stuck at the end of the list, this will 
+                  // detect the new images and immediately start loading the "Next" one.
                   id(manage_slideshow_memory).execute();
 
-  # -------------------------------------------------------------------------
+ # -------------------------------------------------------------------------
   # Logic & Memory Management
   # -------------------------------------------------------------------------
   - id: manage_slideshow_memory
     mode: restart
     then:
       - lambda: |-
-          // Configuration
-          const int WINDOW_SIZE = 3; // Keep Current, +1, +2 loaded
+          // Configuration: Keep Current + 2 Lookahead loaded
+          const int WINDOW_SIZE = 3; 
           int current_q_idx = id(slideshow_queue_index);
           int total_imgs = id(slideshow_queue_ids).size();
           
           if (total_imgs == 0) return;
 
-          // 1. Identify which Queue Indices should be loaded
+          // 1. Calculate the active "Window" of Queue Indices
           std::vector<int> active_queue_indices;
           for (int i = 0; i < WINDOW_SIZE; i++) {
-             // Handle wrapping
              int q_idx = (current_q_idx + i) % total_imgs; 
              active_queue_indices.push_back(q_idx);
           }
 
-          // 2. Map Queue Indices to Slots (0-5)
+          // 2. Iterate over all physical slots (0-5)
           for (int slot_idx = 0; slot_idx < 6; slot_idx++) {
             
-            // Does this physical slot (0-5) match any active queue index?
-            // Logic: Slot S handles Queue Q if (Q % 6 == S)
+            // Check if this slot is needed for any of our active queue indices
+            // Logic: Slot S is used for Queue Q if (Q % 6 == S)
             int target_queue_idx = -1;
             
             for (int q : active_queue_indices) {
@@ -129,24 +142,26 @@ script:
             auto *component = id(online_images)[slot_idx];
 
             if (target_queue_idx != -1) {
-              // ACTIVE: Ensure URL is set and downloading
+              // --- SLOT SHOULD BE ACTIVE ---
               std::string target_url = id(slideshow_queue_ids)[target_queue_idx];
               
-              // Handle full URL construction if the packed data is just ID
+              // If we have just an ID, construct the full URL
               std::string full_url = target_url; 
               if (full_url.find("http") == std::string::npos) {
                  full_url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + target_url;
               }
 
-              // Check if we need to start a download (if not already active or url changed)
+              // Load if not already active
+              // We also check if the URL has changed, just in case
               if (!id(image_slot_active)[slot_idx]) {
                 ESP_LOGI("slideshow_mem", "Loading Slot %d (Queue %d)", slot_idx, target_queue_idx);
                 component->set_url(full_url);
-                component->update(); // Trigger download
+                component->update(); 
                 id(image_slot_active)[slot_idx] = true;
               }
             } else {
-              // INACTIVE: Release memory
+              // --- SLOT SHOULD BE INACTIVE ---
+              // Release memory if it's currently active
               if (id(image_slot_active)[slot_idx]) {
                 ESP_LOGD("slideshow_mem", "Releasing Slot %d", slot_idx);
                 component->release();
@@ -158,27 +173,34 @@ script:
           id(update_debug_status).execute();
 
   - id: advance_slideshow
+    mode: single # Prevent double-clicks from messing up math
     then:
       - lambda: |-
-          int next_q = id(slideshow_queue_index) + 1;
           int total = id(slideshow_queue_ids).size();
-          
           if (total > 0) {
-            id(slideshow_queue_index) = next_q % total;
+            // 1. Advance the Global Queue Index
+            int next_q = (id(slideshow_queue_index) + 1) % total;
+            id(slideshow_queue_index) = next_q;
             
-            // Map queue index to 0-5 slot for the frontend
-            int next_slot = id(slideshow_queue_index) % 6;
+            // 2. Calculate which physical Slot (0-5) this corresponds to
+            int next_slot = next_q % 6;
+            
+            ESP_LOGI("slideshow", "Advancing to Queue Index %d (Slot %d)", next_q, next_slot);
+            
+            // 3. Update the Display
             id(image_index).publish_state(next_slot);
           }
+      # 4. Update Memory (Load the new lookahead, free the old previous)
       - script.execute: manage_slideshow_memory
+      # 5. Scroll the UI
       - script.execute: handle_lvgl_scroll
 
   - id: handle_lvgl_scroll
     then:
       - lambda: |-
           int slot = (int)id(image_index).state;
-          // Scroll LVGL container to the new slot
           lv_coord_t target_x = slot * ${screenwidth};
+          // Use LV_ANIM_ON for smooth scroll
           lv_obj_scroll_to_x(id(image_container), target_x, LV_ANIM_ON);
 
   - id: apply_image_colors
@@ -204,8 +226,8 @@ script:
     mode: restart
     then:
       - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
-      - script.execute: advance_slideshow
-      - script.execute: slideshow_timer
+      # - script.execute: advance_slideshow
+      # - script.execute: slideshow_timer
 
   - id: update_debug_status
     then:

@@ -482,7 +482,8 @@ lvgl:
                   y: 60
                   on_click:
                     then:
-                      - number.increment: image_index
+                      - script.execute: advance_slideshow
+                      # - number.increment: image_index
                       # - script.execute: find_next_valid_slot
               
               - button:
@@ -553,7 +554,7 @@ lvgl:
               then:
                 - script.execute: 
                     id: fetch_slideshow_queue
-                    count: 3
+                    count: 4
                 # - lambda: |-
                 #     static bool toggle = false;
                 #     toggle = !toggle;

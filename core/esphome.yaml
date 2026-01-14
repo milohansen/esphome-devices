@@ -36,7 +36,7 @@ wifi:
     - delay: 1s
     - script.execute:
         id: fetch_slideshow_queue
-        count: 3
+        count: 5
     # - delay: 1s
     # - lambda: |-
     #     id(image_index).publish_state(0);
