@@ -374,12 +374,12 @@ lvgl:
               - lambda: |-
                   lv_obj_scroll_to_x(id(image_container), 0, LV_ANIM_OFF);
 
-                  id(image_map)[0] = id(image_subcontainer_0);
-                  id(image_map)[1] = id(image_subcontainer_1);
-                  id(image_map)[2] = id(image_subcontainer_2);
-                  id(image_map)[3] = id(image_subcontainer_3);
-                  id(image_map)[4] = id(image_subcontainer_4);
-                  id(image_map)[5] = id(image_subcontainer_5);
+                  // id(image_map)[0] = id(image_subcontainer_0);
+                  // id(image_map)[1] = id(image_subcontainer_1);
+                  // id(image_map)[2] = id(image_subcontainer_2);
+                  // id(image_map)[3] = id(image_subcontainer_3);
+                  // id(image_map)[4] = id(image_subcontainer_4);
+                  // id(image_map)[5] = id(image_subcontainer_5);
 
             on_scroll_end:
               - lambda: |-
@@ -552,9 +552,8 @@ lvgl:
             on_click:
               then:
                 - script.execute: 
-                    id: fetch_slideshow_packed
-                    count: 1
-                    from_index: id(image_index).state
+                    id: fetch_slideshow_queue
+                    count: 3
                 # - lambda: |-
                 #     static bool toggle = false;
                 #     toggle = !toggle;

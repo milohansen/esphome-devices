@@ -187,119 +187,119 @@ text_sensor:
     internal: true
 
   # Image URL sensors - now populated from slideshow API
-  - id: ha_image_url_slot_0
-    platform: template
-    # internal: true
-    on_value:
-      - lambda: |-
-          id(image_slot_retry_count)[0] = 0;
-          id(image_slot_loading)[0] = false;
-      - delay: 100ms
-      - if:
-          condition:
-            lambda: |-
-              int current = (int)id(image_index).state;
-              int prev = (current - 1 + 6) % 6;
-              int next = (current + 1) % 6;
-              int lookahead = (current + 2) % 6;
-              return current == 0 || prev == 0 || next == 0 || lookahead == 0;
-          then:
-            - script.execute: update_online_images
+  # - id: ha_image_url_slot_0
+  #   platform: template
+  #   # internal: true
+  #   on_value:
+  #     - lambda: |-
+  #         id(image_slot_retry_count)[0] = 0;
+  #         id(image_slot_loading)[0] = false;
+  #     - delay: 100ms
+  #     - if:
+  #         condition:
+  #           lambda: |-
+  #             int current = (int)id(image_index).state;
+  #             int prev = (current - 1 + 6) % 6;
+  #             int next = (current + 1) % 6;
+  #             int lookahead = (current + 2) % 6;
+  #             return current == 0 || prev == 0 || next == 0 || lookahead == 0;
+  #         then:
+  #           - script.execute: update_online_images
 
-  - id: ha_image_url_slot_1
-    platform: template
-    # internal: true
-    on_value:
-      - lambda: |-
-          id(image_slot_retry_count)[1] = 0;
-          id(image_slot_loading)[1] = false;
-      - delay: 100ms
-      - if:
-          condition:
-            lambda: |-
-              int current = (int)id(image_index).state;
-              int prev = (current - 1 + 6) % 6;
-              int next = (current + 1) % 6;
-              int lookahead = (current + 2) % 6;
-              return current == 1 || prev == 1 || next == 1 || lookahead == 1;
-          then:
-            - script.execute: update_online_images
+  # - id: ha_image_url_slot_1
+  #   platform: template
+  #   # internal: true
+  #   on_value:
+  #     - lambda: |-
+  #         id(image_slot_retry_count)[1] = 0;
+  #         id(image_slot_loading)[1] = false;
+  #     - delay: 100ms
+  #     - if:
+  #         condition:
+  #           lambda: |-
+  #             int current = (int)id(image_index).state;
+  #             int prev = (current - 1 + 6) % 6;
+  #             int next = (current + 1) % 6;
+  #             int lookahead = (current + 2) % 6;
+  #             return current == 1 || prev == 1 || next == 1 || lookahead == 1;
+  #         then:
+  #           - script.execute: update_online_images
 
-  - id: ha_image_url_slot_2
-    platform: template
-    # internal: true
-    on_value:
-      - lambda: |-
-          id(image_slot_retry_count)[2] = 0;
-          id(image_slot_loading)[2] = false;
-      - delay: 100ms
-      - if:
-          condition:
-            lambda: |-
-              int current = (int)id(image_index).state;
-              int prev = (current - 1 + 6) % 6;
-              int next = (current + 1) % 6;
-              int lookahead = (current + 2) % 6;
-              return current == 2 || prev == 2 || next == 2 || lookahead == 2;
-          then:
-            - script.execute: update_online_images
+  # - id: ha_image_url_slot_2
+  #   platform: template
+  #   # internal: true
+  #   on_value:
+  #     - lambda: |-
+  #         id(image_slot_retry_count)[2] = 0;
+  #         id(image_slot_loading)[2] = false;
+  #     - delay: 100ms
+  #     - if:
+  #         condition:
+  #           lambda: |-
+  #             int current = (int)id(image_index).state;
+  #             int prev = (current - 1 + 6) % 6;
+  #             int next = (current + 1) % 6;
+  #             int lookahead = (current + 2) % 6;
+  #             return current == 2 || prev == 2 || next == 2 || lookahead == 2;
+  #         then:
+  #           - script.execute: update_online_images
 
-  - id: ha_image_url_slot_3
-    platform: template
-    # internal: true
-    on_value:
-      - lambda: |-
-          id(image_slot_retry_count)[3] = 0;
-          id(image_slot_loading)[3] = false;
-      - delay: 100ms
-      - if:
-          condition:
-            lambda: |-
-              int current = (int)id(image_index).state;
-              int prev = (current - 1 + 6) % 6;
-              int next = (current + 1) % 6;
-              int lookahead = (current + 2) % 6;
-              return current == 3 || prev == 3 || next == 3 || lookahead == 3;
-          then:
-            - script.execute: update_online_images
+  # - id: ha_image_url_slot_3
+  #   platform: template
+  #   # internal: true
+  #   on_value:
+  #     - lambda: |-
+  #         id(image_slot_retry_count)[3] = 0;
+  #         id(image_slot_loading)[3] = false;
+  #     - delay: 100ms
+  #     - if:
+  #         condition:
+  #           lambda: |-
+  #             int current = (int)id(image_index).state;
+  #             int prev = (current - 1 + 6) % 6;
+  #             int next = (current + 1) % 6;
+  #             int lookahead = (current + 2) % 6;
+  #             return current == 3 || prev == 3 || next == 3 || lookahead == 3;
+  #         then:
+  #           - script.execute: update_online_images
 
-  - id: ha_image_url_slot_4
-    platform: template
-    # internal: true
-    on_value:
-      - lambda: |-
-          id(image_slot_retry_count)[4] = 0;
-          id(image_slot_loading)[4] = false;
-      - delay: 100ms
-      - if:
-          condition:
-            lambda: |-
-              int current = (int)id(image_index).state;
-              int prev = (current - 1 + 6) % 6;
-              int next = (current + 1) % 6;
-              int lookahead = (current + 2) % 6;
-              return current == 4 || prev == 4 || next == 4 || lookahead == 4;
-          then:
-            - script.execute: update_online_images
+  # - id: ha_image_url_slot_4
+  #   platform: template
+  #   # internal: true
+  #   on_value:
+  #     - lambda: |-
+  #         id(image_slot_retry_count)[4] = 0;
+  #         id(image_slot_loading)[4] = false;
+  #     - delay: 100ms
+  #     - if:
+  #         condition:
+  #           lambda: |-
+  #             int current = (int)id(image_index).state;
+  #             int prev = (current - 1 + 6) % 6;
+  #             int next = (current + 1) % 6;
+  #             int lookahead = (current + 2) % 6;
+  #             return current == 4 || prev == 4 || next == 4 || lookahead == 4;
+  #         then:
+  #           - script.execute: update_online_images
 
-  - id: ha_image_url_slot_5
-    platform: template
-    # internal: true
-    on_value:
-      - lambda: |-
-          id(image_slot_retry_count)[5] = 0;
-          id(image_slot_loading)[5] = false;
-      - delay: 100ms
-      - if:
-          condition:
-            lambda: |-
-              int current = (int)id(image_index).state;
-              int prev = (current - 1 + 6) % 6;
-              int next = (current + 1) % 6;
-              int lookahead = (current + 2) % 6;
-              return current == 5 || prev == 5 || next == 5 || lookahead == 5;
-          then:
-            - script.execute: update_online_images
+  # - id: ha_image_url_slot_5
+  #   platform: template
+  #   # internal: true
+  #   on_value:
+  #     - lambda: |-
+  #         id(image_slot_retry_count)[5] = 0;
+  #         id(image_slot_loading)[5] = false;
+  #     - delay: 100ms
+  #     - if:
+  #         condition:
+  #           lambda: |-
+  #             int current = (int)id(image_index).state;
+  #             int prev = (current - 1 + 6) % 6;
+  #             int next = (current + 1) % 6;
+  #             int lookahead = (current + 2) % 6;
+  #             return current == 5 || prev == 5 || next == 5 || lookahead == 5;
+  #         then:
+  #           - script.execute: update_online_images
 
   # - platform: debug
   #   device:
