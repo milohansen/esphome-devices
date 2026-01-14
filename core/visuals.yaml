@@ -7,7 +7,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
       - script.execute:
           id: online_image_download_finished
@@ -35,7 +35,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -52,7 +52,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -69,7 +69,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -86,7 +86,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -103,7 +103,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -120,7 +120,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -137,7 +137,7 @@ online_image:
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
     update_interval: never
-    placeholder: landscape
+    placeholder: placeholder_image
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
@@ -148,39 +148,11 @@ online_image:
           index: 7
 
 image:
-  - file: assets/images/DSC_4482.jpg
-    id: landscape
+  - file: assets/images/bella-small.jpg
+    id: placeholder_image
     type: RGB565
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
-  - file: assets/images/DSC_6532.jpg
-    id: owl
-    type: RGB565
-    byte_order: little_endian
-    resize: ${screenwidth}x${screenheight}
-  - file: assets/images/DSC_8007.jpg
-    id: crow
-    type: RGB565
-    byte_order: little_endian
-    resize: ${screenwidth}x${screenheight}
-
-  - id: image_0
-    # file: "https://placehold.co/900x600/4f46e5/FFFFFF/jpeg"
-    file: "/mnt/g/Photos/Exports/Display/PXL_20251204_051321059.jpg"
-    type: RGB565
-    byte_order: little_endian
-    resize: ${screenwidth}x${screenheight}
-  - id: image_1
-    # file: "https://placehold.co/900x600/4f46e5/FFFFFF/jpeg"
-    file: "/mnt/g/Photos/Exports/2025/12/DSC_2100.jpg"
-    type: RGB565
-    byte_order: little_endian
-    resize: ${screenwidth}x${screenheight}
-
-  # - id: placeholder_jpeg
-  #   file: "https://placehold.co/900x600/orange/FFFFFF/jpeg"
-  #   type: RGB565
-  #   byte_order: little_endian
 
 font:
 # Monospace Fonts

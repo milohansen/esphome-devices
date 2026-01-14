@@ -394,11 +394,11 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_0
-                        src: image_1
+                        src: placeholder_image
                     # - image:
                     #     <<: *image_template
                     #     id: test_pairing
-                    #     src: image_1
+                    #     src: placeholder_image
                     - label:
                         <<: *image_label_template
                         text: "0"
@@ -409,7 +409,7 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_1
-                        src: landscape
+                        src: placeholder_image
                     - label:
                         <<: *image_label_template
                         text: "1"
@@ -420,7 +420,7 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_2
-                        src: image_0
+                        src: placeholder_image
                     - label:
                         <<: *image_label_template
                         text: "2"
@@ -431,7 +431,7 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_3
-                        src: landscape
+                        src: placeholder_image
                     - label:
                         <<: *image_label_template
                         text: "3"
@@ -442,7 +442,7 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_4
-                        src: crow
+                        src: placeholder_image
                     - label:
                         <<: *image_label_template
                         text: "4"
@@ -453,7 +453,7 @@ lvgl:
                     - image:
                         <<: *image_template
                         id: background_image_5
-                        src: owl
+                        src: placeholder_image
                     - label:
                         <<: *image_label_template
                         text: "5"
@@ -552,9 +552,10 @@ lvgl:
             y: -60
             on_click:
               then:
-                - script.execute: 
-                    id: fetch_slideshow_queue
-                    count: 4
+                - script.execute: cleanup_slideshow_queue
+                # - script.execute: 
+                #     id: fetch_slideshow_queue
+                #     count: 4
                 # - lambda: |-
                 #     static bool toggle = false;
                 #     toggle = !toggle;

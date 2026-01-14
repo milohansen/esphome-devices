@@ -42,7 +42,7 @@ number:
           id: debug_label
           text: !lambda 'return "Idx: " + to_string((int)x);'
       # - script.execute: advance_slideshow
-      - script.execute: apply_image_colors
+      # - script.execute: apply_image_colors
       # - script.execute: update_online_images
       - script.stop: slideshow_timer
       - script.execute: slideshow_timer
