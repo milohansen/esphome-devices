@@ -32,15 +32,18 @@ number:
     entity_category: diagnostic
     optimistic: true
     restore_value: false
-    internal: true
-    mode: box
+    # internal: true
     min_value: 0
     max_value: 5
     step: 1
     initial_value: 0
     on_value:
+      - lvgl.label.update:
+          id: debug_label
+          text: !lambda 'return "Idx: " + to_string((int)x);'
+      # - script.execute: advance_slideshow
       - script.execute: apply_image_colors
-      - script.execute: update_online_images
+      # - script.execute: update_online_images
       - script.stop: slideshow_timer
       - script.execute: slideshow_timer
 

@@ -116,6 +116,7 @@ packages: # Local
   assistant: !include core/assistant.yaml
   timers: !include core/timers.yaml
   material_theme_integration: !include core/material_theme.yaml
+  slideshow: !include core/slideshow.yaml
   # core: !include localtest/core-lvgl.yaml
 
   peripherals: !include hw/peripherals.yaml

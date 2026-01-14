@@ -189,7 +189,7 @@ text_sensor:
   # Image URL sensors - now populated from slideshow API
   - id: ha_image_url_slot_0
     platform: template
-    internal: true
+    # internal: true
     on_value:
       - lambda: |-
           id(image_slot_retry_count)[0] = 0;
@@ -208,7 +208,7 @@ text_sensor:
 
   - id: ha_image_url_slot_1
     platform: template
-    internal: true
+    # internal: true
     on_value:
       - lambda: |-
           id(image_slot_retry_count)[1] = 0;
@@ -227,7 +227,7 @@ text_sensor:
 
   - id: ha_image_url_slot_2
     platform: template
-    internal: true
+    # internal: true
     on_value:
       - lambda: |-
           id(image_slot_retry_count)[2] = 0;
@@ -246,7 +246,7 @@ text_sensor:
 
   - id: ha_image_url_slot_3
     platform: template
-    internal: true
+    # internal: true
     on_value:
       - lambda: |-
           id(image_slot_retry_count)[3] = 0;
@@ -265,7 +265,7 @@ text_sensor:
 
   - id: ha_image_url_slot_4
     platform: template
-    internal: true
+    # internal: true
     on_value:
       - lambda: |-
           id(image_slot_retry_count)[4] = 0;
@@ -284,7 +284,7 @@ text_sensor:
 
   - id: ha_image_url_slot_5
     platform: template
-    internal: true
+    # internal: true
     on_value:
       - lambda: |-
           id(image_slot_retry_count)[5] = 0;

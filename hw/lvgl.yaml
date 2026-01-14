@@ -239,6 +239,11 @@ lvgl:
 
   top_layer:
     widgets:
+      - label:
+          <<: *image_label_template
+          id: debug_label
+          text: "0"
+          align: TOP_MID
       - obj:
           id: assistant_container
           y: -42px
@@ -390,10 +395,10 @@ lvgl:
                         <<: *image_template
                         id: background_image_0
                         src: image_1
-                    - image:
-                        <<: *image_template
-                        id: test_pairing
-                        src: image_1
+                    # - image:
+                    #     <<: *image_template
+                    #     id: test_pairing
+                    #     src: image_1
                     - label:
                         <<: *image_label_template
                         text: "0"
@@ -477,7 +482,8 @@ lvgl:
                   y: 60
                   on_click:
                     then:
-                      - script.execute: find_next_valid_slot
+                      - number.increment: image_index
+                      # - script.execute: find_next_valid_slot
               
               - button:
                   id: button_show_timers
@@ -498,16 +504,6 @@ lvgl:
                         text_font: font_icons
                         text_color: text_inverse
                         text: "\ue425"
-              # - button:
-              #     id: button_show_timers
-              #     text: "Show Timers"
-              #     floating: true
-              #     align: BOTTOM_RIGHT
-              #     y: -60
-              #     x: -60
-              #     on_click:
-              #       then:
-              #         - lvgl.page.show: timer_page
               
               - container:
                   id: time_date_container
@@ -555,30 +551,34 @@ lvgl:
             y: -60
             on_click:
               then:
-                - lambda: |-
-                    static bool toggle = false;
-                    toggle = !toggle;
-                    int h = lv_obj_get_height(id(home_assistant_container));
-                    int32_t start = 0;
-                    int32_t end = h;
-                    if (!toggle) {
-                      int y_pos = lv_obj_get_y(id(image_container));
-                      ESP_LOGD("custom", "home_assistant_container height=%d, image_container y=%d", h, y_pos);
-                      start = y_pos;
-                      end = 0;
-                    }
+                - script.execute: 
+                    id: fetch_slideshow_packed
+                    count: 1
+                    from_index: id(image_index).state
+                # - lambda: |-
+                #     static bool toggle = false;
+                #     toggle = !toggle;
+                #     int h = lv_obj_get_height(id(home_assistant_container));
+                #     int32_t start = 0;
+                #     int32_t end = h;
+                #     if (!toggle) {
+                #       int y_pos = lv_obj_get_y(id(image_container));
+                #       ESP_LOGD("custom", "home_assistant_container height=%d, image_container y=%d", h, y_pos);
+                #       start = y_pos;
+                #       end = 0;
+                #     }
 
-                    // int h = lv_obj_get_height(id(home_assistant_container));
-                    // ESP_LOGD("custom", "TEST button clicked, home_assistant_container height=%d", h);
-                    // lv_obj_set_style_transform_zoom(id(image_container), end, LV_PART_MAIN);
+                #     // int h = lv_obj_get_height(id(home_assistant_container));
+                #     // ESP_LOGD("custom", "TEST button clicked, home_assistant_container height=%d", h);
+                #     // lv_obj_set_style_transform_zoom(id(image_container), end, LV_PART_MAIN);
                     
-                    lv_anim_t a;
-                    lv_anim_init(&a);
-                    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
-                    lv_anim_set_var(&a, id(image_container));
-                    lv_anim_set_time(&a, 200);
-                    lv_anim_set_values(&a, start, end);
-                    lv_anim_start(&a);
+                #     lv_anim_t a;
+                #     lv_anim_init(&a);
+                #     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+                #     lv_anim_set_var(&a, id(image_container));
+                #     lv_anim_set_time(&a, 200);
+                #     lv_anim_set_values(&a, start, end);
+                #     lv_anim_start(&a);
 
     - id: timer_page
       bg_color: white

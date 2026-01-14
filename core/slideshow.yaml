@@ -1,0 +1,671 @@
+script:
+  - id: register_device_with_api
+    then:
+      - logger.log: "Registering device with slideshow API..."
+      - http_request.post:
+          url: "${slideshow_api_base}/api/devices"
+          request_headers:
+            Content-Type: application/json
+          json:
+            id: "${slideshow_device_id}"
+            name: "${friendly_name}"
+            width: ${screenwidth}
+            height: ${screenheight}
+            orientation: "landscape"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code == 200)
+                  {
+                    ESP_LOGI("slideshow_api", "Device registered successfully");
+                  }
+                  else
+                  {
+                    ESP_LOGW("slideshow_api", "Device registration failed with status %d", response->status_code);
+                  }
+
+  - id: fetch_slideshow_next
+    then:
+      - logger.log: "Fetching slideshow next photo from API..."
+      - http_request.get:
+          url: "${slideshow_api_base}/api/devices/${slideshow_device_id}/next-packed"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code != 200)
+                  {
+                    ESP_LOGW("slideshow_api", "Failed to fetch queue: status %d", response->status_code);
+                    return;
+                  }
+
+                  ESP_LOGI("slideshow_api", "Fetched %s/api/devices/%s/next-packed", "${slideshow_api_base}", "${slideshow_device_id}");
+                  ESP_LOGI("slideshow_api", "Parsing JSON response...");
+
+                  text_sensor::TextSensor* url_sensors[6] = {
+                    id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+                    id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+                  };
+
+                  id(slideshow_queue_ids).clear();
+                  id(slot_source_colors).clear();
+
+                  ESP_LOGI("slideshow_api", "BODY: %s", body.c_str());
+
+                  const int next_image_index = (((int)id(image_index).state) + 1) % 6;
+
+                  // Use ESPHome's JSON parser - for arrays, parse_json provides the array content
+                  json::parse_json(body, [url_sensors,next_image_index](JsonObject item) -> bool {
+
+                    std::string img_url = "";
+                    std::string img_source_color = "";
+                    
+                    // 3. Access "images" as a JsonArray
+                    if (item["i"].is<JsonArray>()) {
+                      
+                      JsonArray images = item["i"].as<JsonArray>();
+
+                      // 4. Iterate over the specific images
+                      for (JsonArray img_arr : images)
+                      {
+                        if (img_arr.size() > 0) {
+                          img_url = img_arr[0].as<std::string>();
+                          id(slideshow_queue_ids).push_back(img_url);
+
+                          ESP_LOGD("slideshow_api", "Found Image %s", img_url.c_str());
+
+                          // Check for source_color (snake_case per your TS type)
+                          if (img_arr.size() > 1) {
+                              img_source_color = img_arr[1].as<std::string>();
+                              id(slot_source_colors)[next_image_index] = img_source_color;
+                          }
+                        }
+                      }
+                    }
+                    
+                    std::string url = id(slideshow_queue_ids)[0];
+                    url_sensors[next_image_index]->publish_state(url);
+                    ESP_LOGI("slideshow_api", "Slot %d URL: %s", next_image_index, url.c_str());
+                    
+                    return true;
+                  });
+
+  - id: fetch_slideshow_packed
+    parameters:
+      count: int
+      from_index: int
+    then:
+      - logger.log: "Fetching slideshow next photo from API..."
+      - http_request.get:
+          # url: "${slideshow_api_base}/api/devices/${slideshow_device_id}/packed?count=${count}"
+          url: !lambda |-
+            return "${slideshow_api_base}/api/devices/${slideshow_device_id}/packed?count=" + std::to_string(count);
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code != 200)
+                  {
+                    ESP_LOGW("slideshow_api", "Failed to fetch queue: status %d", response->status_code);
+                    return;
+                  }
+
+                  ESP_LOGI("slideshow_api", "Fetched %s/api/devices/%s/packed?count=%d", "${slideshow_api_base}", "${slideshow_device_id}", count);
+                  ESP_LOGI("slideshow_api", "Parsing JSON response...");
+
+                  text_sensor::TextSensor* url_sensors[6] = {
+                    id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+                    id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+                  };
+
+                  id(slideshow_queue_ids).clear();
+                  id(slot_source_colors).clear();
+
+                  ESP_LOGI("slideshow_api", "BODY: %s", body.c_str());
+
+                  // ---------------------------------------------------------
+                  // FIX: Use direct parsing instead of callback helper
+                  // This handles root-level Arrays correctly
+                  // ---------------------------------------------------------
+                  auto doc = json::parse_json(body);
+
+                  if (doc.isNull()) {
+                    ESP_LOGW("slideshow_api", "Failed to parse JSON body");
+                    return;
+                  }
+
+                  if (!doc.is<JsonArray>()) {
+                    ESP_LOGW("slideshow_api", "JSON response is not an array");
+                    return;
+                  }
+
+                  JsonArray root = doc.as<JsonArray>();
+
+                  std::string img_url = "";
+                  std::string img_source_color = "";
+
+                  int offset = 0;
+
+                  // for (JsonArray img_arr : root)
+                  for (JsonArray item : root)
+                  {
+                    for (int j = 0; j < count; j++) {
+                      JsonArray images = item[j].as<JsonArray>();
+
+                      JsonArray img_arr = images[0].as<JsonArray>();
+                      if (img_arr.size() > 0) {
+                        img_url = img_arr[0].as<std::string>();
+                        id(slideshow_queue_ids).push_back(img_url);
+
+                        ESP_LOGD("slideshow_api", "Found Image %s", img_url.c_str());
+
+                        int slot_index = (from_index + offset) % 6;
+                        // Check for source_color
+                        if (img_arr.size() > 1) {
+                            img_source_color = img_arr[1].as<std::string>();
+                            id(slot_source_colors)[slot_index] = img_source_color;
+                        } else {
+                            id(slot_source_colors)[slot_index] = "";
+                        }
+
+                        offset++;
+                      }
+                    }
+                  }
+
+                  for (int i = 0; i < id(slideshow_queue_ids).size(); i++)
+                  {
+                    std::string url = id(slideshow_queue_ids)[i];
+                    int slot_index = (from_index + i) % 6;
+                    url_sensors[slot_index]->publish_state(url);
+                    ESP_LOGD("slideshow_api", "  Image %d: %s", i, url.c_str());
+                  }
+
+  - id: fetch_slideshow_queue
+    then:
+      - logger.log: "Fetching slideshow queue from API..."
+      - http_request.get:
+          url: "${slideshow_api_base}/api/devices/${slideshow_device_id}/slideshow"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code != 200)
+                  {
+                    ESP_LOGW("slideshow_api", "Failed to fetch queue: status %d", response->status_code);
+                    return;
+                  }
+
+                  ESP_LOGI("slideshow_api", "Fetched %s/api/devices/%s/slideshow", "${slideshow_api_base}", "${slideshow_device_id}");
+                  ESP_LOGI("slideshow_api", "Parsing JSON response...");
+
+                  text_sensor::TextSensor* url_sensors[6] = {
+                    id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+                    id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+                  };
+
+                  id(slideshow_queue_ids).clear();
+                  id(slot_source_colors).clear();
+
+                  // Use ESPHome's JSON parser - for arrays, parse_json provides the array content
+                  json::parse_json(body, [url_sensors](JsonObject root) -> bool {
+                    int item_index = 0;
+
+                    // 1. Access "queue" as a JsonArray
+                    if (!root["queue"].is<JsonArray>()) {
+                         ESP_LOGW("slideshow_api", "JSON missing 'queue' array");
+                         return false;
+                    }
+                    
+                    JsonArray queue = root["queue"].as<JsonArray>();
+                    
+                    // 2. Iterate over the QueueItems (Array)
+                    for (JsonObject item : queue)
+                    {
+                      // 3. Access "images" as a JsonArray
+                      if (item["images"].is<JsonArray>()) {
+                        
+                        JsonArray images = item["images"].as<JsonArray>();
+
+                        // 4. Iterate over the specific images
+                        for (JsonObject img_obj : images)
+                        {
+                          if (img_obj["url"].is<std::string>()) {
+                            std::string img_url = img_obj["url"].as<std::string>();
+                            id(slideshow_queue_ids).push_back(img_url);
+                            
+                            // Get the index of the image we just added (size - 1)
+                            int current_img_index = id(slideshow_queue_ids).size() - 1;
+
+                            ESP_LOGD("slideshow_api", "Found Image %s", img_url.c_str());
+
+                            // Check for source_color (snake_case per your TS type)
+                            if (img_obj["source_color"].is<std::string>()) {
+                                std::string s_color = img_obj["source_color"].as<std::string>();
+                                id(slot_source_colors)[current_img_index] = s_color;
+                            }
+                          }
+                        }
+                      }
+                    }
+                    
+                    ESP_LOGI("slideshow_api", "Found %d images in queue", id(slideshow_queue_ids).size());
+                    id(slideshow_queue_index) = 0;
+                    
+                    // Record fetch time and status
+                    if (id(homeassistant_time).now().is_valid())
+                    {
+                      auto now = id(homeassistant_time).now();
+                      char time_str[6];
+                      int hour = now.hour % 12;
+                      if (hour == 0) hour = 12;
+                      snprintf(time_str, sizeof(time_str), "%d:%02d", hour, now.minute);
+                      id(slideshow_last_fetch_time) = time_str;
+                    }
+                    else
+                    {
+                      id(slideshow_last_fetch_time) = "Pending";
+                    }
+                    
+                    if (id(slideshow_queue_ids).size() > 0)
+                    {
+                      id(slideshow_queue_status) = "OK (" + std::to_string(id(slideshow_queue_ids).size()) + " images)";
+                    }
+                    else
+                    {
+                      id(slideshow_queue_status) = "Empty queue";
+                    }
+                    
+                    // Initialize component-to-slot mapping for first 4 slots (0-3)
+                    id(component_to_slot)[0] = 0;
+                    id(component_to_slot)[1] = 1;
+                    id(component_to_slot)[2] = 2;
+                    id(component_to_slot)[3] = 3;
+                    
+                    // Populate first 4 URL slots for initial display
+                    for (int i = 0; i < 4 && i < id(slideshow_queue_ids).size(); i++)
+                    {
+                      // std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + id(slideshow_queue_ids)[i];
+                      std::string url = id(slideshow_queue_ids)[i];
+                      url_sensors[i]->publish_state(url);
+                      ESP_LOGI("slideshow_api", "Slot %d URL: %s", i, url.c_str());
+                    }
+                    
+                    return true;
+                  });
+
+  - id: advance_slideshow
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int old_slot = (current - 1 + 6) % 6;  // Slot we're moving away from
+          int new_lookahead = (current + 3) % 6; // New lookahead slot
+
+          // Find which component was displaying the old slot and release it
+          for (int comp = 0; comp < 4; comp++)
+          {
+            if (id(component_to_slot)[comp] == old_slot)
+            {
+              ESP_LOGI("advance", "Releasing component %d (was slot %d)", comp, old_slot);
+              
+              online_image::OnlineImage* components[4] = {
+                id(online_image_0), id(online_image_1),
+                id(online_image_2), id(online_image_3)
+              };
+              components[comp]->release();
+              
+              // Reassign this component to the new lookahead slot
+              id(component_to_slot)[comp] = new_lookahead;
+              id(image_slot_success)[old_slot] = false;
+              id(image_slot_loading)[old_slot] = false;
+              id(image_slot_retry_count)[old_slot] = 0;
+              
+              ESP_LOGI("advance", "Component %d now assigned to slot %d", comp, new_lookahead);
+              break;
+            }
+          }
+
+          // Load URL for new lookahead slot if available in queue
+          id(slideshow_queue_index)++;
+          int queue_pos = id(slideshow_queue_index) + 2; // Position for 3rd lookahead
+
+          if (queue_pos < id(slideshow_queue_ids).size())
+          {
+            std::string image_id = id(slideshow_queue_ids)[queue_pos];
+            std::string url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + image_id;
+            
+            text_sensor::TextSensor* url_sensors[6] = {
+              id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+              id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+            };
+            
+            url_sensors[new_lookahead]->publish_state(url);
+            ESP_LOGI("advance", "Loaded queue position %d into slot %d", queue_pos, new_lookahead);
+          }
+          else if (id(slideshow_queue_index) >= id(slideshow_queue_ids).size() - 3)
+          {
+            // Queue running low, fetch new queue
+            ESP_LOGI("advance", "Queue exhausted, fetching new queue");
+            id(fetch_slideshow_packed)->execute(3, queue_pos);
+          }
+      - script.execute: find_next_valid_slot
+
+  - id: slideshow_timer
+    mode: restart
+    then:
+      - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
+      # - script.execute: advance_slideshow
+      - number.increment: image_index
+
+  - id: apply_image_colors
+    then:
+      - lambda: |-
+          int slot = (int)id(image_index).state;
+
+          // Check if we have a source color for this slot
+          if (id(slot_source_colors).count(slot))
+          {
+            std::string color_str = id(slot_source_colors)[slot];
+            
+            // Remove # prefix if present
+            if (!color_str.empty() && color_str[0] == '#')
+            {
+              color_str = color_str.substr(1);
+            }
+            
+            // Validate hex string (expecting 6 or 8 chars)
+            if (color_str.length() == 6 || color_str.length() == 8)
+            {
+              // Pad with FF alpha if only RGB provided
+              if (color_str.length() == 6)
+              {
+                color_str = "FF" + color_str;
+              }
+              
+              // Convert hex string to uint32_t ARGB
+              uint32_t color = std::stoul(color_str, nullptr, 16);
+              
+              ESP_LOGI("apply_colors", "Applying color palette for slot %d", slot);
+              ESP_LOGI("apply_colors", "  Source color: #%s -> 0x%08X", 
+                       id(slot_source_colors)[slot].c_str(), color);
+              
+              // Generate new Material Design 3 scheme with image's source color
+              id(material_theme_component).set_source_color(color);
+              id(material_theme_component).generate_scheme();
+            }
+            else
+            {
+              ESP_LOGW("apply_colors", "Invalid color format for slot %d: %s", 
+                       slot, color_str.c_str());
+            }
+          }
+          else
+          {
+            ESP_LOGD("apply_colors", "No source color available for slot %d", slot);
+          }
+
+  - id: retry_download_with_backoff
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int& retry_count = id(image_slot_retry_count)[current];
+
+          // Calculate exponential backoff: 1s, 2s, 4s, 8s, 16s... capped at 300s (5min)
+          int delay_seconds = std::min(300, (int)pow(2, retry_count));
+          retry_count++;
+
+          ESP_LOGI("retry", "Scheduling retry for slot %d in %d seconds (attempt %d)", current, delay_seconds, retry_count);
+          id(image_slot_loading)[current] = true;
+      - delay: !lambda |-
+          int current = (int)id(image_index).state;
+          int retry_count = id(image_slot_retry_count)[current] - 1;
+          int delay_seconds = std::min(300, (int)pow(2, retry_count));
+          return delay_seconds * 1000;
+      - script.execute: update_online_images
+
+  - id: update_online_images
+    mode: single
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+
+          ESP_LOGI("update_images", "Loading images for current slot %d", current);
+
+          online_image::OnlineImage* components[8] = {
+            id(online_image_0), id(online_image_1),
+            id(online_image_2), id(online_image_3),
+            id(online_image_4), id(online_image_5),
+            id(online_image_6), id(online_image_7)
+          };
+
+          text_sensor::TextSensor* url_sensors[6] = {
+            id(ha_image_url_slot_0), id(ha_image_url_slot_1), id(ha_image_url_slot_2),
+            id(ha_image_url_slot_3), id(ha_image_url_slot_4), id(ha_image_url_slot_5)
+          };
+
+          // Load current + 3 lookahead slots (4 total)
+          for (int offset = 0; offset < 4; offset++)
+          {
+            int slot = (current + offset) % 6;
+            
+            // Find which component is assigned to this slot
+            int comp = -1;
+            for (int c = 0; c < 4; c++)
+            {
+              if (id(component_to_slot)[c] == slot)
+              {
+                comp = c;
+                break;
+              }
+            }
+            
+            if (comp == -1)
+            {
+              ESP_LOGW("update_images", "No component assigned to slot %d", slot);
+              continue;
+            }
+            
+            // Load image if not already loading/loaded
+            if (!id(image_slot_loading)[slot] && !id(image_slot_success)[slot])
+            {
+              std::string url = url_sensors[slot]->state;
+              if (!url.empty() && url != "unknown" && url.find("http") == 0)
+              {
+                ESP_LOGI("update_images", "Component %d loading slot %d: %s", comp, slot, url.c_str());
+                components[comp]->set_url(url);
+                id(image_slot_loading)[slot] = true;
+                components[comp]->update();
+              }
+            }
+          }
+      - delay: 500ms
+      - lambda: |-
+          int current = (int)id(image_index).state;
+
+          online_image::OnlineImage* components[4] = {
+            id(online_image_0), id(online_image_1),
+            id(online_image_2), id(online_image_3)
+          };
+
+          lv_obj_t* widgets[6] = {
+            id(background_image_0), id(background_image_1), id(background_image_2),
+            id(background_image_3), id(background_image_4), id(background_image_5)
+          };
+
+          // Update LVGL widgets for successfully loaded slots
+          for (int comp = 0; comp < 4; comp++)
+          {
+            int slot = id(component_to_slot)[comp];
+            
+            if (id(image_slot_success)[slot] && widgets[slot] != nullptr)
+            {
+              auto img_dsc = components[comp]->get_lv_img_dsc();
+              if (img_dsc != nullptr)
+              {
+                ESP_LOGI("update_images", "Updating LVGL slot %d from component %d", slot, comp);
+                lv_img_set_src(widgets[slot], img_dsc);
+              }
+            }
+          }
+
+          // // Update debug status panel
+          // std::string status_str = "";
+          // for (int i = 0; i < 6; i++)
+          // {
+          //   if (id(image_slot_success)[i])
+          //   {
+          //     status_str += std::to_string(i);
+          //   }
+          //   else if (id(image_slot_loading)[i])
+          //   {
+          //     status_str += "(" + std::to_string(i) + ")";
+          //   }
+          //   if (i < 5) status_str += " ";
+          // }
+          // lv_label_set_text(id(debug_slots_loaded), ("Loaded: " + status_str).c_str());
+
+  - id: find_next_valid_slot
+    then:
+      - lambda: |-
+          int current = (int)id(image_index).state;
+          int attempts = 0;
+          int next_slot = (current + 1) % 6;
+
+          // Search for next successful slot (max 6 attempts to avoid infinite loop)
+          while (attempts < 6)
+          {
+            if (id(image_slot_success)[next_slot])
+            {
+              ESP_LOGI("find_next", "Found valid slot %d", next_slot);
+              id(image_index).publish_state(next_slot);
+              
+              // Calculate scroll position and animation
+              lv_coord_t target_x = next_slot * ${screenwidth};
+              lv_anim_enable_t anim = (next_slot == (current + 1) % 6) ? LV_ANIM_ON : LV_ANIM_OFF;
+              
+              lv_obj_scroll_to_x(id(image_container), target_x, anim);
+              
+              // Move viewed container to end
+              lv_obj_t* viewed = id(image_map)[current];
+              const int map_size = id(image_map).size();
+              lv_obj_move_to_index(viewed, map_size - 1);
+              lv_obj_scroll_to_x(id(image_container), 0, LV_ANIM_OFF);
+              
+              return;
+            }
+            next_slot = (next_slot + 1) % 6;
+            attempts++;
+          }
+
+          ESP_LOGW("find_next", "No valid slots found!");
+          // Stay on current slot if no valid images exist
+  
+  - id: online_image_download_finished
+    parameters:
+      index: int
+    then:
+      - lambda: |-
+          int slot = id(component_to_slot)[index];
+          ESP_LOGI("download_finished", "Download finished for slot %d", slot);
+          id(image_slot_success)[slot] = true;
+          id(image_slot_loading)[slot] = false;
+          id(image_slot_retry_count)[slot] = 0;
+  - id: online_image_error
+    parameters:
+      index: int
+    then:
+      - lambda: |-
+          int slot = id(component_to_slot)[index];
+          id(image_slot_retry_count)[slot]++;
+          int retry_count = id(image_slot_retry_count)[slot];
+          ESP_LOGW("online_image", "Component %d -> Slot %d download failed (attempt %d)", index, slot, retry_count);
+          id(image_slot_loading)[slot] = false;
+          auto component = id(online_images)[index];
+          component->release();
+      - delay: !lambda |-
+          int slot = id(component_to_slot)[index];
+          int retry_count = id(image_slot_retry_count)[slot] - 1;
+          int delay_seconds = std::min(300, (int)pow(2, retry_count));
+          ESP_LOGI("retry", "Scheduling retry for slot %d in %d seconds (attempt %d)", slot, delay_seconds, retry_count);
+          return delay_seconds * 1000;
+      - lambda: |-
+          auto component = id(online_images)[index];
+          component->update();
+
+# debug:
+#   update_interval: 30s
+
+globals:
+  # Source colors for Material Design theme generation
+  - id: slot_source_colors
+    type: "std::map<int, std::string>"
+    restore_value: no
+
+  - id: image_map
+    type: "std::map<int, lv_obj_t*>"
+    restore_value: no
+
+  - id: replace_this_image_index
+    type: int
+    restore_value: no
+    initial_value: "-1"
+
+  # Image slot state tracking
+  - id: image_slot_success
+    type: "std::map<int, bool>"
+    restore_value: no
+  - id: image_slot_loading
+    type: "std::map<int, bool>"
+    restore_value: no
+  - id: image_slot_retry_count
+    type: "std::map<int, int>"
+    restore_value: no
+
+  # Component to slot mapping (which online_image component is assigned to which UI slot)
+  - id: component_to_slot
+    type: "std::map<int, int>"
+    restore_value: no
+    initial_value: "{{0,0}, {1,1}, {2,2}, {3,3}, {4,4}, {5,5}}"
+
+  # Slideshow queue management
+  - id: slideshow_queue_ids
+    type: "std::vector<std::string>"
+    restore_value: no
+  - id: slideshow_queue_index
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: slideshow_last_fetch_time
+    type: std::string
+    restore_value: no
+    initial_value: '"--:--"'
+  - id: slideshow_queue_status
+    type: std::string
+    restore_value: no
+    initial_value: '"Not loaded"'
+
+mapping:
+  - id: online_images
+    from: int
+    to: online_image::OnlineImage
+    entries:
+      0: online_image_0
+      1: online_image_1
+      2: online_image_2
+      3: online_image_3
+      4: online_image_4
+      5: online_image_5
+      6: online_image_6
+      7: online_image_7
+
+  # - id: image_layouts
+  #   from: int
+  #   to: text::Text
+  #   entries:
+  #     0: image_0_layout
+  #     1: image_1_layout
+  #     2: image_2_layout
+  #     3: image_3_layout
+  #     4: image_4_layout
+  #     5: image_5_layout

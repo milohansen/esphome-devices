@@ -9,18 +9,24 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[0];
-          ESP_LOGI("online_image", "Component 0 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+      - script.execute:
+          id: online_image_download_finished
+          index: 0
+      # - lambda: |-
+      #     int slot = id(component_to_slot)[0];
+      #     ESP_LOGI("online_image", "Component 0 -> Slot %d downloaded successfully", slot);
+      #     id(image_slot_success)[slot] = true;
+      #     id(image_slot_loading)[slot] = false;
+      #     id(image_slot_retry_count)[slot] = 0;
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[0];
-          ESP_LOGW("online_image", "Component 0 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+      - script.execute:
+          id: online_image_error
+          index: 0
+      # - lambda: |-
+      #     int slot = id(component_to_slot)[0];
+      #     ESP_LOGW("online_image", "Component 0 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
+      #     id(image_slot_loading)[slot] = false;
+      # - script.execute: retry_download_with_backoff
 
   - id: online_image_1
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+1"
@@ -31,18 +37,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[1];
-          ESP_LOGI("online_image", "Component 1 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 1
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[1];
-          ESP_LOGW("online_image", "Component 1 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 1
 
   - id: online_image_2
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+2"
@@ -53,18 +54,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[2];
-          ESP_LOGI("online_image", "Component 2 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 2
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[2];
-          ESP_LOGW("online_image", "Component 2 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 2
 
   - id: online_image_3
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+3"
@@ -75,18 +71,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[3];
-          ESP_LOGI("online_image", "Component 3 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 3
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[3];
-          ESP_LOGW("online_image", "Component 3 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 3
 
   - id: online_image_4
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+4"
@@ -97,18 +88,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[4];
-          ESP_LOGI("online_image", "Component 4 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 4
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[4];
-          ESP_LOGW("online_image", "Component 4 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 4
 
   - id: online_image_5
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+5"
@@ -119,18 +105,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[5];
-          ESP_LOGI("online_image", "Component 5 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 5
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[5];
-          ESP_LOGW("online_image", "Component 5 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 5
 
   - id: online_image_6
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
@@ -141,18 +122,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[6];
-          ESP_LOGI("online_image", "Component 6 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 6
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[6];
-          ESP_LOGW("online_image", "Component 6 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 6
 
   - id: online_image_7
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+7"
@@ -163,18 +139,13 @@ online_image:
     update_interval: never
     placeholder: landscape
     on_download_finished:
-      - lambda: |-
-          int slot = id(component_to_slot)[7];
-          ESP_LOGI("online_image", "Component 7 -> Slot %d downloaded successfully", slot);
-          id(image_slot_success)[slot] = true;
-          id(image_slot_loading)[slot] = false;
-          id(image_slot_retry_count)[slot] = 0;
+     - script.execute:
+          id: online_image_download_finished
+          index: 7
     on_error:
-      - lambda: |-
-          int slot = id(component_to_slot)[7];
-          ESP_LOGW("online_image", "Component 7 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-          id(image_slot_loading)[slot] = false;
-      - script.execute: retry_download_with_backoff
+     - script.execute:
+          id: online_image_error
+          index: 7
 
 image:
   - file: assets/images/DSC_4482.jpg
