@@ -496,6 +496,12 @@ lvgl:
                   width: 72
                   height: 56
                   radius: 29
+                  
+                  bg_color: primary_base
+                  text_color: text_inverse
+                  shadow_width: 4
+                  shadow_opa: 20%
+                  
                   on_click:
                     then:
                       - lvgl.page.show: timer_page

@@ -245,6 +245,8 @@ script:
           } else {
             ESP_LOGD("slideshow_colors", "No color mapping for Queue Index %d", q_idx);
           }
+      - lvgl.widget.redraw: button_show_timers
+      - logger.log: "Applied image source color from slideshow and redrew screen."
 
   - id: slideshow_timer
     mode: restart

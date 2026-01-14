@@ -2,22 +2,22 @@ substitutions:
   name: guition-p4-70
   friendly_name: Guition P4 70
 
-## Modular version Main P4
+  ## Modular version Main P4
 
-## SETTINGS ######################################################################################################################################
-  screenwidth:  "1024"
+  ## SETTINGS ######################################################################################################################################
+  screenwidth: "1024"
   screenheight: "600"
   rotate_display: "0"
 
   startup_sound: "Home_Connected" # (options are: available, Home_Connected, Home_Connected_Male, Computer_Ready)
 
   weather_entity: "weather.forecast_home"
-  
+
   # Slideshow API configuration
   slideshow_api_base: !secret slideshow_api_base
   slideshow_device_id: "kitchen-display"
 
-##################################################################################################################################################
+  ##################################################################################################################################################
 
   font_glyphsets: "GF_Latin_Kernel"
 
@@ -35,8 +35,8 @@ substitutions:
   voice_assist_timer_finished_phase_id: "20"
 
   # Material Theme
-  theme_source_color: "0xFF2A9D8F"  # Pacific Teal (current primary_base color)
-  theme_variant: "TONAL_SPOT"       # Options: TONAL_SPOT, VIBRANT, EXPRESSIVE, CONTENT, MONOCHROME, NEUTRAL
+  theme_source_color: "0xFF4285F4" # Google Blue
+  theme_variant: "TONAL_SPOT" # Options: TONAL_SPOT, VIBRANT, EXPRESSIVE, CONTENT, MONOCHROME, NEUTRAL
 
 # esphome:
 #   name: ${name}
@@ -65,9 +65,9 @@ esp32:
       disable_vfs_support_select: false
       disable_vfs_support_dir: false
     sdkconfig_options:
-      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"   # Stop screen flashing during OTA
+      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y" # Stop screen flashing during OTA
       CONFIG_SDMMC_HOST_DEFAULT: "y"
-      CONFIG_LV_COLOR_SCREEN_TRANSP: "y"  # Enable LVGL screen transparency
+      CONFIG_LV_COLOR_SCREEN_TRANSP: "y" # Enable LVGL screen transparency
 
 psram:
   mode: hex
@@ -101,7 +101,7 @@ material_theme:
   id: material_theme_component
   source_color: ${theme_source_color}
   is_dark: false
-  contrast_level: 0.0  # -1.0 (min contrast) to 1.0 (max contrast), 0.0 = standard
+  contrast_level: 0.0 # -1.0 (min contrast) to 1.0 (max contrast), 0.0 = standard
   variant: ${theme_variant}
 
 packages: # Local
@@ -130,14 +130,13 @@ micro_wake_word:
   id: mww
   models:
     - okay_nabu
-
 ##################################################################################################################################################
 
 # i2c air:
 #   - id: sensor_bus
 #     sda: GPIO46
 #     scl: GPIO45
-    
+
 # sensor:
 #   - id: sen55
 #     platform: sen5x

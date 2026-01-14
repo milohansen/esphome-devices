@@ -23,22 +23,22 @@ Linking .pioenvs/guition-p4-70/firmware.elf
 ┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Memory Type/Section ┃ Used [bytes] ┃ Used [%] ┃ Remain [bytes] ┃ Total [bytes] ┃
 ┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
-│ External RAM        │      7787104 │      5.8 │      126430592 │     134217696 │
-│    .rodata          │      6477248 │     4.83 │                │               │
-│    .text            │      1309280 │     0.98 │                │               │
+│ External RAM        │      4342536 │     3.24 │      129875160 │     134217696 │
+│    .rodata          │      3031144 │     2.26 │                │               │
+│    .text            │      1310816 │     0.98 │                │               │
 │    .init_array      │          320 │      0.0 │                │               │
 │    .appdesc         │          256 │      0.0 │                │               │
-│ DIRAM               │       101274 │    17.57 │         475190 │        576464 │
+│ DIRAM               │       101298 │    17.57 │         475166 │        576464 │
 │    .text            │        68966 │    11.96 │                │               │
-│    .bss             │        18664 │     3.24 │                │               │
+│    .bss             │        18688 │     3.24 │                │               │
 │    .data            │        13644 │     2.37 │                │               │
 │ HP core RAM         │          104 │     1.27 │           8088 │          8192 │
 │    .data            │           60 │     0.73 │                │               │
 │    .text            │           44 │     0.54 │                │               │
 │ LP RAM              │            0 │      0.0 │          32768 │         32768 │
 └─────────────────────┴──────────────┴──────────┴────────────────┴───────────────┘
-RAM:   [=         ]   6.3% (used 32308 bytes from 512000 bytes)
-Flash: [==========]  96.8% (used 7869138 bytes from 8126464 bytes)
+RAM:   [=         ]   6.3% (used 32332 bytes from 512000 bytes)
+Flash: [=====     ]  54.4% (used 4424570 bytes from 8126464 bytes)
 Building .pioenvs/guition-p4-70/firmware.bin
 Creating ESP32P4 image...
 Successfully created ESP32P4 image.
@@ -51,11 +51,11 @@ Using FLASH_EXTRA_IMAGES from PlatformIO environment
 Merging binaries into /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin
 Merging binaries with esptool
 SHA digest in image updated.
-Wrote 0x791610 bytes to file '/home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin', ready to flash to offset 0x0.
+Wrote 0x4486c0 bytes to file '/home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin', ready to flash to offset 0x0.
 Successfully created /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.factory.bin
 esp32_copy_ota_bin([".pioenvs/guition-p4-70/firmware.bin"], [".pioenvs/guition-p4-70/firmware.elf"])
 Copied firmware to /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-70/.pioenvs/guition-p4-70/firmware.ota.bin
-========================= [SUCCESS] Took 23.58 seconds =========================
+========================= [SUCCESS] Took 20.65 seconds =========================
 
 ==============================================================================================================================
                                                   Component Memory Analysis                                                   
@@ -63,9 +63,9 @@ Copied firmware to /home/miloh/repos/esphome-devices/.esphome/build/guition-p4-7
 
 Component                     |   Flash (text) |   Flash (data) |   RAM (data) |    RAM (bss) |     Total Flash |    Total RAM
 ------------------------------+----------------+----------------+--------------+--------------+-----------------+-------------
-app_framework                 |       56,316 B |    5,907,278 B |         84 B |          0 B |     5,963,594 B |         84 B
-other                         |      192,946 B |      223,801 B |     14,974 B |          0 B |       416,747 B |     14,974 B
-rom_functions                 |      110,536 B |       10,064 B |        588 B |          0 B |       120,600 B |        588 B
+app_framework                 |       57,480 B |    2,460,878 B |         84 B |          0 B |     2,518,358 B |         84 B
+other                         |      192,946 B |      223,817 B |     14,990 B |          0 B |       416,763 B |     14,990 B
+rom_functions                 |      110,556 B |       10,068 B |        592 B |          0 B |       120,624 B |        592 B
 esp_system                    |       60,698 B |       16,289 B |         73 B |          0 B |        76,987 B |         73 B
 libc                          |       70,318 B |        1,225 B |        820 B |          0 B |        71,543 B |        820 B
 wifi_config                   |       61,320 B |          404 B |         36 B |          0 B |        61,724 B |         36 B
@@ -74,21 +74,21 @@ cpp_anonymous                 |       56,136 B |           88 B |         36 B |
 crypto                        |       48,802 B |        1,325 B |         17 B |          0 B |        50,127 B |         17 B
 wifi_stack                    |       10,904 B |       27,078 B |        530 B |          0 B |        37,982 B |        530 B
 misc_system                   |       34,588 B |        2,902 B |        634 B |          0 B |        37,490 B |        634 B
-[esphome]api                  |       32,048 B |        2,468 B |         12 B |          0 B |        34,516 B |         12 B
+[esphome]api                  |       32,064 B |        2,468 B |         12 B |          0 B |        34,532 B |         12 B
 interrupt_handlers            |       32,686 B |        1,099 B |        566 B |          0 B |        33,785 B |        566 B
-[esphome]core                 |       30,196 B |        2,060 B |        849 B |          0 B |        32,256 B |        849 B
+[esphome]core                 |       30,194 B |        2,064 B |        853 B |          0 B |        32,258 B |        853 B
 mdns_lib                      |       27,886 B |          376 B |        376 B |          0 B |        28,262 B |        376 B
 crypto_math                   |       25,770 B |          728 B |         56 B |          0 B |        26,498 B |         56 B
 math_lib                      |       24,678 B |        1,375 B |        553 B |          0 B |        26,053 B |        553 B
 freertos                      |       23,340 B |          692 B |        692 B |          0 B |        24,032 B |        692 B
+cpp_runtime                   |       18,324 B |          302 B |        212 B |          0 B |        18,626 B |        212 B
 sdmmc_driver                  |       18,530 B |            8 B |          0 B |          0 B |        18,538 B |          0 B
-cpp_runtime                   |       17,990 B |          302 B |        212 B |          0 B |        18,292 B |        212 B
 memory_mgmt                   |       14,634 B |          435 B |        177 B |          0 B |        15,069 B |        177 B
 [esphome]voice_assistant      |       14,186 B |          344 B |          4 B |          0 B |        14,530 B |          4 B
 hal_layer                     |       13,368 B |            8 B |          8 B |          0 B |        13,376 B |          8 B
 dhcp                          |       11,046 B |        2,056 B |         60 B |          0 B |        13,102 B |         60 B
 [esphome]wifi                 |       12,516 B |          117 B |         53 B |          0 B |        12,633 B |         53 B
-error_handling                |       11,464 B |        1,076 B |        206 B |          0 B |        12,540 B |        206 B
+error_handling                |       11,468 B |        1,076 B |        206 B |          0 B |        12,544 B |        206 B
 time_lib                      |       11,352 B |        1,028 B |        280 B |          0 B |        12,380 B |        280 B
 spi_flash                     |       10,354 B |           20 B |         20 B |          0 B |        10,374 B |         20 B
 uart_driver                   |        8,956 B |          488 B |        368 B |          0 B |         9,444 B |        368 B
@@ -138,7 +138,7 @@ cpp_stdlib                    |          974 B |        1,603 B |         96 B |
 spi_driver                    |        2,412 B |            0 B |          0 B |          0 B |         2,412 B |          0 B
 [esphome]esp32                |        2,302 B |          109 B |         13 B |          0 B |         2,411 B |         13 B
 [esphome]touchscreen          |        2,284 B |           80 B |          0 B |          0 B |         2,364 B |          0 B
-[esphome]resampler            |        2,174 B |          168 B |          0 B |          0 B |         2,342 B |          0 B
+[esphome]resampler            |        2,194 B |          168 B |          0 B |          0 B |         2,362 B |          0 B
 [esphome]i2c                  |        2,164 B |          152 B |          8 B |          0 B |         2,316 B |          8 B
 rate_control                  |        2,254 B |            0 B |          0 B |          0 B |         2,254 B |          0 B
 pwm_driver                    |        2,108 B |           36 B |         36 B |          0 B |         2,144 B |         36 B
@@ -214,43 +214,43 @@ arduino_core                  |            8 B |            8 B |          8 B |
 [esphome]audio_adc            |            0 B |           16 B |          0 B |          0 B |            16 B |          0 B
 touch_driver                  |            0 B |            4 B |          4 B |          0 B |             4 B |          4 B
 ------------------------------+----------------+----------------+--------------+--------------+-----------------+-------------
-TOTAL                         |                |                |              |              |     7,606,015 B |     27,613 B
+TOTAL                         |                |                |              |              |     4,161,195 B |     27,637 B
 
 Top Flash Consumers:
-1. app_framework (5,963,594 B) - 78.4% of analyzed flash
-2. other (416,747 B) - 5.5% of analyzed flash
-3. rom_functions (120,600 B) - 1.6% of analyzed flash
-4. esp_system (76,987 B) - 1.0% of analyzed flash
-5. libc (71,543 B) - 0.9% of analyzed flash
-6. wifi_config (61,724 B) - 0.8% of analyzed flash
-7. network_stack (60,895 B) - 0.8% of analyzed flash
-8. cpp_anonymous (56,224 B) - 0.7% of analyzed flash
-9. crypto (50,127 B) - 0.7% of analyzed flash
-10. wifi_stack (37,982 B) - 0.5% of analyzed flash
-11. misc_system (37,490 B) - 0.5% of analyzed flash
-12. [esphome]api (34,516 B) - 0.5% of analyzed flash
-13. interrupt_handlers (33,785 B) - 0.4% of analyzed flash
-14. [esphome]core (32,256 B) - 0.4% of analyzed flash
-15. mdns_lib (28,262 B) - 0.4% of analyzed flash
-16. crypto_math (26,498 B) - 0.3% of analyzed flash
-17. math_lib (26,053 B) - 0.3% of analyzed flash
-18. freertos (24,032 B) - 0.3% of analyzed flash
-19. sdmmc_driver (18,538 B) - 0.2% of analyzed flash
-20. cpp_runtime (18,292 B) - 0.2% of analyzed flash
-21. memory_mgmt (15,069 B) - 0.2% of analyzed flash
-22. [esphome]voice_assistant (14,530 B) - 0.2% of analyzed flash
-23. hal_layer (13,376 B) - 0.2% of analyzed flash
-24. dhcp (13,102 B) - 0.2% of analyzed flash
-25. [esphome]wifi (12,633 B) - 0.2% of analyzed flash
+1. app_framework (2,518,358 B) - 60.5% of analyzed flash
+2. other (416,763 B) - 10.0% of analyzed flash
+3. rom_functions (120,624 B) - 2.9% of analyzed flash
+4. esp_system (76,987 B) - 1.9% of analyzed flash
+5. libc (71,543 B) - 1.7% of analyzed flash
+6. wifi_config (61,724 B) - 1.5% of analyzed flash
+7. network_stack (60,895 B) - 1.5% of analyzed flash
+8. cpp_anonymous (56,224 B) - 1.4% of analyzed flash
+9. crypto (50,127 B) - 1.2% of analyzed flash
+10. wifi_stack (37,982 B) - 0.9% of analyzed flash
+11. misc_system (37,490 B) - 0.9% of analyzed flash
+12. [esphome]api (34,532 B) - 0.8% of analyzed flash
+13. interrupt_handlers (33,785 B) - 0.8% of analyzed flash
+14. [esphome]core (32,258 B) - 0.8% of analyzed flash
+15. mdns_lib (28,262 B) - 0.7% of analyzed flash
+16. crypto_math (26,498 B) - 0.6% of analyzed flash
+17. math_lib (26,053 B) - 0.6% of analyzed flash
+18. freertos (24,032 B) - 0.6% of analyzed flash
+19. cpp_runtime (18,626 B) - 0.4% of analyzed flash
+20. sdmmc_driver (18,538 B) - 0.4% of analyzed flash
+21. memory_mgmt (15,069 B) - 0.4% of analyzed flash
+22. [esphome]voice_assistant (14,530 B) - 0.3% of analyzed flash
+23. hal_layer (13,376 B) - 0.3% of analyzed flash
+24. dhcp (13,102 B) - 0.3% of analyzed flash
+25. [esphome]wifi (12,633 B) - 0.3% of analyzed flash
 
 Top RAM Consumers:
-1. other (14,974 B) - 54.2% of analyzed RAM
+1. other (14,990 B) - 54.2% of analyzed RAM
 2. network_stack (1,663 B) - 6.0% of analyzed RAM
-3. [esphome]core (849 B) - 3.1% of analyzed RAM
+3. [esphome]core (853 B) - 3.1% of analyzed RAM
 4. libc (820 B) - 3.0% of analyzed RAM
 5. freertos (692 B) - 2.5% of analyzed RAM
 6. misc_system (634 B) - 2.3% of analyzed RAM
-7. rom_functions (588 B) - 2.1% of analyzed RAM
+7. rom_functions (592 B) - 2.1% of analyzed RAM
 8. interrupt_handlers (566 B) - 2.0% of analyzed RAM
 9. math_lib (553 B) - 2.0% of analyzed RAM
 10. wifi_stack (530 B) - 1.9% of analyzed RAM
@@ -279,10 +279,10 @@ Note: This analysis covers symbols in the ELF file. Some runtime allocations may
 
 Subcategory                    |         Size |  Count |  % of Core
 -------------------------------+--------------+--------+-----------
-Other Core                     |     16,461 B |    307 |      51.0%
+Other Core                     |     16,465 B |    307 |      51.0%
 Component Framework            |      5,564 B |     76 |      17.2%
 C++ STL                        |      3,072 B |     66 |       9.5%
-Application Core               |      2,836 B |     23 |       8.8%
+Application Core               |      2,834 B |     23 |       8.8%
 Scheduler                      |      2,336 B |     16 |       7.2%
 C++ Runtime (vtables/RTTI)     |      1,204 B |     36 |       3.7%
 String Utilities               |        454 B |      5 |       1.4%
@@ -293,7 +293,7 @@ I/O Utilities                  |         15 B |      2 |       0.0%
 
 [esphome]core Symbols > 100 B (79 symbols):
 1. esphome::mixer_speaker::MixerSpeaker::audio_mixer_task(void*) (1,432 B)
-2. esphome::App (808 B)
+2. esphome::App (812 B)
 3. esphome::Scheduler::set_timer_common_(esphome::Component*, esphome::Scheduler::SchedulerItem::Type, bool, void const*, unsigned long, std::function<void ()>, bool, bool) (650 B)
 4. esphome::ComponentIterator::advance() (548 B)
 5. esphome::mixer_speaker::SourceSpeaker::start_() (548 B)
@@ -305,7 +305,7 @@ I/O Utilities                  |         15 B |      2 |       0.0%
 11. esphome::Application::loop() (322 B)
 12. esphome::(anonymous namespace)::store_component_error_message(esphome::Component const*, char const*, bool) (312 B)
 13. esphome::mixer_speaker::SourceSpeaker::duck_samples(short*, unsigned long, signed char*, unsigned long*, unsigned long, signed char) (310 B)
-14. esphome::Application::teardown_components(unsigned long) (304 B)
+14. esphome::Application::teardown_components(unsigned long) (302 B)
 15. esphome::Application::setup_wake_loop_threadsafe_() (302 B)
 16. esphome::mixer_speaker::MixerSpeaker::loop() (302 B)
 17. esphome::Scheduler::full_cleanup_removed_items_() (272 B)
@@ -378,7 +378,7 @@ I/O Utilities                  |         15 B |      2 |       0.0%
 ==============================================================================================================================
 
 Total symbols: 555
-Total size: 34,516 B
+Total size: 34,532 B
 
 [esphome]api Symbols > 100 B (97 symbols):
 1. esphome::api::APIServerConnectionBase::read_message(unsigned long, unsigned long, unsigned char const*) (1,360 B)
@@ -398,8 +398,8 @@ Total size: 34,516 B
 15. void std::vector<esphome::api::APIConnection::DeferredBatch::BatchItem, std::allocator<esphome::api::APIConnection::DeferredBatch::BatchItem> >::_M_realloc_append<esphome::EntityBase*&, esphome::api::APIConnection::MessageCreator&, unsigned char&, unsigned char&>(esphome::EntityBase*&, esphome::api::APIConnection::MessageCreator&, unsigned char&, unsigned char&) (290 B)
 16. esphome::api::LightCommandRequest::decode_varint(unsigned long, esphome::api::ProtoVarInt) (286 B)
 17. esphome::api::APIConnection::APIConnection(std::unique_ptr<esphome::socket::Socket, std::default_delete<esphome::socket::Socket> >, esphome::api::APIServer*) (270 B)
-18. esphome::api::APIConnection::encode_message_to_buffer(esphome::api::ProtoMessage&, unsigned char, esphome::api::APIConnection*, unsigned long, bool) (262 B)
-19. esphome::api::APIFrameHelper::buffer_data_from_iov_(iovec const*, int, unsigned short, unsigned short) (260 B)
+18. esphome::api::APIFrameHelper::buffer_data_from_iov_(iovec const*, int, unsigned short, unsigned short) (268 B)
+19. esphome::api::APIConnection::encode_message_to_buffer(esphome::api::ProtoMessage&, unsigned char, esphome::api::APIConnection*, unsigned long, bool) (262 B)
 20. void std::vector<esphome::api::MediaPlayerSupportedFormat, std::allocator<esphome::api::MediaPlayerSupportedFormat> >::_M_realloc_append<>() (258 B)
 21. esphome::api::api_error_to_logstr(esphome::api::APIError) (256 B)
 22. esphome::api::HomeAssistantServiceCallAction<int>::play(int const&) (254 B)
@@ -973,15 +973,15 @@ Total size: 2,364 B
 ==============================================================================================================================
 
 Total symbols: 36
-Total size: 2,342 B
+Total size: 2,362 B
 
 [esphome]resampler Symbols > 100 B (8 symbols):
-1. esphome::resampler::ResamplerSpeaker::resample_task(void*) (532 B)
+1. esphome::resampler::ResamplerSpeaker::resample_task(void*) (548 B)
 2. esphome::resampler::ResamplerSpeaker::loop() (486 B)
 3. vtable for esphome::resampler::ResamplerSpeaker (168 B)
 4. esphome::resampler::ResamplerSpeaker::play(unsigned char const*, unsigned int, unsigned long) (156 B)
-5. std::_Function_handler<void (unsigned long, long long), esphome::resampler::ResamplerSpeaker::setup()::{lambda(unsigned long, long long)#1}>::_M_invoke(std::_Any_data const&, unsigned long&&, long long&&) (132 B)
-6. esphome::resampler::ResamplerSpeaker::setup() (132 B)
+5. esphome::resampler::ResamplerSpeaker::setup() (136 B)
+6. std::_Function_handler<void (unsigned long, long long), esphome::resampler::ResamplerSpeaker::setup()::{lambda(unsigned long, long long)#1}>::_M_invoke(std::_Any_data const&, unsigned long&&, long long&&) (132 B)
 7. esphome::resampler::ResamplerSpeaker::start_() (126 B)
 8. esphome::resampler::ResamplerSpeaker::start_task_() (124 B)
 ==============================================================================================================================
@@ -1127,10 +1127,10 @@ SECTION ANALYSIS
 Section              Address      Size         Location
 --------------------------------------------------------------------------------
 .dram0.data          0x4ff10d80      13644 B   RAM
-.dram0.bss           0x4ff142d0      18664 B   RAM
+.dram0.bss           0x4ff142d0      18688 B   RAM
 --------------------------------------------------------------------------------
-Total RAM sections size: 32,308 bytes
-Total Flash sections size: 7,786,528 bytes
+Total RAM sections size: 32,332 bytes
+Total Flash sections size: 4,341,960 bytes
 
 ================================================================================
 STRINGS IN RAM SECTIONS
@@ -1139,7 +1139,6 @@ Note: .bss sections contain uninitialized data (no strings to extract)
 
 Section: .dram0.data
 ----------------------------------------
-  0x4ff111ad: "%uH %uH$%uH(%uH,%uH" (len=19)
   0x4ff12198: "esp_psram" (len=9)
   0x4ff122f4: "Tasks currently running:" (len=24)
   0x4ff1245b: "Ospi_flash" (len=10)
@@ -1274,7 +1273,7 @@ xIsrStack                                          B          3072 B  .dram0.bss
 s_retention                                        d          2008 B  .dram0.data
 packet.19                                          b          1460 B  .dram0.bss
 dns_table                                          b          1104 B  .dram0.bss
-esphome::App                                       B           808 B  .dram0.bss
+esphome::App                                       B           812 B  .dram0.bss
 s_intr_handlers                                    b           512 B  .dram0.bss
 s_test_data                                        d           512 B  .dram0.data
 pxReadyTasksLists                                  b           500 B  .dram0.bss
@@ -1350,8 +1349,8 @@ s_tuning_cfg_drv                                   b            52 B  .dram0.bss
 ================================================================================
 SUMMARY
 ================================================================================
-Total strings found in RAM: 124
-Total bytes used by strings: 4,068
+Total strings found in RAM: 123
+Total bytes used by strings: 4,048
 
 ================================================================================
 POTENTIAL OPTIMIZATION TARGETS
