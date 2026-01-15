@@ -36,7 +36,7 @@ substitutions:
 
   # Material Theme
   theme_source_color: "0xFF4285F4" # Google Blue
-  theme_variant: "TONAL_SPOT" # Options: TONAL_SPOT, VIBRANT, EXPRESSIVE, CONTENT, MONOCHROME, NEUTRAL
+  theme_variant: "EXPRESSIVE" # Options: TONAL_SPOT, VIBRANT, EXPRESSIVE, CONTENT, MONOCHROME, NEUTRAL
 
 # esphome:
 #   name: ${name}
