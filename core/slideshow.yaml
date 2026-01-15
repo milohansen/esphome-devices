@@ -64,7 +64,7 @@ script:
                   JsonArray root = doc.as<JsonArray>();
 
                   for (JsonArray batch : root) {
-                    for (JsonArray item : batch) {
+                    for (JsonArray img_data : batch) {
                        // item is an array of variants, take the first one
                       //  if (item.size() > 0) {
                       //    JsonArray img_data = item[0].as<JsonArray>();
@@ -158,8 +158,8 @@ script:
 
               // Load if not already active
               // We also check if the URL has changed, just in case
-              std::string current_url = component->get_url();
-              if (!id(image_slot_active)[slot_idx] || current_url != full_url) {
+              // std::string current_url = component->get_url();
+              if (!id(image_slot_active)[slot_idx]) {
                 ESP_LOGI("slideshow_mem", "Loading Slot %d (Queue %d)", slot_idx, target_queue_idx);
                 component->set_url(full_url);
                 component->update(); 
@@ -196,15 +196,15 @@ script:
             // 3. Update the Display
             id(image_index).publish_state(next_slot);
           }
-      # 4. Update Memory (Load the new lookahead, free the old previous)
-      - script.execute: manage_slideshow_memory
       # 5. Scroll the UI
       - script.execute: handle_lvgl_scroll
       # pause to allow scroll to finish
       - delay: 200ms
       # 6. Apply Image Colors
       - script.execute: apply_image_colors
-      # 7. Cleanup Old Images
+      - delay: 50ms
+      # Update Memory (Load the new lookahead, free the old previous)
+      - script.execute: manage_slideshow_memory
       # - script.execute: cleanup_slideshow_queue
       - if:
           condition:
