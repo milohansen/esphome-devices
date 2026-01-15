@@ -40,19 +40,6 @@ esphome:
 # Example: Button to regenerate theme with different color
 button:
   - platform: template
-    name: "Regenerate Theme"
-    id: regenerate_theme_button
-    on_press:
-      - logger.log:
-          format: "Regenerating Material Theme"
-          level: INFO
-      - material_theme.generate_scheme:
-          id: material_theme_component
-          # Keep current settings, just regenerate
-          # Uncomment below to change color dynamically:
-          # source_color: 0xFF6366F1  # Example: Indigo
-          # variant: VIBRANT
-  - platform: template
     name: "Apply Theme"
     on_press:
       - script.execute: apply_image_colors
