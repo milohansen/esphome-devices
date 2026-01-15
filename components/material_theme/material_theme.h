@@ -142,7 +142,7 @@ class MaterialThemeComponent : public Component {
   uint32_t source_color_{0xFF2A9D8F};  // Default: Pacific Teal from current config
   bool is_dark_{false};
   float contrast_level_{0.0};
-  SchemeVariant variant_{VARIANT_CONTENT};
+  SchemeVariant variant_{VARIANT_EXPRESSIVE};
   
   ColorScheme current_scheme_{};
   std::vector<std::function<void(const ColorScheme&)>> scheme_generated_callbacks_;
