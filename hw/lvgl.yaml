@@ -1,5 +1,57 @@
 # --- WIDGET TEMPLATING -------------------------------------------------------
-  
+
+.button_template: &button_template
+  styles: primary_style
+  pressed:
+    styles: primary_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: primary_container_style
+.button_template_container: &button_template_container
+  styles: primary_container_style
+  pressed:
+    styles: primary_container_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: primary_style
+
+.button_secondary_template: &button_secondary_template
+  styles: secondary_style
+  pressed:
+    styles: secondary_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: secondary_container_style
+.button_secondary_template_container: &button_secondary_template_container
+  styles: secondary_container_style
+  pressed:
+    styles: secondary_container_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: secondary_style
+
+.button_tertiary_template: &button_tertiary_template
+  styles: tertiary_style
+  pressed:
+    styles: tertiary_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: tertiary_container_style
+.button_tertiary_template_container: &button_tertiary_template_container
+  styles: tertiary_container_style
+  pressed:
+    styles: tertiary_container_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: tertiary_style
+
+ 
 # ESPHome hidden items for widget templates
 # IMAGES
 .image_container_template: &image_container_template
@@ -74,61 +126,12 @@
   width: 80
   floating: true
   align: BOTTOM_MID
-  bg_color: 0xE0E7FF
-  text_color: 0x4338CA
+  # bg_color: 0xE0E7FF
+  # text_color: 0x4338CA
   radius: 4px
   border_width: 0
+  <<: *button_secondary_template_container
 
-.button_template: &button_template
-  styles: primary_style
-  pressed:
-    styles: primary_style
-  disabled:
-    styles: surface_var_style
-  checked:
-    styles: primary_container_style
-.button_template_container: &button_template_container
-  styles: primary_container_style
-  pressed:
-    styles: primary_container_style
-  disabled:
-    styles: surface_var_style
-  checked:
-    styles: primary_style
-
-.button_secondary_template: &button_secondary_template
-  styles: secondary_style
-  pressed:
-    styles: secondary_style
-  disabled:
-    styles: surface_var_style
-  checked:
-    styles: secondary_container_style
-.button_secondary_template_container: &button_secondary_template_container
-  styles: secondary_container_style
-  pressed:
-    styles: secondary_container_style
-  disabled:
-    styles: surface_var_style
-  checked:
-    styles: secondary_style
-
-.button_tertiary_template: &button_tertiary_template
-  styles: tertiary_style
-  pressed:
-    styles: tertiary_style
-  disabled:
-    styles: surface_var_style
-  checked:
-    styles: tertiary_container_style
-.button_tertiary_template_container: &button_tertiary_template_container
-  styles: tertiary_container_style
-  pressed:
-    styles: tertiary_container_style
-  disabled:
-    styles: surface_var_style
-  checked:
-    styles: tertiary_style
 
 # --- LVGL CONFIGURATION --------------------------------------------------------
 lvgl:
