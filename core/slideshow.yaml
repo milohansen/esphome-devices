@@ -66,8 +66,8 @@ script:
                   for (JsonArray batch : root) {
                     for (JsonArray item : batch) {
                        // item is an array of variants, take the first one
-                       if (item.size() > 0) {
-                         JsonArray img_data = item[0].as<JsonArray>();
+                      //  if (item.size() > 0) {
+                      //    JsonArray img_data = item[0].as<JsonArray>();
                          
                          // img_data[0] = URL, img_data[1] = Color
                          if (img_data.size() > 0) {
@@ -82,7 +82,7 @@ script:
                              id(slot_source_colors_map)[q_idx] = img_data[1].as<std::string>();
                            }
                          }
-                       }
+                      //  }
                     }
                   }
                   
@@ -99,16 +99,14 @@ script:
                     id(image_index).publish_state(0); 
                   }
                   
-                  // 4. Trigger Memory Manager
-                  // This is crucial: if we were stuck at the end of the list, this will 
-                  // detect the new images and immediately start loading the "Next" one.
-                  id(manage_slideshow_memory).execute();
+      - delay: 100ms
+      - script.execute: manage_slideshow_memory
 
  # -------------------------------------------------------------------------
   # Logic & Memory Management
   # -------------------------------------------------------------------------
   - id: manage_slideshow_memory
-    mode: restart
+    mode: single
     then:
       - lambda: |-
           // Configuration: Load Previous (-1), Current (0), and Next (+1)
@@ -160,7 +158,8 @@ script:
 
               // Load if not already active
               // We also check if the URL has changed, just in case
-              if (!id(image_slot_active)[slot_idx]) {
+              std::string current_url = component->get_url();
+              if (!id(image_slot_active)[slot_idx] || current_url != full_url) {
                 ESP_LOGI("slideshow_mem", "Loading Slot %d (Queue %d)", slot_idx, target_queue_idx);
                 component->set_url(full_url);
                 component->update(); 

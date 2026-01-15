@@ -51,7 +51,7 @@ select:
     icon: "mdi:palette"
     # entity_category: config
     optimistic: true
-    # restore_value: true
+    restore_value: true
     options:
       - Tonal Spot
       - Vibrant
@@ -59,7 +59,7 @@ select:
       - Content
       - Monochrome
       - Neutral
-    initial_option: Content
+    initial_option: Expressive
     on_value:
       - if:
           condition:

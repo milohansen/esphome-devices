@@ -115,16 +115,16 @@
 # ============================================================================
 # Example 7: Update theme variant when input changes
 # ============================================================================
-- id: theme_variant_change
-  alias: "ESPHome: Theme Variant Changed"
-  description: "Trigger theme regeneration when variant changes"
-  trigger:
-    - platform: state
-      entity_id: input_select.theme_variant
-    - platform: state
-      entity_id: input_select.theme_mode
-    - platform: state
-      entity_id: input_number.theme_contrast
-  action:
-    - service: esphome.guition_p4_70_regenerate_theme_button_press
-      data: {}
+# - id: theme_variant_change
+#   alias: "ESPHome: Theme Variant Changed"
+#   description: "Trigger theme regeneration when variant changes"
+#   trigger:
+#     - platform: state
+#       entity_id: input_select.theme_variant
+#     - platform: state
+#       entity_id: input_select.theme_mode
+#     - platform: state
+#       entity_id: input_number.theme_contrast
+#   action:
+#     - service: esphome.guition_p4_70_regenerate_theme_button_press
+#       data: {}

@@ -87,7 +87,48 @@
     styles: surface_var_style
   checked:
     styles: primary_container_style
+.button_template_container: &button_template_container
+  styles: primary_container_style
+  pressed:
+    styles: primary_container_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: primary_style
 
+.button_secondary_template: &button_secondary_template
+  styles: secondary_style
+  pressed:
+    styles: secondary_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: secondary_container_style
+.button_secondary_template_container: &button_secondary_template_container
+  styles: secondary_container_style
+  pressed:
+    styles: secondary_container_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: secondary_style
+
+.button_tertiary_template: &button_tertiary_template
+  styles: tertiary_style
+  pressed:
+    styles: tertiary_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: tertiary_container_style
+.button_tertiary_template_container: &button_tertiary_template_container
+  styles: tertiary_container_style
+  pressed:
+    styles: tertiary_container_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: tertiary_style
 
 # --- LVGL CONFIGURATION --------------------------------------------------------
 lvgl:
@@ -594,7 +635,7 @@ lvgl:
                   align: TOP_RIGHT
                   x: -60
                   y: 60
-                  styles: tertiary_style
+                  <<: *button_tertiary_template
                   on_click:
                     then:
                       - script.execute: advance_slideshow
@@ -676,16 +717,78 @@ lvgl:
                   id: fetch_slideshow_queue
                   count: 5
 
-        - button:
-            id: button_test
-            text: "TEST"
-            floating: true
-            align: BOTTOM_MID
+
+        - container:
+            id: test_container
             y: -60
-            <<: *button_template
-            on_click:
-              then:
-                - logger.log: "TEST button clicked"
+            align: BOTTOM_MID
+            width: SIZE_CONTENT
+            height: SIZE_CONTENT
+            floating: true
+            layout:
+              type: flex
+              flex_flow: row
+              flex_align_main: center
+              flex_align_cross: center
+              pad_column: 6px
+            widgets:
+            - container:
+                id: test_buttons
+                width: SIZE_CONTENT
+                height: SIZE_CONTENT
+                layout:
+                  type: flex
+                  flex_flow: column
+                  flex_align_main: center
+                  flex_align_cross: center
+                  pad_row: 6px
+                widgets:
+                  - button:
+                      id: test_button
+                      text: "TEST"
+                      <<: *button_template
+                  - button:
+                      id: test_button_secondary
+                      text: "TEST"
+                      <<: *button_secondary_template
+                  - button:
+                      id: test_button_tertiary
+                      text: "TEST"
+                      <<: *button_tertiary_template
+            - container:
+                id: test_buttons_containers
+                width: SIZE_CONTENT
+                height: SIZE_CONTENT
+                layout:
+                  type: flex
+                  flex_flow: column
+                  flex_align_main: center
+                  flex_align_cross: center
+                  pad_row: 6px
+                widgets:
+                  - button:
+                      id: test_button_container
+                      text: "TEST"
+                      <<: *button_template_container
+                  - button:
+                      id: test_button_secondary_container
+                      text: "TEST"
+                      <<: *button_secondary_template_container
+                  - button:
+                      id: test_button_tertiary_container
+                      text: "TEST"
+                      <<: *button_tertiary_template_container
+
+        # - button:
+        #     id: button_test
+        #     text: "TEST"
+        #     floating: true
+        #     align: BOTTOM_MID
+        #     y: -60
+        #     <<: *button_template
+        #     on_click:
+        #       then:
+        #         - logger.log: "TEST button clicked"
                 # - script.execute: apply_image_colors
                 # - script.execute: cleanup_slideshow_queue
                 # - script.execute: 
