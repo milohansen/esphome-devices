@@ -48,6 +48,11 @@
   rotation: 270
   align: CENTER
   adv_hittest: true
+  styles: outline_style
+  bg_opa: 0%
+  indicator:
+    styles: primary_style
+    bg_opa: 0%
   # arc_color: 0x4F46E5
   # arc_opa: 50%
   # arc_opa: 0%
@@ -74,6 +79,15 @@
   radius: 4px
   border_width: 0
 
+.button_template: &button_template
+  styles: primary_style
+  pressed:
+    styles: primary_style
+  disabled:
+    styles: surface_var_style
+  checked:
+    styles: primary_container_style
+
 
 # --- LVGL CONFIGURATION --------------------------------------------------------
 lvgl:
@@ -91,13 +105,62 @@ lvgl:
   style_definitions:
     - id: image_style
       radius: 0
-  gradients:
-    - id: gradient_background
-      stops:
-        - position: 0
-          color: 0xc2e59c
-        - position: 255
-          color: 0x64b3f4
+
+    - id: primary_style
+      bg_color: primary_color
+      text_color: on_primary_color
+      arc_color: primary_color
+    - id: primary_container_style
+      bg_color: primary_container_color
+      text_color: on_primary_container_color
+      arc_color: primary_container_color
+
+    - id: secondary_style
+      bg_color: secondary_color
+      text_color: on_secondary_color
+      arc_color: secondary_color
+    - id: secondary_container_style
+      bg_color: secondary_container_color
+      text_color: on_secondary_container_color
+      arc_color: secondary_container_color
+
+    - id: tertiary_style
+      bg_color: tertiary_color
+      text_color: on_tertiary_color
+      arc_color: tertiary_color
+    - id: tertiary_container_style
+      bg_color: tertiary_container_color
+      text_color: on_tertiary_container_color
+      arc_color: tertiary_container_color
+
+    - id: error_style
+      bg_color: error_color
+      text_color: on_error_color
+    - id: error_container_style
+      bg_color: error_container_color
+      text_color: on_error_container_color
+
+    - id: background_style
+      bg_color: background_color
+      text_color: on_background_color
+    - id: surface_style
+      bg_color: surface_color
+      text_color: on_surface_color
+    - id: surface_var_style
+      bg_color: surface_var_color
+      text_color: on_surface_var_color
+    - id: inverse_surface_style
+      bg_color: inverse_surface_color
+      text_color: on_inverse_surface_color
+
+    - id: shadow_style
+      shadow_color: shadow_color
+    - id: outline_style
+      arc_color: outline_color
+      border_color: outline_color
+    - id: outline_var_style
+      arc_color: outline_var_color
+      border_color: outline_var_color
 
   # Warm earthy palette inspired by palette-2.css
   # Colors: Terracotta primary, Stone neutrals, Olive/Mustard/Brick accents
@@ -107,7 +170,7 @@ lvgl:
       bg_color: background_surface
       text_color: text_main
       border_color: border_color
-      shadow_color: text_main
+      shadow_color: shadow_color
       
     # Button styling
     button:
@@ -244,6 +307,65 @@ lvgl:
           id: debug_label
           text: "0"
           align: TOP_MID
+      - container:
+          id: colors_test
+          y: 60
+          align: TOP_MID
+          width: SIZE_CONTENT
+          height: 42px
+          layout:
+            type: flex
+            flex_flow: row
+            flex_align_main: center
+            flex_align_cross: center
+            pad_column: 6px
+          widgets:
+            - obj:
+                id: color_primary
+                width: 32px
+                height: 32px
+                styles: primary_style
+                bg_opa: COVER
+                border_width: 0
+                scrollable: false
+            - obj:
+                width: 32px
+                height: 32px
+                styles: primary_container_style
+                bg_opa: COVER
+                border_width: 0
+                scrollable: false
+            - obj:
+                id: color_secondary
+                width: 32px
+                height: 32px
+                styles: secondary_style
+                bg_opa: COVER
+                border_width: 0
+                scrollable: false
+            - obj:
+                width: 32px
+                height: 32px
+                styles: secondary_container_style
+                bg_opa: COVER
+                border_width: 0
+                scrollable: false
+            - obj:
+                id: color_tertiary
+                width: 32px
+                height: 32px
+                styles: tertiary_style
+                bg_opa: COVER
+                border_width: 0
+                scrollable: false
+            - obj:
+                width: 32px
+                height: 32px
+                styles: tertiary_container_style
+                bg_opa: COVER
+                border_width: 0
+                scrollable: false
+
       - obj:
           id: assistant_container
           y: -42px
@@ -309,7 +431,6 @@ lvgl:
     - id: home_page
       bg_color: background_page
       bg_opa: COVER
-      # bg_grad: gradient_background
       scrollable: false
       widgets:
         - obj:
@@ -374,17 +495,10 @@ lvgl:
               - lambda: |-
                   lv_obj_scroll_to_x(id(image_container), 0, LV_ANIM_OFF);
 
-                  // id(image_map)[0] = id(image_subcontainer_0);
-                  // id(image_map)[1] = id(image_subcontainer_1);
-                  // id(image_map)[2] = id(image_subcontainer_2);
-                  // id(image_map)[3] = id(image_subcontainer_3);
-                  // id(image_map)[4] = id(image_subcontainer_4);
-                  // id(image_map)[5] = id(image_subcontainer_5);
-
-            on_scroll_end:
-              - lambda: |-
-                  int16_t x_pos = lv_obj_get_scroll_x(id(image_container));
-                  ESP_LOGD("lvgl", "Scroll ended at x=%d", x_pos);
+            # on_scroll_end:
+            #   - lambda: |-
+            #       int16_t x_pos = lv_obj_get_scroll_x(id(image_container));
+            #       ESP_LOGD("lvgl", "Scroll ended at x=%d", x_pos);
 
             widgets:
               - container:
@@ -458,20 +572,20 @@ lvgl:
                         <<: *image_label_template
                         text: "5"
 
-              - button:
-                  id: button_talk
-                  text: "Talk"
-                  floating: true
-                  align: TOP_LEFT
-                  x: 60
-                  y: 60
-                  on_click:
-                    - if:
-                        condition: voice_assistant.is_running
-                        then:
-                          - voice_assistant.stop:
-                        else:
-                          - voice_assistant.start_continuous:
+              # - button:
+              #     id: button_talk
+              #     text: "Talk"
+              #     floating: true
+              #     align: TOP_LEFT
+              #     x: 60
+              #     y: 60
+              #     on_click:
+              #       - if:
+              #           condition: voice_assistant.is_running
+              #           then:
+              #             - voice_assistant.stop:
+              #           else:
+              #             - voice_assistant.start_continuous:
 
               - button:
                   id: button_next
@@ -480,6 +594,7 @@ lvgl:
                   align: TOP_RIGHT
                   x: -60
                   y: 60
+                  styles: tertiary_style
                   on_click:
                     then:
                       - script.execute: advance_slideshow
@@ -496,12 +611,9 @@ lvgl:
                   width: 72
                   height: 56
                   radius: 29
-                  
-                  bg_color: primary_base
-                  text_color: text_inverse
-                  shadow_width: 4
-                  shadow_opa: 20%
-                  
+
+                  styles: primary_container_style
+
                   on_click:
                     then:
                       - lvgl.page.show: timer_page
@@ -509,7 +621,6 @@ lvgl:
                     - label:
                         align: CENTER
                         text_font: font_icons
-                        text_color: text_inverse
                         text: "\ue425"
               
               - container:
@@ -542,6 +653,7 @@ lvgl:
                     - label:
                         id: date_label
                         text:
+                          # TODO: this formats the date with leading zeros, need to fix
                           time_format: "%a, %b %d"
                           time: !lambda return id(homeassistant_time).now();
                         text_font: font_big_date
@@ -551,14 +663,31 @@ lvgl:
                           lvgl.widget.refresh: date_label
           
         - button:
+            id: button_fetch
+            text: "Fetch Slideshow"
+            floating: true
+            align: TOP_LEFT
+            x: 60
+            y: 60
+            styles: error_style
+            # <<: *button_template
+            on_click:
+              - script.execute: 
+                  id: fetch_slideshow_queue
+                  count: 5
+
+        - button:
             id: button_test
             text: "TEST"
             floating: true
             align: BOTTOM_MID
             y: -60
+            <<: *button_template
             on_click:
               then:
-                - script.execute: cleanup_slideshow_queue
+                - logger.log: "TEST button clicked"
+                # - script.execute: apply_image_colors
+                # - script.execute: cleanup_slideshow_queue
                 # - script.execute: 
                 #     id: fetch_slideshow_queue
                 #     count: 4
@@ -609,6 +738,7 @@ lvgl:
             width: 72
             height: 56
             radius: 29
+            styles: primary_container_style
             on_click:
               then:
                 - lvgl.page.show: home_page
@@ -634,6 +764,7 @@ lvgl:
             floating: true
             align: BOTTOM_MID
             y: -60
+            styles: primary_style
             state:
               disabled: true
             on_click:
@@ -716,6 +847,23 @@ lvgl:
                           id: cancel_timer_by_slot_index
                           index: 2
 
+        - container:
+            <<: *timer_container_template
+            id: timer_static
+            hidden: false
+            widgets:
+              - arc:
+                  <<: *timer_arc_template
+                  id: timer_arc_static
+                  width: 120
+                  height: 120
+                  value: 16000
+              - label:
+                  <<: *timer_label_template
+                  id: timer_label_static
+              - button:
+                  <<: *timer_button_template
+
         - led:
             id: assistant_connected_led
             floating: true
@@ -723,6 +871,3 @@ lvgl:
             y: 60
             x: -60
             color: text_muted
-
-    
-

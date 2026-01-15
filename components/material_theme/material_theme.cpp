@@ -200,6 +200,13 @@ std::string MaterialThemeComponent::argb_to_hex(Argb argb) {
   return std::string(buf);
 }
 
+esphome::Color MaterialThemeComponent::argb_to_color(Argb argb) {
+  uint8_t r = get_red(argb);
+  uint8_t g = get_green(argb);
+  uint8_t b = get_blue(argb);
+  return esphome::Color(r, g, b);
+}
+
 // Material Color Utilities C++ library handles all color generation
 // No stub helper functions needed
 

@@ -240,12 +240,48 @@ script:
             if (color_str.length() == 8) {
               uint32_t color = std::stoul(color_str, nullptr, 16);
               id(material_theme_component).set_source_color(color);
-              id(material_theme_component).generate_scheme();
+              auto scheme = id(material_theme_component).generate_scheme();
+
+              // id(primary_base) = esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.primary);
+              esphome::Color primary_color = esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.primary);
+              id(primary_base) = primary_color;
+
+              lv_style_set_bg_color(id(primary_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.primary));
+              lv_style_set_text_color(id(primary_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_primary));
+              lv_style_set_bg_color(id(primary_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.primary_container));
+              lv_style_set_text_color(id(primary_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_primary_container));
+              
+              lv_style_set_bg_color(id(secondary_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.secondary));
+              lv_style_set_text_color(id(secondary_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_secondary));
+              lv_style_set_bg_color(id(secondary_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.secondary_container));
+              lv_style_set_text_color(id(secondary_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_secondary_container));
+              
+              lv_style_set_bg_color(id(tertiary_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.tertiary));
+              lv_style_set_text_color(id(tertiary_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_tertiary));
+              lv_style_set_bg_color(id(tertiary_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.tertiary_container));
+              lv_style_set_text_color(id(tertiary_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_tertiary_container));
+              
+              lv_style_set_bg_color(id(error_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.error));
+              lv_style_set_text_color(id(error_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_error));
+              lv_style_set_bg_color(id(error_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.error_container));
+              lv_style_set_text_color(id(error_container_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_error_container));
+
+              lv_style_set_bg_color(id(background_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.background));
+              lv_style_set_text_color(id(background_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_background));
+              lv_style_set_bg_color(id(surface_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.surface));
+              lv_style_set_text_color(id(surface_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_surface));
+              lv_style_set_bg_color(id(surface_var_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.surface_variant));
+              lv_style_set_text_color(id(surface_var_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_surface_variant));
+              
+              
+
+
+              ESP_LOGD("slideshow_colors", "Applied primary color: #%s", esphome::material_theme::MaterialThemeComponent::argb_to_hex(scheme.primary).c_str());
             }
           } else {
             ESP_LOGD("slideshow_colors", "No color mapping for Queue Index %d", q_idx);
           }
-      - lvgl.widget.redraw: button_show_timers
+          
       - logger.log: "Applied image source color from slideshow and redrew screen."
 
   - id: slideshow_timer

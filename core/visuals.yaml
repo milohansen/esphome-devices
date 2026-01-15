@@ -268,3 +268,78 @@ color:
     hex: B34338
   - id: status_error_bg
     hex: FBEAE8
+
+    # Material Design 3 Color Scheme
+
+  - id: primary_color
+    hex: 8a5021
+  - id: on_primary_color
+    hex: ffffff
+  - id: primary_container_color
+    hex: ffdcc5
+  - id: on_primary_container_color
+    hex: 6d390b
+
+  - id: secondary_color
+    hex: 755945
+  - id: on_secondary_color
+    hex: ffffff
+  - id: secondary_container_color
+    hex: ffdcc5
+  - id: on_secondary_container_color
+    hex: 5b412f
+
+  - id: tertiary_color
+    hex: 5e6135
+  - id: on_tertiary_color
+    hex: ffffff
+  - id: tertiary_container_color
+    hex: e4e6ae
+  - id: on_tertiary_container_color
+    hex: 464920
+
+  - id: error_color
+    hex: ba1a1a
+  - id: on_error_color
+    hex: ffffff
+  - id: error_container_color
+    hex: ffdad6
+  - id: on_error_container_color
+    hex: 93000a
+
+  - id: background_color
+    hex: fff8f5
+  - id: on_background_color
+    hex: 221a15
+  - id: surface_color
+    hex: fff8f5
+  - id: on_surface_color
+    hex: 221a15
+  - id: surface_var_color
+    hex: e7d7ce
+  - id: on_surface_var_color
+    hex: 52443b
+
+  - id: outline_color
+    hex: 84746a
+  - id: outline_var_color
+    hex: d6c3b7
+
+  - id: scrim_color
+    red_int: 0
+    green_int: 0
+    blue_int: 0
+  - id: shadow_color
+    red_int: 0
+    green_int: 0
+    blue_int: 0
+
+  - id: inverse_surface_color
+    hex: 382f29
+  - id: on_inverse_surface_color
+    hex: feeee4
+  - id: inverse_primary_color
+    hex: ffb783
+
+  - id: surface_container_color
+    hex: fbebe1

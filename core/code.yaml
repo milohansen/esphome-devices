@@ -115,8 +115,6 @@ script:
             node: ${name}
             phase: !lambda return phase;
 
-# debug:
-#   update_interval: 30s
 
 globals:
   - id: init_in_progress
@@ -138,3 +136,26 @@ globals:
     type: bool
     restore_value: no
     initial_value: "false"
+
+# debug:
+#   update_interval: 5s
+
+# text_sensor:
+#   - platform: debug
+#     device:
+#       name: "Device Info"
+#     reset_reason:
+#       name: "Reset Reason"
+
+# sensor:
+#   - platform: debug
+#     free:
+#       name: "Heap Free"
+#     block:
+#       name: "Heap Max Block"
+#     loop_time:
+#       name: "Loop Time"
+#     psram:
+#       name: "Free PSRAM"
+#     cpu_frequency:
+#       name: "CPU Frequency"

@@ -25,6 +25,49 @@ button:
           id: theme
           source_color: 0xFF6366F1  # Indigo
           is_dark: false
+  - platform: template
+    name: "Apply Theme"
+    on_press:
+      - script.execute: apply_image_colors
+
+select:
+  - id: color_scheme_variant
+    platform: template
+    name: "Material Theme Color Variant"
+    icon: "mdi:palette"
+    # entity_category: config
+    optimistic: true
+    # restore_value: true
+    options:
+      - Tonal Spot
+      - Vibrant
+      - Expressive
+      - Content
+      - Monochrome
+      - Neutral
+    initial_option: Content
+    on_value:
+      - lambda: |-
+          ESP_LOGD("material_theme", "Color scheme variant changed to: %s", x.c_str());
+          material_theme::SchemeVariant variant;
+          if (x == "Tonal Spot") {
+            variant = material_theme::VARIANT_TONAL_SPOT;
+          } else if (x == "Vibrant") {
+            variant = material_theme::VARIANT_VIBRANT;
+          } else if (x == "Expressive") {
+            variant = material_theme::VARIANT_EXPRESSIVE;
+          } else if (x == "Content") {
+            variant = material_theme::VARIANT_CONTENT;
+          } else if (x == "Monochrome") {
+            variant = material_theme::VARIANT_MONOCHROME;
+          } else if (x == "Neutral") {
+            variant = material_theme::VARIANT_NEUTRAL;
+          } else {
+            ESP_LOGW("material_theme", "Unknown variant selected: %s", x.c_str());
+            return;
+          }
+          id(material_theme_component).set_variant(variant);
+      # - script.execute: apply_image_colors
 
 # Example: Generate theme from Home Assistant entity color
 binary_sensor:

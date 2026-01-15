@@ -11,6 +11,7 @@
 #include "esphome/core/automation.h"
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
+#include "esphome/core/color.h"
 
 // Include Material Color Utilities - we'll download these separately
 // For now, forward declare what we need
@@ -100,7 +101,12 @@ class MaterialThemeComponent : public Component {
   void set_source_color(uint32_t color) { this->source_color_ = color; }
   void set_is_dark(bool is_dark) { this->is_dark_ = is_dark; }
   void set_contrast_level(float level) { this->contrast_level_ = level; }
-  void set_variant(SchemeVariant variant) { this->variant_ = variant; }
+  // void set_variant(SchemeVariant variant) { this->variant_ = variant; }
+  void set_variant(SchemeVariant variant) {
+    ESP_LOGCONFIG(TAG, "set_variant was: %d, desired: %d", this->variant_, variant);
+    this->variant_ = variant;
+    ESP_LOGCONFIG(TAG, "set_variant confirm: %d", this->variant_);
+  }
   void set_variant(int variant) { this->variant_ = static_cast<SchemeVariant>(variant); }
   
   // Generate a new color scheme from source color
@@ -122,6 +128,9 @@ class MaterialThemeComponent : public Component {
   
   // Helper to convert ARGB to hex string
   static std::string argb_to_hex(Argb argb);
+
+  // Helper to convert ARGB to esphome::Color
+  static esphome::Color argb_to_color(Argb argb);
   
   // Extract RGB components
   static uint8_t get_red(Argb argb) { return (argb >> 16) & 0xFF; }
@@ -133,7 +142,7 @@ class MaterialThemeComponent : public Component {
   uint32_t source_color_{0xFF2A9D8F};  // Default: Pacific Teal from current config
   bool is_dark_{false};
   float contrast_level_{0.0};
-  SchemeVariant variant_{VARIANT_TONAL_SPOT};
+  SchemeVariant variant_{VARIANT_CONTENT};
   
   ColorScheme current_scheme_{};
   std::vector<std::function<void(const ColorScheme&)>> scheme_generated_callbacks_;

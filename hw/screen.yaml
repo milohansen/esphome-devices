@@ -19,7 +19,7 @@ touchscreen:
     #         }  
     on_release:
       then:
-        - logger.log: "Touch released"
+        # - logger.log: "Touch released"
         - if:
             condition: lvgl.is_paused
             then:
