@@ -169,7 +169,7 @@ class GenerateSchemeAction : public Action<Ts...> {
     uint32_t source = this->source_color_.value_or(x..., this->parent_->get_current_scheme().primary);
     bool dark = this->is_dark_.value_or(x..., false);
     float contrast = this->contrast_level_.value_or(x..., 0.0);
-    SchemeVariant var = this->variant_.value_or(x..., VARIANT_TONAL_SPOT);
+    SchemeVariant var = this->variant_.value_or(x..., VARIANT_EXPRESSIVE);
     
     ESP_LOGD(TAG, "Generating color scheme: source=0x%08X, dark=%d, contrast=%.2f, variant=%d",
              source, dark, contrast, var);
