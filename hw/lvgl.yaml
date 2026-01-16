@@ -167,6 +167,21 @@ lvgl:
 
   # log_level: info
 
+  on_boot:
+    - lambda: |-
+        ESP_LOGI("lvgl", "LVGL initialized");
+        id(debug_widgets).clear();
+        id(debug_widgets).push_back(id(debug_label));
+        id(debug_widgets).push_back(id(debug_spinner));
+        id(debug_widgets).push_back(id(test_container));
+        id(debug_widgets).push_back(id(button_fetch));
+        id(debug_widgets).push_back(id(label_image_0));
+        id(debug_widgets).push_back(id(label_image_1));
+        id(debug_widgets).push_back(id(label_image_2));
+        id(debug_widgets).push_back(id(label_image_3));
+        id(debug_widgets).push_back(id(label_image_4));
+        id(debug_widgets).push_back(id(label_image_5));
+        
   style_definitions:
     - id: image_style
       radius: 0
@@ -441,18 +456,89 @@ lvgl:
       #           scrollable: false
 
       - spinner:
-          id: a_spinner
+          id: debug_spinner
           align: LEFT_MID
           arc_length: 60deg
           spin_time: 5s
           arc_opa: 0%
-          arc_width: 8px
+          arc_width: 4px
           width: 48px
           height: 48px
           x: 60
           adv_hittest: true
           indicator:
             styles: primary_arc_style
+
+      - container:
+          id: test_container
+          # y: -60
+          # align: BOTTOM_MID
+          align: RIGHT_MID
+          x: -60
+          width: SIZE_CONTENT
+          height: SIZE_CONTENT
+          floating: true
+          layout:
+            type: flex
+            flex_flow: row
+            flex_align_main: center
+            flex_align_cross: center
+            pad_column: 6px
+          widgets:
+          - container:
+              id: test_buttons
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              layout:
+                type: flex
+                flex_flow: column
+                flex_align_main: center
+                flex_align_cross: center
+                pad_row: 6px
+              widgets:
+                - button:
+                    id: test_button
+                    text: "TEST"
+                    <<: *button_template
+                - button:
+                    id: test_button_secondary
+                    text: "TEST"
+                    <<: *button_secondary_template
+                - button:
+                    id: test_button_tertiary
+                    text: "TEST"
+                    <<: *button_tertiary_template
+                - button:
+                    id: test_button_error
+                    text: "TEST"
+                    <<: *button_error_template
+          - container:
+              id: test_buttons_containers
+              width: SIZE_CONTENT
+              height: SIZE_CONTENT
+              layout:
+                type: flex
+                flex_flow: column
+                flex_align_main: center
+                flex_align_cross: center
+                pad_row: 6px
+              widgets:
+                - button:
+                    id: test_button_container
+                    text: "TEST"
+                    <<: *button_template_container
+                - button:
+                    id: test_button_secondary_container
+                    text: "TEST"
+                    <<: *button_secondary_template_container
+                - button:
+                    id: test_button_tertiary_container
+                    text: "TEST"
+                    <<: *button_tertiary_template_container
+                - button:
+                    id: test_button_error_container
+                    text: "TEST"
+                    <<: *button_error_template_container
 
       - button:
           id: button_switch_page
@@ -816,78 +902,6 @@ lvgl:
               - script.execute: 
                   id: fetch_slideshow_queue
                   count: 5
-
-
-        - container:
-            id: test_container
-            # y: -60
-            # align: BOTTOM_MID
-            align: RIGHT_MID
-            x: -60
-            width: SIZE_CONTENT
-            height: SIZE_CONTENT
-            floating: true
-            layout:
-              type: flex
-              flex_flow: row
-              flex_align_main: center
-              flex_align_cross: center
-              pad_column: 6px
-            widgets:
-            - container:
-                id: test_buttons
-                width: SIZE_CONTENT
-                height: SIZE_CONTENT
-                layout:
-                  type: flex
-                  flex_flow: column
-                  flex_align_main: center
-                  flex_align_cross: center
-                  pad_row: 6px
-                widgets:
-                  - button:
-                      id: test_button
-                      text: "TEST"
-                      <<: *button_template
-                  - button:
-                      id: test_button_secondary
-                      text: "TEST"
-                      <<: *button_secondary_template
-                  - button:
-                      id: test_button_tertiary
-                      text: "TEST"
-                      <<: *button_tertiary_template
-                  - button:
-                      id: test_button_error
-                      text: "TEST"
-                      <<: *button_error_template
-            - container:
-                id: test_buttons_containers
-                width: SIZE_CONTENT
-                height: SIZE_CONTENT
-                layout:
-                  type: flex
-                  flex_flow: column
-                  flex_align_main: center
-                  flex_align_cross: center
-                  pad_row: 6px
-                widgets:
-                  - button:
-                      id: test_button_container
-                      text: "TEST"
-                      <<: *button_template_container
-                  - button:
-                      id: test_button_secondary_container
-                      text: "TEST"
-                      <<: *button_secondary_template_container
-                  - button:
-                      id: test_button_tertiary_container
-                      text: "TEST"
-                      <<: *button_tertiary_template_container
-                  - button:
-                      id: test_button_error_container
-                      text: "TEST"
-                      <<: *button_error_template_container
 
         # - button:
         #     id: button_test

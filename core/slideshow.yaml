@@ -420,6 +420,18 @@ script:
           level: WARN
       # Optional: Implement backoff retry here if needed
 
+  - id: set_debug_visibility
+    then:
+      - lambda: |-
+          bool show = id(show_slideshow_debug).state;
+          for (auto obj : id(debug_widgets)) {
+            if (show) {
+              lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
+            } else {
+              lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+            }
+          }
+
 globals:
   # Main Queue
   - id: slideshow_queue_ids
@@ -438,6 +450,10 @@ globals:
 
   - id: image_slot_active
     type: "std::map<int, bool>"
+    restore_value: no
+
+  - id: debug_widgets
+    type: "std::vector<lv_obj_t*>"
     restore_value: no
 
 text_sensor:
@@ -483,13 +499,13 @@ switch:
     name: "First Photo Loaded"
     optimistic: true
     restore_mode: ALWAYS_OFF
-    # internal: true
+    internal: true
   - id: first_photo_loading
     platform: template
     name: "First Photo Loading"
     optimistic: true
     restore_mode: ALWAYS_ON
-    # internal: true
+    internal: true
 
   - id: slideshow_scrolling
     platform: template
@@ -502,5 +518,7 @@ switch:
     platform: template
     name: "Show Slideshow Debug"
     optimistic: true
-    restore_mode: ALWAYS_OFF
-    internal: true
+    restore_mode: RESTORE_DEFAULT_ON
+    # internal: true
+    on_state: 
+      - script.execute: set_debug_visibility
