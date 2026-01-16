@@ -26,6 +26,7 @@ script:
                   }
 
   - id: fetch_slideshow_queue
+    mode: single
     parameters:
       count: int
     then:
@@ -98,13 +99,43 @@ script:
                     id(slideshow_queue_index) = 0;
                     id(image_index).publish_state(0); 
                   }
-                  
-      - delay: 100ms
-      - script.execute: manage_slideshow_memory
+
+      - if:
+          condition:
+            switch.is_off: first_photo_loaded
+          then:
+            - script.execute: load_first_image
+          else:
+            - delay: 100ms
+            - script.execute: manage_slideshow_memory
 
  # -------------------------------------------------------------------------
   # Logic & Memory Management
   # -------------------------------------------------------------------------
+  - id: load_first_image
+    mode: single
+    then:
+      - switch.turn_on: first_photo_loading
+      # Activate the first image if we just loaded it
+      - lambda: |-
+          if (!id(slideshow_queue_ids).empty()) {
+            ESP_LOGI("slideshow_api", "First photo loaded, starting slideshow");
+            auto *component = id(online_images)[0];
+            std::string target_url = id(slideshow_queue_ids)[0];
+            component->set_url(target_url);
+            component->update(); 
+            id(image_slot_active)[0] = true;
+          }
+      - script.execute: apply_image_colors
+      - wait_until:
+          condition:
+            switch.is_off: first_photo_loading
+          timeout: 30s
+      - switch.turn_on: first_photo_loaded
+      - logger.log: "First photo loaded, starting slideshow memory management"
+      - script.execute: manage_slideshow_memory
+      - script.execute: slideshow_timer
+
   - id: manage_slideshow_memory
     mode: single
     then:
@@ -199,7 +230,10 @@ script:
       # 5. Scroll the UI
       - script.execute: handle_lvgl_scroll
       # pause to allow scroll to finish
-      - delay: 200ms
+      - wait_until:
+          condition:
+            switch.is_off: slideshow_scrolling
+          timeout: 2s
       # 6. Apply Image Colors
       - script.execute: apply_image_colors
       - delay: 50ms
@@ -271,24 +305,27 @@ script:
               lv_style_set_text_color(id(surface_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_surface));
               lv_style_set_bg_color(id(surface_var_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.surface_variant));
               lv_style_set_text_color(id(surface_var_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.on_surface_variant));
+
+              lv_style_set_arc_color(id(primary_arc_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.primary));
+              lv_style_set_arc_color(id(secondary_arc_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.secondary));
+              lv_style_set_arc_color(id(surface_arc_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.surface));
+
+              lv_style_set_text_color(id(text_shadow_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.shadow));
+              lv_style_set_shadow_color(id(shadow_style), esphome::material_theme::MaterialThemeComponent::argb_to_color(scheme.shadow));
               
               
-
-
               ESP_LOGD("slideshow_colors", "Applied primary color: #%s", esphome::material_theme::MaterialThemeComponent::argb_to_hex(scheme.primary).c_str());
             }
           } else {
             ESP_LOGD("slideshow_colors", "No color mapping for Queue Index %d", q_idx);
           }
-          
-      - logger.log: "Applied image source color from slideshow and redrew screen."
 
   - id: slideshow_timer
     mode: restart
     then:
       - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
-      # - script.execute: advance_slideshow
-      # - script.execute: slideshow_timer
+      - script.execute: advance_slideshow
+      - script.execute: slideshow_timer
 
   - id: update_debug_status
     then:
@@ -390,7 +427,7 @@ globals:
   - id: slideshow_queue_index
     type: int
     restore_value: no
-    initial_value: "1"
+    initial_value: "0"
 
   - id: image_slot_active
     type: "std::map<int, bool>"
@@ -431,3 +468,25 @@ mapping:
       3: background_image_3
       4: background_image_4
       5: background_image_5
+
+
+switch:
+  - id: first_photo_loaded
+    platform: template
+    name: "First Photo Loaded"
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    # internal: true
+  - id: first_photo_loading
+    platform: template
+    name: "First Photo Loading"
+    optimistic: true
+    restore_mode: ALWAYS_ON
+    # internal: true
+
+  - id: slideshow_scrolling
+    platform: template
+    name: "Slideshow Scrolling"
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    internal: true

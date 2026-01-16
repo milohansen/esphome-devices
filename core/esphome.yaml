@@ -66,12 +66,14 @@ time:
       - seconds: 0
         then:
          - lvgl.widget.refresh: time_label
+         - lvgl.widget.refresh: time_label_shadow
       # Update the date label every day at midnight
       - seconds: 0
         minutes: 0
         hours: 0
         then:
          - lvgl.widget.refresh: date_label
+         - lvgl.widget.refresh: date_label_shadow
 
 api:
   id: ha_api
