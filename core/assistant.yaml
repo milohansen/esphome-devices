@@ -233,19 +233,19 @@ binary_sensor:
     device_class: running
     entity_category: diagnostic
     # internal: true
-    on_state_change:
-      then:
-      - if:
-          condition:
-            lambda: return x.value();
-          then:
-            - lvgl.led.update:
-                id: assistant_connected_led
-                color: primary_base
-          else:
-            - lvgl.led.update:
-                id: assistant_connected_led
-                color: status_error_bg
+    # on_state_change:
+    #   then:
+    #   - if:
+    #       condition:
+    #         lambda: return x.value();
+    #       then:
+    #         - lvgl.led.update:
+    #             id: assistant_connected_led
+    #             color: primary_base
+    #       else:
+    #         - lvgl.led.update:
+    #             id: assistant_connected_led
+    #             color: status_error_bg
 
 text_sensor:
   - id: text_request

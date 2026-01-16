@@ -221,7 +221,7 @@ lvgl:
     - id: shadow_style
       shadow_color: shadow_color
     - id: text_shadow_style
-      text_color: red
+      text_color: shadow_color
     - id: outline_style
       arc_color: outline_color
       border_color: outline_color
@@ -381,64 +381,64 @@ lvgl:
           id: debug_label
           text: "0"
           align: TOP_MID
-      - container:
-          id: colors_test
-          y: 60
-          align: TOP_MID
-          width: SIZE_CONTENT
-          height: 42px
-          layout:
-            type: flex
-            flex_flow: row
-            flex_align_main: center
-            flex_align_cross: center
-            pad_column: 6px
-          widgets:
-            - obj:
-                id: color_primary
-                width: 32px
-                height: 32px
-                styles: primary_style
-                bg_opa: COVER
-                border_width: 0
-                scrollable: false
-            - obj:
-                width: 32px
-                height: 32px
-                styles: primary_container_style
-                bg_opa: COVER
-                border_width: 0
-                scrollable: false
-            - obj:
-                id: color_secondary
-                width: 32px
-                height: 32px
-                styles: secondary_style
-                bg_opa: COVER
-                border_width: 0
-                scrollable: false
-            - obj:
-                width: 32px
-                height: 32px
-                styles: secondary_container_style
-                bg_opa: COVER
-                border_width: 0
-                scrollable: false
-            - obj:
-                id: color_tertiary
-                width: 32px
-                height: 32px
-                styles: tertiary_style
-                bg_opa: COVER
-                border_width: 0
-                scrollable: false
-            - obj:
-                width: 32px
-                height: 32px
-                styles: tertiary_container_style
-                bg_opa: COVER
-                border_width: 0
-                scrollable: false
+      # - container:
+      #     id: colors_test
+      #     y: 60
+      #     align: TOP_MID
+      #     width: SIZE_CONTENT
+      #     height: 42px
+      #     layout:
+      #       type: flex
+      #       flex_flow: row
+      #       flex_align_main: center
+      #       flex_align_cross: center
+      #       pad_column: 6px
+      #     widgets:
+      #       - obj:
+      #           id: color_primary
+      #           width: 32px
+      #           height: 32px
+      #           styles: primary_style
+      #           bg_opa: COVER
+      #           border_width: 0
+      #           scrollable: false
+      #       - obj:
+      #           width: 32px
+      #           height: 32px
+      #           styles: primary_container_style
+      #           bg_opa: COVER
+      #           border_width: 0
+      #           scrollable: false
+      #       - obj:
+      #           id: color_secondary
+      #           width: 32px
+      #           height: 32px
+      #           styles: secondary_style
+      #           bg_opa: COVER
+      #           border_width: 0
+      #           scrollable: false
+      #       - obj:
+      #           width: 32px
+      #           height: 32px
+      #           styles: secondary_container_style
+      #           bg_opa: COVER
+      #           border_width: 0
+      #           scrollable: false
+      #       - obj:
+      #           id: color_tertiary
+      #           width: 32px
+      #           height: 32px
+      #           styles: tertiary_style
+      #           bg_opa: COVER
+      #           border_width: 0
+      #           scrollable: false
+      #       - obj:
+      #           width: 32px
+      #           height: 32px
+      #           styles: tertiary_container_style
+      #           bg_opa: COVER
+      #           border_width: 0
+      #           scrollable: false
 
       - spinner:
           id: a_spinner
@@ -495,8 +495,7 @@ lvgl:
           min_width: 256px
           # width: 100%
           height: 42px
-          bg_color: background_surface
-          bg_opa: COVER
+          styles: surface_style
           radius: 6px
           pad_all: 3px
           pad_top: 9px
@@ -602,7 +601,7 @@ lvgl:
             scroll_snap_x: "START"
             scrollbar_mode: "OFF"
             scroll_one: true
-            scroll_elastic: true
+            scroll_elastic: false
             
             shadow_spread: 4
 
@@ -638,6 +637,7 @@ lvgl:
                     #     src: placeholder_image
                     - label:
                         <<: *image_label_template
+                        id: label_image_0
                         text: "0"
               - container:
                   <<: *image_container_template
@@ -649,6 +649,7 @@ lvgl:
                         src: placeholder_image
                     - label:
                         <<: *image_label_template
+                        id: label_image_1
                         text: "1"
               - container:
                   <<: *image_container_template
@@ -660,6 +661,7 @@ lvgl:
                         src: placeholder_image
                     - label:
                         <<: *image_label_template
+                        id: label_image_2
                         text: "2"
               - container:
                   <<: *image_container_template
@@ -671,6 +673,7 @@ lvgl:
                         src: placeholder_image
                     - label:
                         <<: *image_label_template
+                        id: label_image_3
                         text: "3"
               - container:
                   <<: *image_container_template
@@ -682,6 +685,7 @@ lvgl:
                         src: placeholder_image
                     - label:
                         <<: *image_label_template
+                        id: label_image_4
                         text: "4"
               - container:
                   <<: *image_container_template
@@ -693,6 +697,7 @@ lvgl:
                         src: placeholder_image
                     - label:
                         <<: *image_label_template
+                        id: label_image_5
                         text: "5"
 
               # - button:
@@ -733,6 +738,7 @@ lvgl:
                   align: BOTTOM_LEFT
                   x: 62
                   y: -58
+                  opa: 50%
                   layout:
                     type: flex
                     flex_flow: column_reverse
@@ -924,10 +930,9 @@ lvgl:
                 #     lv_anim_start(&a);
 
     - id: timer_page
-      bg_color: white
-      bg_opa: COVER
 
       styles: background_style
+      bg_opa: COVER
 
       layout:
         type: flex
@@ -945,7 +950,7 @@ lvgl:
             floating: true
             align: BOTTOM_MID
             y: -60
-            styles: primary_style
+            <<: *button_error_template_container
             state:
               disabled: true
             on_click:
@@ -1044,11 +1049,4 @@ lvgl:
                   id: timer_label_static
               - button:
                   <<: *timer_button_template
-
-        - led:
-            id: assistant_connected_led
-            floating: true
-            align: TOP_RIGHT
-            y: 60
-            x: -60
-            color: text_muted
+                  

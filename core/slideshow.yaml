@@ -236,10 +236,10 @@ script:
           timeout: 2s
       # 6. Apply Image Colors
       - script.execute: apply_image_colors
+      - script.execute: slideshow_timer
       - delay: 50ms
       # Update Memory (Load the new lookahead, free the old previous)
       - script.execute: manage_slideshow_memory
-      # - script.execute: cleanup_slideshow_queue
       - if:
           condition:
             lambda: |-
@@ -248,6 +248,8 @@ script:
             - script.execute:
                 id: fetch_slideshow_queue
                 count: 5
+            - delay: 1s
+            - script.execute: cleanup_slideshow_queue
 
   - id: handle_lvgl_scroll
     then:
@@ -325,7 +327,7 @@ script:
     then:
       - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
       - script.execute: advance_slideshow
-      - script.execute: slideshow_timer
+      # - script.execute: slideshow_timer
 
   - id: update_debug_status
     then:
@@ -487,6 +489,13 @@ switch:
   - id: slideshow_scrolling
     platform: template
     name: "Slideshow Scrolling"
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+  - id: show_slideshow_debug
+    platform: template
+    name: "Show Slideshow Debug"
     optimistic: true
     restore_mode: ALWAYS_OFF
     internal: true
