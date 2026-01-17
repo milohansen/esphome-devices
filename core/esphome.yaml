@@ -31,15 +31,11 @@ wifi:
   password: !secret wifi_password
   ap:
     password: "RZ7D3EzJdPM6"
-  on_connect: 
-    - script.execute: register_device_with_api
-    - delay: 1s
+  on_connect:
     - script.execute:
         id: fetch_slideshow_queue
         count: 5
-    # - delay: 1s
-    # - lambda: |-
-    #     id(image_index).publish_state(0);
+        is_new: true
 
 captive_portal:
 

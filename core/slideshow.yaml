@@ -2,39 +2,18 @@ script:
   # -------------------------------------------------------------------------
   # API / Data Fetching
   # -------------------------------------------------------------------------
-  - id: register_device_with_api
-    then:
-      - logger.log: "Registering device with slideshow API..."
-      - http_request.post:
-          url: "${slideshow_api_base}/api/devices"
-          request_headers:
-            Content-Type: application/json
-          json:
-            id: "${slideshow_device_id}"
-            name: "${friendly_name}"
-            width: ${screenwidth}
-            height: ${screenheight}
-            orientation: "landscape"
-          capture_response: true
-          on_response:
-            then:
-              - lambda: |-
-                  if (response->status_code == 200) {
-                    ESP_LOGI("slideshow_api", "Device registered successfully");
-                  } else {
-                    ESP_LOGW("slideshow_api", "Device registration failed: %d", response->status_code);
-                  }
 
   - id: fetch_slideshow_queue
     mode: single
     parameters:
       count: int
+      is_new: bool
     then:
       - logger.log: "Fetching packed slideshow queue..."
       - http_request.get:
           # Request 'count' items in packed format to save bandwidth/memory
           url: !lambda |-
-            return "${slideshow_api_base}/api/devices/${slideshow_device_id}/packed?count=" + std::to_string(count);
+            return "${slideshow_api_base}/api/devices/${slideshow_device_id}/packed?count=" + std::to_string(count) + "&is_new=" + (is_new ? "true" : "false");
           capture_response: true
           on_response:
             then:
@@ -49,14 +28,11 @@ script:
                   // We track this so we know if we need to 'start' the slideshow or just 'extend' it.
                   bool was_empty = id(slideshow_queue_ids).empty();
                   size_t previous_size = id(slideshow_queue_ids).size();
-                  // id(slideshow_queue_ids).clear();
-                  // id(slot_source_colors_map).clear();
 
                   // Parse Packed JSON: Root is an Array of batches
                   // [[[ "url", "color" ], ...], ...]
                   // Logic: Loop through the JSON and push_back to the existing vector.
                   auto doc = json::parse_json(body);
-                  
                   if (!doc.is<JsonArray>()) {
                     ESP_LOGW("slideshow_api", "Invalid packed format (not an array)");
                     return;
@@ -66,24 +42,30 @@ script:
 
                   for (JsonArray batch : root) {
                     for (JsonArray img_data : batch) {
-                       // item is an array of variants, take the first one
-                      //  if (item.size() > 0) {
-                      //    JsonArray img_data = item[0].as<JsonArray>();
-                         
-                         // img_data[0] = URL, img_data[1] = Color
-                         if (img_data.size() > 0) {
-                           std::string url = img_data[0].as<std::string>();
-                           
-                           // APPEND to the list
-                           id(slideshow_queue_ids).push_back(url);
+                      if (img_data.size() > 0) {
+                          // Handle Single URL or Pair of URLs
+                          std::string stored_value = "";
+                          
+                          // Check if the first element is an array (Pair) or string (Single)
+                          if (img_data[0].is<JsonArray>()) {
+                            JsonArray urls = img_data[0].as<JsonArray>();
+                            if (urls.size() > 0) stored_value = urls[0].as<std::string>();
+                            // Use pipe delimiter for pairs
+                            if (urls.size() > 1) stored_value += "|" + urls[1].as<std::string>();
+                          } else {
+                            stored_value = img_data[0].as<std::string>();
+                          }
+                          
+                          if (!stored_value.empty()) {
+                            id(slideshow_queue_ids).push_back(stored_value);
 
-                           // Map color to the NEW index
-                           if (img_data.size() > 1) {
-                             int q_idx = id(slideshow_queue_ids).size() - 1;
-                             id(slot_source_colors_map)[q_idx] = img_data[1].as<std::string>();
-                           }
-                         }
-                      //  }
+                            // Map color
+                            if (img_data.size() > 1) {
+                              int q_idx = id(slideshow_queue_ids).size() - 1;
+                              id(slot_source_colors_map)[q_idx] = img_data[1].as<std::string>();
+                            }
+                          }
+                        }
                     }
                   }
                   
@@ -117,6 +99,7 @@ script:
     then:
       - switch.turn_on: first_photo_loading
       # Activate the first image if we just loaded it
+      # The first image will always be a single image at index 0
       - lambda: |-
           if (!id(slideshow_queue_ids).empty()) {
             ESP_LOGI("slideshow_api", "First photo loaded, starting slideshow");
@@ -157,7 +140,6 @@ script:
             // Handle wrapping for both positive and negative numbers
              // ((n % M) + M) % M is the standard way to handle negative modulo in C++
              int q_idx = ((raw_idx % total_imgs) + total_imgs) % total_imgs;
-             
              active_queue_indices.push_back(q_idx);
           }
 
@@ -176,37 +158,73 @@ script:
             }
 
             auto *component = id(online_images)[slot_idx];
+            
+            auto *comp_a = id(online_images)[slot_idx];
+            auto *comp_b = id(online_images_b)[slot_idx];
+            auto *widget_a = id(image_widgets)[slot_idx];
+            auto *widget_b = id(image_widgets_b)[slot_idx];
 
             if (target_queue_idx != -1) {
-              // --- SLOT SHOULD BE ACTIVE ---
-              std::string target_url = id(slideshow_queue_ids)[target_queue_idx];
+              // --- SLOT ACTIVE ---
+              std::string raw_val = id(slideshow_queue_ids)[target_queue_idx];
               
-              // If we have just an ID, construct the full URL
-              std::string full_url = target_url; 
-              if (full_url.find("http") == std::string::npos) {
-                 full_url = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + target_url;
+              // Parse Pair (Split by |)
+              std::string url_a = raw_val;
+              std::string url_b = "";
+              size_t delimiter_pos = raw_val.find('|');
+              if (delimiter_pos != std::string::npos) {
+                url_a = raw_val.substr(0, delimiter_pos);
+                url_b = raw_val.substr(delimiter_pos + 1);
+              }
+              
+              // Configure Layout (Single vs Pair)
+              int full_w = ${screenwidth};
+              if (url_b.empty()) {
+                // Single Mode
+                lv_obj_add_flag(widget_b, LV_OBJ_FLAG_HIDDEN);
+                lv_obj_set_width(widget_a, full_w);
+              } else {
+                // Pair Mode
+                int half_w = (full_w - 4) / 2; // Subtract gap
+                lv_obj_set_width(widget_a, half_w);
+                lv_obj_set_width(widget_b, half_w);
+                lv_obj_clear_flag(widget_b, LV_OBJ_FLAG_HIDDEN);
               }
 
-              // Load if not already active
-              // We also check if the URL has changed, just in case
-              // std::string current_url = component->get_url();
-              if (!id(image_slot_active)[slot_idx]) {
-                ESP_LOGI("slideshow_mem", "Loading Slot %d (Queue %d)", slot_idx, target_queue_idx);
-                component->set_url(full_url);
-                component->update(); 
-                id(image_slot_active)[slot_idx] = true;
+              // Load Image A
+              std::string full_url_a = url_a; 
+              if (full_url_a.find("http") == std::string::npos) {
+                 full_url_a = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + url_a;
               }
+              if (!id(image_slot_active)[slot_idx]) {
+                comp_a->set_url(full_url_a);
+                comp_a->update(); 
+              }
+
+              // Load Image B
+              if (!url_b.empty()) {
+                std::string full_url_b = url_b; 
+                if (full_url_b.find("http") == std::string::npos) {
+                   full_url_b = "${slideshow_api_base}/api/devices/${slideshow_device_id}/images/" + url_b;
+                }
+                if (!id(image_slot_active)[slot_idx]) {
+                  comp_b->set_url(full_url_b);
+                  comp_b->update(); 
+                }
+              } else {
+                comp_b->release();
+              }
+
+              id(image_slot_active)[slot_idx] = true;
             } else {
-              // --- SLOT SHOULD BE INACTIVE ---
-              // Release memory if it's currently active
+              // --- SLOT INACTIVE ---
               if (id(image_slot_active)[slot_idx]) {
-                ESP_LOGD("slideshow_mem", "Releasing Slot %d", slot_idx);
-                component->release();
+                comp_a->release();
+                comp_b->release();
                 id(image_slot_active)[slot_idx] = false;
               }
             }
           }
-          
           id(update_debug_status).execute();
 
   - id: advance_slideshow
@@ -248,6 +266,7 @@ script:
             - script.execute:
                 id: fetch_slideshow_queue
                 count: 5
+                is_new: false
             - delay: 1s
             - script.execute: cleanup_slideshow_queue
 
@@ -392,15 +411,23 @@ script:
   - id: online_image_download_finished
     parameters:
       index: int
+      is_secondary: bool
     then:
       - lambda: |-
           int slot = index;
-          // Only update LVGL if this slot is supposed to be active
           if (id(image_slot_active)[slot]) {
-            // Update LVGL image source
-            auto *comp = id(online_images)[slot];
-            auto *widget = id(image_widgets)[slot];
-            if (widget) {
+            lv_obj_t *widget = nullptr;
+            online_image::OnlineImage *comp = nullptr;
+
+            if (is_secondary) {
+               widget = id(image_widgets_b)[slot];
+               comp = id(online_images_b)[slot];
+            } else {
+               widget = id(image_widgets)[slot];
+               comp = id(online_images)[slot];
+            }
+
+            if (widget && comp) {
                lv_img_set_src(widget, comp->get_lv_img_dsc());
             }
           }
@@ -413,10 +440,11 @@ script:
   - id: online_image_error
     parameters:
       index: int
+      is_secondary: bool
     then:
       - logger.log: 
-          format: "Download failed for slot %d"
-          args: [index]
+          format: "Download failed for slot %d (secondary: %s)"
+          args: [index, 'is_secondary ? "true" : "false"']
           level: WARN
       # Optional: Implement backoff retry here if needed
 
@@ -479,6 +507,16 @@ mapping:
       3: online_image_3
       4: online_image_4
       5: online_image_5
+  - id: online_images_b
+    from: int
+    to: online_image::OnlineImage
+    entries:
+      0: online_image_0_b
+      1: online_image_1_b
+      2: online_image_2_b
+      3: online_image_3_b
+      4: online_image_4_b
+      5: online_image_5_b
 
   # Map index to LVGL Widget
   - id: image_widgets
@@ -491,6 +529,16 @@ mapping:
       3: background_image_3
       4: background_image_4
       5: background_image_5
+  - id: image_widgets_b
+    from: int
+    to: lv_obj_t
+    entries:
+      0: background_image_0_b
+      1: background_image_1_b
+      2: background_image_2_b
+      3: background_image_3_b
+      4: background_image_4_b
+      5: background_image_5_b
 
 
 switch:

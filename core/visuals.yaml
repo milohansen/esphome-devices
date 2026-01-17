@@ -12,21 +12,12 @@ online_image:
       - script.execute:
           id: online_image_download_finished
           index: 0
-      # - lambda: |-
-      #     int slot = id(component_to_slot)[0];
-      #     ESP_LOGI("online_image", "Component 0 -> Slot %d downloaded successfully", slot);
-      #     id(image_slot_success)[slot] = true;
-      #     id(image_slot_loading)[slot] = false;
-      #     id(image_slot_retry_count)[slot] = 0;
+          is_secondary: false
     on_error:
       - script.execute:
           id: online_image_error
           index: 0
-      # - lambda: |-
-      #     int slot = id(component_to_slot)[0];
-      #     ESP_LOGW("online_image", "Component 0 -> Slot %d download failed (attempt %d)", slot, id(image_slot_retry_count)[slot] + 1);
-      #     id(image_slot_loading)[slot] = false;
-      # - script.execute: retry_download_with_backoff
+          is_secondary: false
 
   - id: online_image_1
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+1"
@@ -40,10 +31,12 @@ online_image:
      - script.execute:
           id: online_image_download_finished
           index: 1
+          is_secondary: false
     on_error:
      - script.execute:
           id: online_image_error
           index: 1
+          is_secondary: false
 
   - id: online_image_2
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+2"
@@ -57,10 +50,12 @@ online_image:
      - script.execute:
           id: online_image_download_finished
           index: 2
+          is_secondary: false
     on_error:
      - script.execute:
           id: online_image_error
           index: 2
+          is_secondary: false
 
   - id: online_image_3
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+3"
@@ -74,10 +69,12 @@ online_image:
      - script.execute:
           id: online_image_download_finished
           index: 3
+          is_secondary: false
     on_error:
      - script.execute:
           id: online_image_error
           index: 3
+          is_secondary: false
 
   - id: online_image_4
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+4"
@@ -91,10 +88,12 @@ online_image:
      - script.execute:
           id: online_image_download_finished
           index: 4
+          is_secondary: false
     on_error:
      - script.execute:
           id: online_image_error
           index: 4
+          is_secondary: false
 
   - id: online_image_5
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+5"
@@ -108,44 +107,121 @@ online_image:
      - script.execute:
           id: online_image_download_finished
           index: 5
+          is_secondary: false
     on_error:
      - script.execute:
           id: online_image_error
           index: 5
+          is_secondary: false
 
-  - id: online_image_6
+  - id: online_image_0_b
     url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
     format: JPEG
     type: RGB565
     byte_order: little_endian
-    resize: ${screenwidth}x${screenheight}
+    resize: 510x${screenheight}
     update_interval: never
-    placeholder: placeholder_image
+    placeholder: placeholder_image_half
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
-          index: 6
+          index: 0
+          is_secondary: true
     on_error:
      - script.execute:
           id: online_image_error
-          index: 6
-
-  - id: online_image_7
-    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+7"
+          index: 0
+          is_secondary: true
+  - id: online_image_1_b
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
     format: JPEG
     type: RGB565
     byte_order: little_endian
-    resize: ${screenwidth}x${screenheight}
+    resize: 510x${screenheight}
     update_interval: never
-    placeholder: placeholder_image
+    placeholder: placeholder_image_half
     on_download_finished:
      - script.execute:
           id: online_image_download_finished
-          index: 7
+          index: 1
+          is_secondary: true
     on_error:
      - script.execute:
           id: online_image_error
-          index: 7
+          index: 1
+          is_secondary: true
+  - id: online_image_2_b
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: 510x${screenheight}
+    update_interval: never
+    placeholder: placeholder_image_half
+    on_download_finished:
+     - script.execute:
+          id: online_image_download_finished
+          index: 2
+          is_secondary: true
+    on_error:
+     - script.execute:
+          id: online_image_error
+          index: 2
+          is_secondary: true
+  - id: online_image_3_b
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: 510x${screenheight}
+    update_interval: never
+    placeholder: placeholder_image_half
+    on_download_finished:
+     - script.execute:
+          id: online_image_download_finished
+          index: 3
+          is_secondary: true
+    on_error:
+     - script.execute:
+          id: online_image_error
+          index: 3
+          is_secondary: true
+  - id: online_image_4_b
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg?text=Slot+6"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: 510x${screenheight}
+    update_interval: never
+    placeholder: placeholder_image_half
+    on_download_finished:
+     - script.execute:
+          id: online_image_download_finished
+          index: 4
+          is_secondary: true
+    on_error:
+     - script.execute:
+          id: online_image_error
+          index: 4
+          is_secondary: true
+  - id: online_image_5_b
+    url: "https://placehold.co/1024x600/4f46e5/FFFFFF/jpeg"
+    format: JPEG
+    type: RGB565
+    byte_order: little_endian
+    resize: 510x${screenheight}
+    update_interval: never
+    placeholder: placeholder_image_half
+    on_download_finished:
+     - script.execute:
+          id: online_image_download_finished
+          index: 5
+          is_secondary: true
+    on_error:
+     - script.execute:
+          id: online_image_error
+          index: 5
+          is_secondary: true
 
 image:
   - file: assets/images/bella-small.jpg
@@ -153,6 +229,11 @@ image:
     type: RGB565
     byte_order: little_endian
     resize: ${screenwidth}x${screenheight}
+  - file: assets/images/bella-small-half.jpg
+    id: placeholder_image_half
+    type: RGB565
+    byte_order: little_endian
+    resize: 510x${screenheight}
 
 font:
 # Monospace Fonts

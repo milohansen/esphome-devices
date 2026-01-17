@@ -181,7 +181,7 @@ lvgl:
         id(debug_widgets).push_back(id(label_image_3));
         id(debug_widgets).push_back(id(label_image_4));
         id(debug_widgets).push_back(id(label_image_5));
-        
+
   style_definitions:
     - id: image_style
       radius: 0
@@ -717,10 +717,11 @@ lvgl:
                         <<: *image_template
                         id: background_image_0
                         src: placeholder_image
-                    # - image:
-                    #     <<: *image_template
-                    #     id: test_pairing
-                    #     src: placeholder_image
+                    - image:
+                        <<: *image_template
+                        id: background_image_0_b
+                        src: placeholder_image_half
+                        hidden: true
                     - label:
                         <<: *image_label_template
                         id: label_image_0
@@ -733,6 +734,11 @@ lvgl:
                         <<: *image_template
                         id: background_image_1
                         src: placeholder_image
+                    - image:
+                        <<: *image_template
+                        id: background_image_1_b
+                        src: placeholder_image_half
+                        hidden: true
                     - label:
                         <<: *image_label_template
                         id: label_image_1
@@ -745,6 +751,11 @@ lvgl:
                         <<: *image_template
                         id: background_image_2
                         src: placeholder_image
+                    - image:
+                        <<: *image_template
+                        id: background_image_2_b
+                        src: placeholder_image_half
+                        hidden: true
                     - label:
                         <<: *image_label_template
                         id: label_image_2
@@ -757,6 +768,11 @@ lvgl:
                         <<: *image_template
                         id: background_image_3
                         src: placeholder_image
+                    - image:
+                        <<: *image_template
+                        id: background_image_3_b
+                        src: placeholder_image_half
+                        hidden: true
                     - label:
                         <<: *image_label_template
                         id: label_image_3
@@ -769,6 +785,11 @@ lvgl:
                         <<: *image_template
                         id: background_image_4
                         src: placeholder_image
+                    - image:
+                        <<: *image_template
+                        id: background_image_4_b
+                        src: placeholder_image_half
+                        hidden: true
                     - label:
                         <<: *image_label_template
                         id: label_image_4
@@ -781,6 +802,11 @@ lvgl:
                         <<: *image_template
                         id: background_image_5
                         src: placeholder_image
+                    - image:
+                        <<: *image_template
+                        id: background_image_5_b
+                        src: placeholder_image_half
+                        hidden: true
                     - label:
                         <<: *image_label_template
                         id: label_image_5
@@ -902,6 +928,7 @@ lvgl:
               - script.execute: 
                   id: fetch_slideshow_queue
                   count: 5
+                  is_new: false
 
         # - button:
         #     id: button_test
