@@ -4,8 +4,8 @@ micro_wake_word:
     - binary_sensor.template.publish:
         id: assistant_active
         state: true
-    - voice_assistant.start:
-        wake_word: !lambda return wake_word;
+    # - voice_assistant.start:
+    #     wake_word: !lambda return wake_word;
 
 voice_assistant:
   id: va

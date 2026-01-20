@@ -1,15 +1,7 @@
-esphome:
-  includes:
-    - components/gemini_live/gemini_live.h
-
-# Define the custom component
-custom_component:
-- lambda: |-
-    // Ensure ids are available. If this file is included, these IDs must exist in the main config.
-    auto *gemini = new esphome::gemini_live::GeminiLiveComponent(id(box_mic), id(box_speaker));
-    return {gemini};
-  components:
-  - id: gemini_live_component
+gemini_live:
+  id: gemini_live_component
+  microphone: box_mic
+  speaker: box_speaker
 
 # Example Triggers
 # You must adjust the IP address to point to your Home Assistant Add-on IP.
