@@ -12,5 +12,6 @@ schema:
   gemini_api_key: str
 ports:
   7000/udp: 7000
+  7000/tcp: 7000
 map:
   - config:rw

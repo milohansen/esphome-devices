@@ -79,6 +79,12 @@ namespace esphome
         }
       }
 
+      void initialize(std::string url)
+      {
+        this->url_ = url;
+        ESP_LOGI("gemini_live", "Initializing Gemini Live Component with URL: %s", url.c_str());
+        this->initialize();
+      }
       void initialize()
       {
         ESP_LOGI("gemini_live", "Initializing Gemini Live Component...");
@@ -117,9 +123,9 @@ namespace esphome
         // }
       }
 
-      void start_streaming(std::string url)
+      void start_streaming()
       {
-        this->proxy_url = url;
+        this->proxy_url = this->url_;
         this->parse_proxy_url();
 
         // Clear any stale data in queue
@@ -135,7 +141,7 @@ namespace esphome
         {
           this->mic->start();
         }
-        ESP_LOGI("gemini_live", "Started streaming to %s", url.c_str());
+        ESP_LOGI("gemini_live", "Started streaming to %s", this->url_.c_str());
       }
 
       void stop_streaming()
@@ -226,6 +232,9 @@ namespace esphome
           count++;
         }
       }
+    
+    protected:
+      std::string url_{"192.168.1.192:7000"};
     };
 
   } // namespace gemini_live
