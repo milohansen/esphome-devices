@@ -70,7 +70,14 @@ namespace esphome
       void loop() override
       {
         if (!this->socket_)
+        {
           return;
+        }
+
+        if (this->is_streaming && this->mic->is_stopped())
+        {
+          this->mic->start();
+        }
 
         // 1. Process outgoing audio queue (from Mic)
         this->process_tx_queue();
