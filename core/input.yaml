@@ -1,4 +1,3 @@
-
 button:
   - id: factory_reset_btn
     platform: factory_reset
@@ -9,18 +8,6 @@ button:
     name: "Add Timer"
     on_press:
       - logger.log: "Add Timer button pressed"
-
-  - id: end_voice_assist_btn
-    platform: template
-    name: "End Voice Assist"
-    on_press:
-      - logger.log: "End Voice Assist button pressed"
-      - binary_sensor.template.publish:
-          id: assistant_active
-          state: false
-      - micro_wake_word.start:
-      - script.execute: set_idle_or_mute_phase
-
 
 number:
   - id: image_duration_minutes
@@ -58,7 +45,6 @@ number:
       # - script.execute: update_online_images
       - script.stop: slideshow_timer
       - script.execute: slideshow_timer
-
 
 switch:
   - id: mute
@@ -125,12 +111,12 @@ switch:
   #   entity_category: config
   #   optimistic: true
   #   restore_mode: RESTORE_DEFAULT_OFF
-    # on_turn_on:
-    #   - display.page.show: debug_page
-    #   - component.update: main_display
-    # on_turn_off:
-    #   - display.page.show: default_clock
-    #   - component.update: main_display
+  # on_turn_on:
+  #   - display.page.show: debug_page
+  #   - component.update: main_display
+  # on_turn_off:
+  #   - display.page.show: default_clock
+  #   - component.update: main_display
 
   - id: clock_24h
     platform: template
@@ -145,7 +131,7 @@ switch:
   #   widget: button_test
   #   name: "LVGL switch"
   #   restore_mode: RESTORE_DEFAULT_OFF
-  #   on_turn_off: 
+  #   on_turn_off:
   #     - logger.log: "LVGL switch turned OFF"
   #     - lambda: |-
   #         lv_anim_t a;
@@ -171,7 +157,6 @@ switch:
   #     # - lvgl.widget.update:
   #     #     id: image_container
   #     #     transform_zoom: 0.8
-        
 
 select:
   - id: wake_word_engine_location

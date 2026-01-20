@@ -48,13 +48,13 @@ namespace esphome
       {
         ESP_LOGI("gemini_live", "Setting up Gemini Live Component...");
 
-        // Register Microphone Callback
-        if (this->mic != nullptr)
-        {
-          this->mic->add_data_callback([this](const std::vector<uint8_t> &data)
-                                       { this->queue_audio_data(data); });
-          ESP_LOGI("gemini_live", "Microphone callback registered");
-        }
+        // // Register Microphone Callback
+        // if (this->mic != nullptr)
+        // {
+        //   this->mic->add_data_callback([this](const std::vector<uint8_t> &data)
+        //                                { this->queue_audio_data(data); });
+        //   ESP_LOGI("gemini_live", "Microphone callback registered");
+        // }
       }
       float get_setup_priority() const override { return setup_priority::LATE; }
 
@@ -136,13 +136,13 @@ namespace esphome
         }
         ESP_LOGI("gemini_live", "UDP listening on port %d", UDP_PORT);
 
-        // // Register Microphone Callback
-        // if (this->mic != nullptr) {
-        //     this->mic->add_data_callback([this](const std::vector<uint8_t> &data) {
-        //         this->queue_audio_data(data);
-        //     });
-        //     ESP_LOGI("gemini_live", "Microphone callback registered");
-        // }
+        // Register Microphone Callback
+        if (this->mic != nullptr)
+        {
+          this->mic->add_data_callback([this](const std::vector<uint8_t> &data)
+                                       { this->queue_audio_data(data); });
+          ESP_LOGI("gemini_live", "Microphone callback registered");
+        }
       }
 
       void start_streaming()
@@ -218,9 +218,10 @@ namespace esphome
       // Called from Microphone Task (Keep this fast!)
       void queue_audio_data(const std::vector<uint8_t> &data)
       {
-        if (!this->is_streaming){
+        if (!this->is_streaming)
+        {
           return;
-}
+        }
 
         std::lock_guard<std::mutex> lock(this->queue_mutex_);
         // Limit queue size to prevent OOM if network hangs
@@ -233,8 +234,24 @@ namespace esphome
       // Called from Main Loop
       void process_tx_queue()
       {
-        if (!this->is_streaming || !this->proxy_addr_valid || !this->socket_)
+        // if (!this->is_streaming || !this->proxy_addr_valid || !this->socket_)
+        // {
+        //   return;
+        // }
+        // DEBUG: Check why we might be returning early
+        if (!this->is_streaming)
         {
+          // This is normal when not active
+          return;
+        }
+        if (!this->socket_)
+        {
+          ESP_LOGW("gemini_live", "Cannot send: Socket is null!");
+          return;
+        }
+        if (!this->proxy_addr_valid)
+        {
+          ESP_LOGW("gemini_live", "Cannot send: Invalid Proxy Address!");
           return;
         }
 
@@ -259,7 +276,10 @@ namespace esphome
           count++;
         }
 
-        ESP_LOGI("gemini_live", "Processed %d packets from TX queue", count);
+        if (count > 0)
+        {
+          ESP_LOGD("gemini_live", "Processed %d packets from TX queue", count);
+        }
       }
 
     protected:

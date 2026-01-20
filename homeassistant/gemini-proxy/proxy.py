@@ -16,7 +16,8 @@ GEMINI_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 # Audio Config
-ESP_INPUT_RATE = 48000  # ESP32 P4 Native
+# ESP_INPUT_RATE = 48000  # ESP32 P4 Native
+ESP_INPUT_RATE = 16000  # ESP32 P4 Native
 GEMINI_INPUT_RATE = 16000
 GEMINI_OUTPUT_RATE = 24000
 ESP_OUTPUT_RATE = 48000
@@ -138,16 +139,17 @@ class AudioProxy:
                     chunk = bytes(self.vad_buffer[:VAD_CHUNK_SIZE_BYTES])
                     del self.vad_buffer[:VAD_CHUNK_SIZE_BYTES]
                     
-                    # Run VAD on this chunk
-                    prob = await asyncio.to_thread(self.vad.is_speech, chunk)
-                    
                     # Gating Logic
                     if self.ai_is_speaking:
+                        # Run VAD on this chunk
+                        prob = await asyncio.to_thread(self.vad.is_speech, chunk)
+
                         if prob > 0.8: # Strong speech detected (Barge-in)
-                            # logger.debug("Barge-in detected!")
+                            logger.debug("Barge-in detected!")
                             await self.audio_queue_mic.put(chunk)
                     else:
                         await self.audio_queue_mic.put(chunk)
+                        logger.debug("Queued chunk to Gemini")
                 
             except asyncio.CancelledError:
                 break

@@ -634,6 +634,15 @@ lvgl:
                 x: 128
                 y: 128
 
+            - label:
+                id: updating_percent_label
+                text: ""
+                text_font: font_big_clock
+                text_align: left
+                text_color: white
+                x: 128
+                y: 256
+
   # --- LVGL PAGES ----------------------------------------------------------------            
   pages:
     - id: home_page
