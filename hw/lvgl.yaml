@@ -636,7 +636,7 @@ lvgl:
 
             - label:
                 id: updating_percent_label
-                text: ""
+                text: " "
                 text_font: font_big_clock
                 text_align: left
                 text_color: white
