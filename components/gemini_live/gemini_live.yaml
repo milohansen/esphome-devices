@@ -11,7 +11,8 @@ micro_wake_word:
   on_wake_word_detected:
     - lambda: |-
         // CHANGE THIS IP:
-        std::string proxy_ip = "192.168.1.100"; 
+        // std::string proxy_ip = "192.168.1.100"; 
+        std::string proxy_ip = "http://homeassistant.local:7000"; 
         id(gemini_live_component)->start_streaming(proxy_ip);
         ESP_LOGD("gemini", "Wake Word detected - Starting Stream");
 

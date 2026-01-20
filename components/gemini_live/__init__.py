@@ -2,8 +2,11 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.const import CONF_ID
 from esphome.components import microphone, speaker
+from pathlib import Path
 
+CODEOWNERS = ["@miloh"]
 DEPENDENCIES = ['network']
+AUTO_LOAD = []
 
 gemini_live_ns = cg.esphome_ns.namespace('gemini_live')
 GeminiLiveComponent = gemini_live_ns.class_('GeminiLiveComponent', cg.Component)
@@ -18,7 +21,10 @@ CONFIG_SCHEMA = cv.Schema({
 })
 
 async def to_code(config):
-    cg.add_global(cg.include("gemini_live.h"))
+    # cg.add_global(cg.include("gemini_live.h"))
+    component_dir = Path(__file__).parent
+    cg.add_build_flag(f"-I{component_dir}")
+
     mic = await cg.get_variable(config[CONF_MICROPHONE])
     spk = await cg.get_variable(config[CONF_SPEAKER])
     

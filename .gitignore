@@ -6,3 +6,4 @@
 /secrets.yaml
 changes
 scratch
+components/**/__pycache__/
