@@ -15,6 +15,7 @@ script:
           url: !lambda |-
             return "${slideshow_api_base}/api/devices/${slideshow_device_id}/packed?count=" + std::to_string(count) + "&is_new=" + (is_new ? "true" : "false");
           capture_response: true
+          max_response_buffer_size: 2048
           on_response:
             then:
               - lambda: |-
@@ -30,7 +31,7 @@ script:
                   size_t previous_size = id(slideshow_queue_ids).size();
 
                   // Parse Packed JSON: Root is an Array of batches
-                  // [[[ "url", "color" ], ...], ...]
+                  // [[ "url" , ("url2",) "color"], ...]
                   // Logic: Loop through the JSON and push_back to the existing vector.
                   auto doc = json::parse_json(body);
                   if (!doc.is<JsonArray>()) {
@@ -40,32 +41,30 @@ script:
 
                   JsonArray root = doc.as<JsonArray>();
 
-                  for (JsonArray batch : root) {
-                    for (JsonArray img_data : batch) {
-                      if (img_data.size() > 0) {
-                          // Handle Single URL or Pair of URLs
-                          std::string stored_value = "";
-                          
-                          // Check if the first element is an array (Pair) or string (Single)
-                          if (img_data[0].is<JsonArray>()) {
-                            JsonArray urls = img_data[0].as<JsonArray>();
-                            if (urls.size() > 0) stored_value = urls[0].as<std::string>();
-                            // Use pipe delimiter for pairs
-                            if (urls.size() > 1) stored_value += "|" + urls[1].as<std::string>();
-                          } else {
-                            stored_value = img_data[0].as<std::string>();
-                          }
-                          
-                          if (!stored_value.empty()) {
-                            id(slideshow_queue_ids).push_back(stored_value);
+                  for (JsonArray img_data : root) {
+                    if (img_data.size() > 0) {
+                      // Handle Single URL or Pair of URLs
+                      std::string stored_value = "";
+                      
+                      // Check if the first element is an array (Pair) or string (Single)
+                      if (img_data[0].is<JsonArray>()) {
+                        JsonArray urls = img_data[0].as<JsonArray>();
+                        if (urls.size() > 0) stored_value = urls[0].as<std::string>();
+                        // Use pipe delimiter for pairs
+                        if (urls.size() > 1) stored_value += "|" + urls[1].as<std::string>();
+                      } else {
+                        stored_value = img_data[0].as<std::string>();
+                      }
+                      
+                      if (!stored_value.empty()) {
+                        id(slideshow_queue_ids).push_back(stored_value);
 
-                            // Map color
-                            if (img_data.size() > 1) {
-                              int q_idx = id(slideshow_queue_ids).size() - 1;
-                              id(slot_source_colors_map)[q_idx] = img_data[1].as<std::string>();
-                            }
-                          }
+                        // Map color
+                        if (img_data.size() > 1) {
+                          int q_idx = id(slideshow_queue_ids).size() - 1;
+                          id(slot_source_colors_map)[q_idx] = img_data[1].as<std::string>();
                         }
+                      }
                     }
                   }
                   
@@ -82,16 +81,26 @@ script:
                     id(image_index).publish_state(0); 
                   }
 
-      - if:
-          condition:
-            switch.is_off: first_photo_loaded
-          then:
-            - script.execute: load_first_image
-          else:
-            - delay: 100ms
-            - script.execute: manage_slideshow_memory
+              - if:
+                  condition:
+                    switch.is_off: first_photo_loaded
+                  then:
+                    - script.execute: load_first_image
+                  else:
+                    - delay: 100ms
+                    - script.execute: manage_slideshow_memory
+          
+          on_error: 
+            then:
+            # TODO: Implement retry/backoff if needed
+              - logger.log: "Error fetching slideshow queue"
+              - delay: 2s
+              - script.execute:
+                  id: fetch_slideshow_queue
+                  count: !lambda "return count;"
+                  is_new: !lambda "return is_new;"
 
- # -------------------------------------------------------------------------
+  # -------------------------------------------------------------------------
   # Logic & Memory Management
   # -------------------------------------------------------------------------
   - id: load_first_image
