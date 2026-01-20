@@ -1,6 +1,10 @@
 micro_wake_word:
   id: !extend mww
   on_wake_word_detected:
+    - logger.log:
+        format: "Wake Word detected!"
+        level: DEBUG
+        tag: "va"
     - binary_sensor.template.publish:
         id: assistant_active
         state: true

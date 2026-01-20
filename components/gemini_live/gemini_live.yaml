@@ -3,12 +3,26 @@ gemini_live:
   microphone: box_mic
   speaker: box_speaker
 
+wifi:
+  on_connect:
+    - logger.log:
+        format: "WiFi connected, initializing Gemini Live Component"
+        level: DEBUG
+        tag: "gemini"
+    - lambda: |-
+        id(gemini_live_component)->initialize();
+        ESP_LOGD("gemini", "Initialized Gemini Live Component");
+
 # Example Triggers
 # You must adjust the IP address to point to your Home Assistant Add-on IP.
 # Usually this is the Home Assistant server IP.
 
 micro_wake_word:
   on_wake_word_detected:
+    - logger.log:
+        format: "Wake Word detected!"
+        level: DEBUG
+        tag: "gemini"
     - lambda: |-
         // CHANGE THIS IP:
         // std::string proxy_ip = "192.168.1.100"; 
