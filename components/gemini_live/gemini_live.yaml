@@ -49,7 +49,7 @@ micro_wake_word:
 button:
   - id: start_voice_assist_btn
     platform: template
-    name: "Start Voice Assist"
+    name: "Gemini Voice Assist - Start"
     on_press:
       - logger.log: "Start Voice Assist button pressed"
       - binary_sensor.template.publish:
@@ -60,12 +60,12 @@ button:
       
   - id: end_voice_assist_btn
     platform: template
-    name: "End Voice Assist"
+    name: "Gemini Voice Assist - Stop"
     on_press:
       - logger.log: "End Voice Assist button pressed"
       - binary_sensor.template.publish:
           id: assistant_active
           state: false
+      - lambda: id(gemini_live_component)->stop_streaming();
       - micro_wake_word.start:
       - script.execute: set_idle_or_mute_phase
-      - lambda: id(gemini_live_component)->stop_streaming();
