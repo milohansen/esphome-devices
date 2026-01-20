@@ -23,7 +23,7 @@ ota:
         - logger.log:
             level: INFO
             format: "OTA Start"
-        - lvgl.widget.redraw: updating_screen
+        - lambda: "id(lvgl_component).loop();"
 
 wifi:
   id: wifi_id

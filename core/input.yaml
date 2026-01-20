@@ -10,6 +10,18 @@ button:
     on_press:
       - logger.log: "Add Timer button pressed"
 
+  - id: end_voice_assist_btn
+    platform: template
+    name: "End Voice Assist"
+    on_press:
+      - logger.log: "End Voice Assist button pressed"
+      - binary_sensor.template.publish:
+          id: assistant_active
+          state: false
+      - micro_wake_word.start:
+      - script.execute: set_idle_or_mute_phase
+
+
 number:
   - id: image_duration_minutes
     platform: template

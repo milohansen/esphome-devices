@@ -4,6 +4,8 @@
 #include "esphome/components/socket/socket.h"
 #include "esphome/components/microphone/microphone.h"
 #include "esphome/components/speaker/speaker.h"
+#include "esphome/core/automation.h"
+#include "esphome/core/component.h"
 #include "esphome/core/log.h"
 #include <vector>
 #include <queue>
@@ -37,6 +39,8 @@ namespace esphome
       esphome::microphone::Microphone *mic{nullptr};
       esphome::speaker::Speaker *speaker{nullptr};
 
+      std::vector<Trigger<> *> stop_triggers_;
+
       GeminiLiveComponent(esphome::microphone::Microphone *mic_ptr, esphome::speaker::Speaker *speaker_ptr)
           : mic(mic_ptr), speaker(speaker_ptr) {}
 
@@ -53,6 +57,15 @@ namespace esphome
         }
       }
       float get_setup_priority() const override { return setup_priority::LATE; }
+
+      // void register_stop_trigger(Trigger<> *trigger)
+      // {
+      //   this->stop_triggers_.push_back(trigger);
+      // }
+      void add_on_stop_callback(std::function<void()> callback)
+      {
+        this->on_stop_callback_.add(std::move(callback));
+      }
 
       void loop() override
       {
@@ -71,6 +84,14 @@ namespace esphome
 
         if (read > 0)
         {
+          // Check if this is the STOP command (match the string sent by Python)
+          if (read == 11 && memcmp(buf, "GEMINI_STOP", 11) == 0)
+          {
+            ESP_LOGW("gemini_live", "Received STOP command from proxy");
+            this->stop_streaming();
+            return;
+          }
+
           if (this->speaker != nullptr)
           {
             // Speaker play is usually safe in loop (main thread)
@@ -152,6 +173,12 @@ namespace esphome
           this->mic->stop();
         }
         ESP_LOGI("gemini_live", "Stopped streaming");
+
+        // for (auto *trigger : this->stop_triggers_)
+        // {
+        //   trigger->trigger();
+        // }
+        this->on_stop_callback_.call();
       }
 
       void parse_proxy_url()
@@ -232,9 +259,20 @@ namespace esphome
           count++;
         }
       }
-    
+
     protected:
       std::string url_{"192.168.1.192:7000"};
+      CallbackManager<void()> on_stop_callback_;
+    };
+
+    class GeminiLiveOnStopStreamingTrigger : public Trigger<>
+    {
+    public:
+      explicit GeminiLiveOnStopStreamingTrigger(GeminiLiveComponent *parent)
+      {
+        parent->add_on_stop_callback([this]()
+                                     { this->trigger(); });
+      }
     };
 
   } // namespace gemini_live

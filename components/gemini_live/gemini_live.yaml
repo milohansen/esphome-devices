@@ -2,6 +2,12 @@ gemini_live:
   id: gemini_live_component
   microphone: box_mic
   speaker: box_speaker
+  on_stop_streaming:
+    - logger.log: "Gemini has stopped streaming!"
+    - binary_sensor.template.publish:
+        id: assistant_active
+        state: false
+    - micro_wake_word.start:
 
 wifi:
   on_connect:
