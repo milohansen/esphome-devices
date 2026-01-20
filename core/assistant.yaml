@@ -187,8 +187,8 @@ binary_sensor:
     device_class: running
     entity_category: diagnostic
     # internal: true
-    filters:
-      - delayed_off: 5s
+    # filters:
+    #   - delayed_off: 5s
     on_state_change:
       then:
       - lambda: |-

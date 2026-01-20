@@ -24,6 +24,11 @@ ota:
             level: INFO
             format: "OTA Start"
         - lambda: "id(lvgl_component).loop();"
+    # on_progress:
+    #   then:
+    #     - logger.log:
+    #         format: "OTA progress %0.1f%%"
+    #         args: ["x"]
 
 wifi:
   id: wifi_id

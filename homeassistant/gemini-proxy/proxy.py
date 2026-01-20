@@ -209,6 +209,7 @@ class AudioProxy:
             try:
                 chunk = await self.audio_queue_mic.get()
                 await session.send_realtime_input(audio={"data": chunk, "mime_type": f"audio/pcm;rate={GEMINI_INPUT_RATE}"})
+                logger.debug("Sent audio chunk to Gemini")
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -223,6 +224,7 @@ class AudioProxy:
                        for part in response.server_content.model_turn.parts:
                            if part.inline_data and isinstance(part.inline_data.data, bytes):
                                self.ai_is_speaking = True
+                               logger.debug("AI is speaking")
                                audio_24k = part.inline_data.data
                                
                                audio_48k = await asyncio.to_thread(

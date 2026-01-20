@@ -84,6 +84,7 @@ namespace esphome
 
         if (read > 0)
         {
+          ESP_LOGD("gemini_live", "Received %d bytes from proxy", read);
           // Check if this is the STOP command (match the string sent by Python)
           if (read == 11 && memcmp(buf, "GEMINI_STOP", 11) == 0)
           {
@@ -174,10 +175,6 @@ namespace esphome
         }
         ESP_LOGI("gemini_live", "Stopped streaming");
 
-        // for (auto *trigger : this->stop_triggers_)
-        // {
-        //   trigger->trigger();
-        // }
         this->on_stop_callback_.call();
       }
 
@@ -221,8 +218,9 @@ namespace esphome
       // Called from Microphone Task (Keep this fast!)
       void queue_audio_data(const std::vector<uint8_t> &data)
       {
-        if (!this->is_streaming)
+        if (!this->is_streaming){
           return;
+}
 
         std::lock_guard<std::mutex> lock(this->queue_mutex_);
         // Limit queue size to prevent OOM if network hangs
@@ -236,7 +234,9 @@ namespace esphome
       void process_tx_queue()
       {
         if (!this->is_streaming || !this->proxy_addr_valid || !this->socket_)
+        {
           return;
+        }
 
         // Process up to 10 packets per loop to prevent blocking if queue built up
         int count = 0;
@@ -258,6 +258,8 @@ namespace esphome
           }
           count++;
         }
+
+        ESP_LOGI("gemini_live", "Processed %d packets from TX queue", count);
       }
 
     protected:
