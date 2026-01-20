@@ -5,6 +5,7 @@ import logging
 import numpy as np
 from scipy import signal as scipy_signal
 from google import genai
+from google.genai import types
 import onnxruntime
 
 # Configuration
@@ -74,7 +75,7 @@ class AudioProxy:
         self.udp_sock.bind((UDP_IP, UDP_PORT))
         self.udp_sock.setblocking(False)
         
-        self.client = genai.Client(api_key=GEMINI_API_KEY)
+        self.client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"})
         self.esp_address = None
         self.running = True
         
@@ -128,10 +129,11 @@ class AudioProxy:
                      self.connection_active.set()
 
                 # 1. Resample to 16k immediately
-                audio_16k = await asyncio.to_thread(self.resample_audio, data, ESP_INPUT_RATE, GEMINI_INPUT_RATE)
+                # audio_16k = await asyncio.to_thread(self.resample_audio, data, ESP_INPUT_RATE, GEMINI_INPUT_RATE)
                 
                 # 2. Add to VAD buffer
-                self.vad_buffer.extend(audio_16k)
+                # self.vad_buffer.extend(audio_16k)
+                self.vad_buffer.extend(data)
                 
                 # 3. Process in fixed-size chunks (32ms = 512 samples = 1024 bytes)
                 while len(self.vad_buffer) >= VAD_CHUNK_SIZE_BYTES:
@@ -149,7 +151,9 @@ class AudioProxy:
                             await self.audio_queue_mic.put(chunk)
                     else:
                         await self.audio_queue_mic.put(chunk)
-                        logger.debug("Queued chunk to Gemini")
+                        # logger.debug("Queued chunk to Gemini")
+
+                # logger.debug(f"UDP Packet received: {len(data)} bytes from {addr}. VAD Buffer size: {len(self.vad_buffer)} bytes")
                 
             except asyncio.CancelledError:
                 break
@@ -157,13 +161,15 @@ class AudioProxy:
                 logger.error(f"UDP Receive Error: {e}")
                 await asyncio.sleep(0.1)
 
+        logger.info("UDP Listener stopped")
+
     async def udp_sender_task(self):
         loop = asyncio.get_running_loop()
         logger.info("UDP Sender started")
         while self.running:
             try:
                 chunk = await self.audio_queue_speaker.get()
-                
+                logger.debug(f"UDP Packet sending: {len(chunk)} bytes")
                 if self.esp_address:
                     target_port = ESP_RESPONSE_PORT
                     target_addr = (self.esp_address[0], target_port)
@@ -182,10 +188,29 @@ class AudioProxy:
         logger.info("Waiting for ESP32 connection before connecting to Gemini...")
         await self.connection_active.wait()
         
-        config = {
-            "response_modalities": ["AUDIO"],
-            "system_instruction": "You are a helpful and friendly AI assistant. Be concise.",
-        }
+        config = types.LiveConnectConfig(
+            response_modalities=["AUDIO"],
+            # "system_instruction": "You are a helpful and friendly AI assistant. Be concise.",
+            system_instruction=types.Content(
+                parts=[types.Part.from_text(text="You are a helpful and friendly AI assistant. Be concise.")],
+                role="user"
+            ),
+            proactivity=types.ProactivityConfig(proactive_audio=True),
+            # enable_affective_dialog=True,
+            speech_config=types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name="Laomedeia")
+                )
+            ),
+            output_audio_transcription=types.AudioTranscriptionConfig,
+            input_audio_transcription=types.AudioTranscriptionConfig,
+            realtime_input_config=types.RealtimeInputConfig(turn_coverage="TURN_INCLUDES_ALL_INPUT"),
+        )
+
+        # config = {
+        #     "response_modalities": ["AUDIO"],
+        #     "system_instruction": "You are a helpful and friendly AI assistant. Be concise.",
+        # }
         
         logger.info(f"Connecting to Gemini Live ({GEMINI_MODEL})...")
         
@@ -211,7 +236,7 @@ class AudioProxy:
             try:
                 chunk = await self.audio_queue_mic.get()
                 await session.send_realtime_input(audio={"data": chunk, "mime_type": f"audio/pcm;rate={GEMINI_INPUT_RATE}"})
-                logger.debug("Sent audio chunk to Gemini")
+                # logger.debug("Sent audio chunk to Gemini")
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -222,6 +247,12 @@ class AudioProxy:
         while self.running:
             try:
                 async for response in session.receive():
+                    # logger.info("Got response from Gemini")
+                    if (response.server_content and response.server_content.output_transcription):
+                        logger.info("Output Transcript:", response.server_content.output_transcription.text)
+                    if (response.server_content and response.server_content.input_transcription):
+                        logger.info("Input Transcript:", response.server_content.input_transcription.text)
+
                     if (response.server_content and response.server_content.model_turn):
                        for part in response.server_content.model_turn.parts:
                            if part.inline_data and isinstance(part.inline_data.data, bytes):
@@ -298,4 +329,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(proxy.run())
     except KeyboardInterrupt:
-        logger.info("Stopping...")
+        logger.info("Stopping...") 
