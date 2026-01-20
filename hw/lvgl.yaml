@@ -181,6 +181,7 @@ lvgl:
         id(debug_widgets).push_back(id(label_image_3));
         id(debug_widgets).push_back(id(label_image_4));
         id(debug_widgets).push_back(id(label_image_5));
+    - script.execute: set_debug_visibility
 
   style_definitions:
     - id: image_style
