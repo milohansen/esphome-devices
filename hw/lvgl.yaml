@@ -643,6 +643,18 @@ lvgl:
                 x: 128
                 y: 256
 
+            - bar:
+                id: updating_percent_bar
+                bg_color: white
+                bg_opa: 20%
+                indicator:
+                  bg_color: white
+                  bg_opa: COVER
+                x: 128
+                y: -128
+                align: BOTTOM_LEFT
+                width: 768
+
   # --- LVGL PAGES ----------------------------------------------------------------            
   pages:
     - id: home_page

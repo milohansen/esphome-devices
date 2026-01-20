@@ -16,6 +16,7 @@ RUN pip3 install \
     numpy \
     scipy \
     onnxruntime \
+    aiohttp \
     --break-system-packages
 
 COPY . /app

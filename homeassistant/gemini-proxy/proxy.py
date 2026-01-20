@@ -7,6 +7,7 @@ from scipy import signal as scipy_signal
 from google import genai
 from google.genai import types
 import onnxruntime
+from aiohttp import web, WSMsgType
 
 # Configuration
 UDP_IP = "0.0.0.0"
@@ -18,34 +19,206 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 # Audio Config
 # ESP_INPUT_RATE = 48000  # ESP32 P4 Native
-ESP_INPUT_RATE = 16000  # ESP32 P4 Native
+ESP_INPUT_RATE = 48000  # ESP32 P4 Native
 GEMINI_INPUT_RATE = 16000
 GEMINI_OUTPUT_RATE = 24000
 ESP_OUTPUT_RATE = 48000
+WEB_INPUT_RATE = 48000  # Standard browser mic rate (approx)
 
 # VAD Config
 VAD_MODEL_PATH = "silero_vad.onnx"
 # Silero VAD works best with chunks of 512, 1024, or 1536 samples (at 16kHz)
-VAD_CHUNK_SIZE_SAMPLES = 512 
+VAD_CHUNK_SIZE_SAMPLES = 512
 VAD_CHUNK_SIZE_BYTES = VAD_CHUNK_SIZE_SAMPLES * 2  # 16-bit audio = 2 bytes/sample
 
 # Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
+# HTML Template for Web Client
+INDEX_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemini Live Proxy Test</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; text-align: center; }
+        button { padding: 10px 20px; font-size: 1.2rem; cursor: pointer; margin: 10px; }
+        #status { margin-top: 20px; color: #666; }
+        .recording { background-color: #ff4444; color: white; }
+        .monitor { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Gemini Live Proxy Test</h1>
+    
+    <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3>Microphone Input</h3>
+        <p>Stream your browser microphone to Gemini.</p>
+        <button id="startBtn">Start Mic</button>
+        <button id="stopBtn" disabled>Stop Mic</button>
+    </div>
+
+    <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px;">
+        <h3>ESP32 Monitor</h3>
+        <p>You will automatically hear audio from the ESP32 when it is connected.</p>
+    </div>
+
+    <div id="status">Ready</div>
+
+    <script>
+        let audioContext;
+        let websocket;
+        let processor;
+        let source;
+        let isRecording = false;
+        let nextStartTime = 0;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const status = document.getElementById('status');
+
+        // Initialize Audio Context on user interaction
+        async function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 48000});
+            }
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+        }
+
+        async function connectWebSocket() {
+            if (websocket && websocket.readyState === WebSocket.OPEN) return;
+
+            websocket = new WebSocket('ws://' + window.location.host + '/ws');
+            websocket.binaryType = 'arraybuffer';
+
+            websocket.onopen = () => {
+                status.innerText = "Connected to Proxy";
+            };
+
+            websocket.onmessage = async (event) => {
+                // Ensure audio context is ready before playing
+                await initAudio(); 
+                playAudio(event.data);
+            };
+
+            websocket.onclose = () => {
+                stopRecording();
+                status.innerText = "Disconnected";
+            };
+        }
+
+        // Auto-connect on load so we can hear ESP32 immediately (after interaction)
+        window.addEventListener('load', () => {
+            connectWebSocket();
+            // We need a user interaction to unlock audio playback usually
+            document.body.addEventListener('click', initAudio, { once: true });
+        });
+
+        startBtn.onclick = async () => {
+            await initAudio();
+            await connectWebSocket();
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                startRecording(stream);
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Error: " + err.message;
+            }
+        };
+
+        stopBtn.onclick = stopRecording;
+
+        function startRecording(stream) {
+            isRecording = true;
+            source = audioContext.createMediaStreamSource(stream);
+            processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+            processor.onaudioprocess = (e) => {
+                if (!isRecording) return;
+                const inputData = e.inputBuffer.getChannelData(0);
+                const pcmData = new Int16Array(inputData.length);
+                for (let i = 0; i < inputData.length; i++) {
+                    let s = Math.max(-1, Math.min(1, inputData[i]));
+                    pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                }
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(pcmData.buffer);
+                }
+            };
+
+            source.connect(processor);
+            processor.connect(audioContext.destination);
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            startBtn.classList.add('recording');
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            if (source) { source.disconnect(); source = null; }
+            if (processor) { processor.disconnect(); processor = null; }
+            // Don't close websocket so we can still hear incoming audio
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            startBtn.classList.remove('recording');
+            status.innerText = "Mic Stopped (Still Listening)";
+            nextStartTime = 0;
+        }
+
+        function playAudio(arrayBuffer) {
+            if (!audioContext) return;
+            
+            const data = new Int16Array(arrayBuffer);
+            const floatData = new Float32Array(data.length);
+            
+            for (let i = 0; i < data.length; i++) {
+                floatData[i] = data[i] / 32768.0;
+            }
+
+            const buffer = audioContext.createBuffer(1, floatData.length, 48000);
+            buffer.getChannelData(0).set(floatData);
+
+            const sourceNode = audioContext.createBufferSource();
+            sourceNode.buffer = buffer;
+            sourceNode.connect(audioContext.destination);
+
+            const currentTime = audioContext.currentTime;
+            if (nextStartTime < currentTime) {
+                nextStartTime = currentTime;
+            }
+            sourceNode.start(nextStartTime);
+            nextStartTime += buffer.duration;
+        }
+    </script>
+</body>
+</html>
+"""
+
 
 class VADWrapper:
     def __init__(self):
         if not os.path.exists(VAD_MODEL_PATH):
             logger.info("Downloading Silero VAD model (V5)...")
             import urllib.request
-            urllib.request.urlretrieve("https://github.com/snakers4/silero-vad/raw/refs/heads/master/src/silero_vad/data/silero_vad.onnx", VAD_MODEL_PATH)
-        
+
+            urllib.request.urlretrieve(
+                "https://github.com/snakers4/silero-vad/raw/refs/heads/master/src/silero_vad/data/silero_vad.onnx",
+                VAD_MODEL_PATH,
+            )
+
         # Suppress onnxruntime warnings
         sess_options = onnxruntime.SessionOptions()
         sess_options.log_severity_level = 3
         self.session = onnxruntime.InferenceSession(VAD_MODEL_PATH, sess_options)
         self.reset_states()
-        
+
     def reset_states(self):
         # Silero VAD V5 uses a single state tensor of shape (2, 1, 128)
         self._state = np.zeros((2, 1, 128), dtype=np.float32)
@@ -53,47 +226,52 @@ class VADWrapper:
     def is_speech(self, audio_chunk_16k):
         audio_int16 = np.frombuffer(audio_chunk_16k, dtype=np.int16)
         audio_float32 = audio_int16.astype(np.float32) / 32768.0
-        
+
         # Protect against empty or tiny chunks
-        if len(audio_float32) < 32: 
-             return 0.0
-             
+        if len(audio_float32) < 32:
+            return 0.0
+
         input_data = {
             "input": audio_float32[np.newaxis, :],
             "sr": np.array([16000], dtype=np.int64),
-            "state": self._state
+            "state": self._state,
         }
-        
+
         # Run inference: returns [output, state]
         out, state = self.session.run(None, input_data)
         self._state = state
         return out[0][0]
+
 
 class AudioProxy:
     def __init__(self):
         self.udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.udp_sock.bind((UDP_IP, UDP_PORT))
         self.udp_sock.setblocking(False)
-        
-        self.client = genai.Client(api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"})
+
+        self.client = genai.Client(
+            api_key=GEMINI_API_KEY, http_options={"api_version": "v1alpha"}
+        )
         self.esp_address = None
         self.running = True
-        
+
         self.audio_queue_mic = asyncio.Queue()
         self.audio_queue_speaker = asyncio.Queue()
-        self.vad_buffer = bytearray() # Buffer for incoming audio
-        
+        self.vad_buffer = bytearray()  # Buffer for incoming audio
+
         self.vad = VADWrapper()
-        
+
         self.ai_is_speaking = False
-        self.connection_active = asyncio.Event() 
-        
+        self.connection_active = asyncio.Event()
+
+        self.web_clients = set()
+
         logger.info(f"Listening on UDP {UDP_IP}:{UDP_PORT}")
 
     def resample_audio(self, audio_data, src_rate, dst_rate):
         if src_rate == dst_rate:
             return audio_data
-        
+
         audio_np = np.frombuffer(audio_data, dtype=np.int16)
         num_samples = int(len(audio_np) * dst_rate / src_rate)
         resampled_np = scipy_signal.resample(audio_np, num_samples)
@@ -112,49 +290,69 @@ class AudioProxy:
             except Exception as e:
                 logger.error(f"Failed to send STOP command: {e}")
 
+    async def process_incoming_audio(self, raw_audio, source_rate):
+        """Shared logic for processing audio from UDP or Web"""
+        # 1. Resample to 16k
+        audio_16k = (
+            raw_audio
+            if source_rate == GEMINI_INPUT_RATE
+            else await asyncio.to_thread(
+                self.resample_audio, raw_audio, source_rate, GEMINI_INPUT_RATE
+            )
+        )
+
+        # 2. Add to VAD buffer
+        self.vad_buffer.extend(audio_16k)
+
+        # 3. Process in fixed-size chunks
+        while len(self.vad_buffer) >= VAD_CHUNK_SIZE_BYTES:
+            chunk = bytes(self.vad_buffer[:VAD_CHUNK_SIZE_BYTES])
+            del self.vad_buffer[:VAD_CHUNK_SIZE_BYTES]
+
+            # Gating Logic
+            if self.ai_is_speaking:
+                prob = await asyncio.to_thread(self.vad.is_speech, chunk)
+                if prob > 0.8:
+                    logger.debug("Barge-in detected!")
+                    await self.audio_queue_mic.put(chunk)
+            else:
+                await self.audio_queue_mic.put(chunk)
+
     async def udp_listener_task(self):
         loop = asyncio.get_running_loop()
         logger.info("UDP Listener started")
-        
+
         while self.running:
             try:
                 data, addr = await loop.sock_recvfrom(self.udp_sock, 4096)
-                
+
                 if not self.esp_address:
                     logger.info(f"Connection established from ESP32 at {addr}")
                     self.esp_address = addr
-                    self.connection_active.set() 
+                    self.connection_active.set()
                 elif self.esp_address[0] != addr[0]:
-                     self.esp_address = addr
-                     self.connection_active.set()
+                    self.esp_address = addr
+                    self.connection_active.set()
 
-                # 1. Resample to 16k immediately
-                # audio_16k = await asyncio.to_thread(self.resample_audio, data, ESP_INPUT_RATE, GEMINI_INPUT_RATE)
-                
-                # 2. Add to VAD buffer
-                # self.vad_buffer.extend(audio_16k)
-                self.vad_buffer.extend(data)
-                
-                # 3. Process in fixed-size chunks (32ms = 512 samples = 1024 bytes)
-                while len(self.vad_buffer) >= VAD_CHUNK_SIZE_BYTES:
-                    # Extract one chunk
-                    chunk = bytes(self.vad_buffer[:VAD_CHUNK_SIZE_BYTES])
-                    del self.vad_buffer[:VAD_CHUNK_SIZE_BYTES]
-                    
-                    # Gating Logic
-                    if self.ai_is_speaking:
-                        # Run VAD on this chunk
-                        prob = await asyncio.to_thread(self.vad.is_speech, chunk)
+                # --- Monitor Logic ---
+                # Forward ESP32 audio to connected Web Clients for monitoring.
+                # Since the browser expects 48kHz (set in playAudio), we must resample.
+                if self.web_clients:
+                    audio_48k_monitor = await asyncio.to_thread(
+                        self.resample_audio,
+                        data,
+                        ESP_INPUT_RATE,
+                        48000,  # Web Client Rate
+                    )
+                    for ws in list(self.web_clients):
+                        if not ws.closed:
+                            try:
+                                await ws.send_bytes(audio_48k_monitor)
+                            except Exception as e:
+                                logger.error(f"Web Send Error: {e}")
 
-                        if prob > 0.8: # Strong speech detected (Barge-in)
-                            logger.debug("Barge-in detected!")
-                            await self.audio_queue_mic.put(chunk)
-                    else:
-                        await self.audio_queue_mic.put(chunk)
-                        # logger.debug("Queued chunk to Gemini")
+                await self.process_incoming_audio(data, ESP_INPUT_RATE)
 
-                # logger.debug(f"UDP Packet received: {len(data)} bytes from {addr}. VAD Buffer size: {len(self.vad_buffer)} bytes")
-                
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -169,16 +367,21 @@ class AudioProxy:
         while self.running:
             try:
                 chunk = await self.audio_queue_speaker.get()
-                logger.debug(f"UDP Packet sending: {len(chunk)} bytes")
+                # logger.debug(f"UDP Packet sending: {len(chunk)} bytes")
                 if self.esp_address:
                     target_port = ESP_RESPONSE_PORT
                     target_addr = (self.esp_address[0], target_port)
-                    
+
                     max_size = 1024
                     for i in range(0, len(chunk), max_size):
-                        sub_chunk = chunk[i:i+max_size]
+                        sub_chunk = chunk[i : i + max_size]
                         await loop.sock_sendto(self.udp_sock, sub_chunk, target_addr)
-                
+
+                if self.web_clients:
+                    for ws in list(self.web_clients):
+                        if not ws.closed:
+                            await ws.send_bytes(chunk)
+
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -187,41 +390,45 @@ class AudioProxy:
     async def gemini_session_handler(self):
         logger.info("Waiting for ESP32 connection before connecting to Gemini...")
         await self.connection_active.wait()
-        
+
         config = types.LiveConnectConfig(
             response_modalities=["AUDIO"],
-            # "system_instruction": "You are a helpful and friendly AI assistant. Be concise.",
             system_instruction=types.Content(
-                parts=[types.Part.from_text(text="You are a helpful and friendly AI assistant. Be concise.")],
-                role="user"
+                parts=[
+                    types.Part.from_text(
+                        text="You are a helpful and friendly AI assistant. Be concise."
+                    )
+                ],
+                role="user",
             ),
             proactivity=types.ProactivityConfig(proactive_audio=True),
             # enable_affective_dialog=True,
             speech_config=types.SpeechConfig(
                 voice_config=types.VoiceConfig(
-                    prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name="Laomedeia")
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                        voice_name="Laomedeia"
+                    )
                 )
             ),
             output_audio_transcription=types.AudioTranscriptionConfig,
             input_audio_transcription=types.AudioTranscriptionConfig,
-            realtime_input_config=types.RealtimeInputConfig(turn_coverage="TURN_INCLUDES_ALL_INPUT"),
+            realtime_input_config=types.RealtimeInputConfig(
+                turn_coverage="TURN_INCLUDES_ALL_INPUT"
+            ),
         )
 
-        # config = {
-        #     "response_modalities": ["AUDIO"],
-        #     "system_instruction": "You are a helpful and friendly AI assistant. Be concise.",
-        # }
-        
         logger.info(f"Connecting to Gemini Live ({GEMINI_MODEL})...")
-        
+
         try:
-            async with self.client.aio.live.connect(model=GEMINI_MODEL, config=config) as session:
+            async with self.client.aio.live.connect(
+                model=GEMINI_MODEL, config=config
+            ) as session:
                 logger.info("Connected to Gemini API!")
-                
+
                 async with asyncio.TaskGroup() as tg:
                     tg.create_task(self.gemini_sender_task(session))
                     tg.create_task(self.gemini_receiver_task(session))
-                    
+
         except Exception as e:
             logger.error(f"Gemini Session Error: {e}")
             # Clear queues to prevent stale audio/state
@@ -229,84 +436,128 @@ class AudioProxy:
             self.vad_buffer.clear()
             while not self.audio_queue_mic.empty():
                 self.audio_queue_mic.get_nowait()
-            raise 
+            raise
 
     async def gemini_sender_task(self, session):
         while self.running:
             try:
                 chunk = await self.audio_queue_mic.get()
-                await session.send_realtime_input(audio={"data": chunk, "mime_type": f"audio/pcm;rate={GEMINI_INPUT_RATE}"})
+                await session.send_realtime_input(
+                    audio={
+                        "data": chunk,
+                        "mime_type": f"audio/pcm;rate={GEMINI_INPUT_RATE}",
+                    }
+                )
                 # logger.debug("Sent audio chunk to Gemini")
             except asyncio.CancelledError:
                 break
             except Exception as e:
                 logger.error(f"Gemini Send Error: {e}")
-                raise 
+                raise
 
     async def gemini_receiver_task(self, session):
         while self.running:
             try:
                 async for response in session.receive():
                     # logger.info("Got response from Gemini")
-                    if (response.server_content and response.server_content.output_transcription):
-                        logger.info("Output Transcript:", response.server_content.output_transcription.text)
-                    if (response.server_content and response.server_content.input_transcription):
-                        logger.info("Input Transcript:", response.server_content.input_transcription.text)
+                    if (
+                        response.server_content
+                        and response.server_content.output_transcription
+                    ):
+                        logger.info(
+                            f"Output Transcript: {response.server_content.output_transcription.text}"
+                        )
+                    if (
+                        response.server_content
+                        and response.server_content.input_transcription
+                    ):
+                        logger.info(
+                            f"Input Transcript: {response.server_content.input_transcription.text}"
+                        )
 
-                    if (response.server_content and response.server_content.model_turn):
-                       for part in response.server_content.model_turn.parts:
-                           if part.inline_data and isinstance(part.inline_data.data, bytes):
-                               self.ai_is_speaking = True
-                               logger.debug("AI is speaking")
-                               audio_24k = part.inline_data.data
-                               
-                               audio_48k = await asyncio.to_thread(
-                                   self.resample_audio, 
-                                   audio_24k, 
-                                   GEMINI_OUTPUT_RATE, 
-                                   ESP_OUTPUT_RATE
-                               )
-                               await self.audio_queue_speaker.put(audio_48k)
-                    
-                    if response.server_content and response.server_content.turn_complete:
-                         self.ai_is_speaking = False
+                    if response.server_content and response.server_content.model_turn:
+                        for part in response.server_content.model_turn.parts:
+                            if part.inline_data and isinstance(
+                                part.inline_data.data, bytes
+                            ):
+                                self.ai_is_speaking = True
+                                logger.debug("AI is speaking")
+                                audio_24k = part.inline_data.data
+
+                                audio_48k = await asyncio.to_thread(
+                                    self.resample_audio,
+                                    audio_24k,
+                                    GEMINI_OUTPUT_RATE,
+                                    ESP_OUTPUT_RATE,
+                                )
+                                await self.audio_queue_speaker.put(audio_48k)
+
+                    if (
+                        response.server_content
+                        and response.server_content.turn_complete
+                    ):
+                        self.ai_is_speaking = False
 
             except asyncio.CancelledError:
                 break
             except Exception as e:
                 logger.error(f"Gemini Receive Error: {e}")
                 self.ai_is_speaking = False
-                await self.send_stop_command() # Tell ESP32 to stop
-                raise 
+                await self.send_stop_command()  # Tell ESP32 to stop
+                raise
 
-    async def handle_http_health_check(self, reader, writer):
+    # --- Web Server Handlers ---
+    async def index_handler(self, request):
+        return web.Response(text=INDEX_HTML, content_type="text/html")
+
+    async def websocket_handler(self, request):
+        ws = web.WebSocketResponse()
+        await ws.prepare(request)
+
+        self.web_clients.add(ws)
+        self.connection_active.set()  # Trigger Gemini connection
+        logger.info("Web Client Connected")
+
         try:
-            request = await reader.read(1024)
-            response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nConnection: close\r\n\r\nGemini Live Proxy is Running!"
-            writer.write(response.encode('utf-8'))
-            await writer.drain()
-        except Exception as e:
-            logger.error(f"HTTP Health Check Error: {e}")
+            async for msg in ws:
+                if msg.type == WSMsgType.BINARY:
+                    # Web client sends Int16 PCM (likely 48kHz from JS)
+                    await self.process_incoming_audio(msg.data, WEB_INPUT_RATE)
+                elif msg.type == WSMsgType.ERROR:
+                    logger.error(
+                        f"Websocket connection closed with exception {ws.exception()}"
+                    )
         finally:
-            writer.close()
-            await writer.wait_closed()
+            self.web_clients.remove(ws)
+            logger.info("Web Client Disconnected")
+
+        return ws
 
     async def run(self):
+        # Start UDP tasks
         udp_listener = asyncio.create_task(self.udp_listener_task())
         udp_sender = asyncio.create_task(self.udp_sender_task())
-        http_server = await asyncio.start_server(self.handle_http_health_check, UDP_IP, UDP_PORT)
-        
-        logger.info(f"HTTP Health Check available at http://{UDP_IP}:{UDP_PORT}")
-        
+
+        # Setup Web Server
+        app = web.Application()
+        app.add_routes(
+            [web.get("/", self.index_handler), web.get("/ws", self.websocket_handler)]
+        )
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "0.0.0.0", UDP_PORT)
+        await site.start()
+
+        logger.info(f"Web Interface available at http://{UDP_IP}:{UDP_PORT}")
+
         while self.running:
             try:
                 await self.gemini_session_handler()
             except Exception:
                 logger.info("Gemini session ended. Reconnecting in 2 seconds...")
                 await asyncio.sleep(2)
-        
-        http_server.close()
-        await http_server.wait_closed()
+
+        await runner.cleanup()
         udp_listener.cancel()
         udp_sender.cancel()
 
@@ -315,6 +566,7 @@ if __name__ == "__main__":
     if not GEMINI_API_KEY and os.path.exists("/data/options.json"):
         try:
             import json
+
             with open("/data/options.json", "r") as f:
                 options = json.load(f)
                 GEMINI_API_KEY = options.get("gemini_api_key")
@@ -329,4 +581,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(proxy.run())
     except KeyboardInterrupt:
-        logger.info("Stopping...") 
+        logger.info("Stopping...")
