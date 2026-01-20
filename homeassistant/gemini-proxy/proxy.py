@@ -38,7 +38,7 @@ class VADWrapper:
         if not os.path.exists(VAD_MODEL_PATH):
             logger.info("Downloading Silero VAD model...")
             import urllib.request
-            urllib.request.urlretrieve("https://github.com/snakers4/silero-vad/raw/master/files/silero_vad.onnx", VAD_MODEL_PATH)
+            urllib.request.urlretrieve("https://github.com/snakers4/silero-vad/raw/refs/heads/master/src/silero_vad/data/silero_vad.onnx", VAD_MODEL_PATH)
         
         self.session = onnxruntime.InferenceSession(VAD_MODEL_PATH)
         self.reset_states()
@@ -221,8 +221,18 @@ class AudioProxy:
 
 
 if __name__ == "__main__":
+    # Add support for reading from /data/options.json (Debian/Non-Bashio fallback)
+    if not GEMINI_API_KEY and os.path.exists("/data/options.json"):
+        try:
+            import json
+            with open("/data/options.json", "r") as f:
+                options = json.load(f)
+                GEMINI_API_KEY = options.get("gemini_api_key")
+        except Exception as e:
+            logger.error(f"Failed to read options.json: {e}")
+
     if not GEMINI_API_KEY:
-        logger.error("GEMINI_API_KEY not found in environment variables.")
+        logger.error("GEMINI_API_KEY not found in environment variables or options.json.")
         exit(1)
 
     proxy = AudioProxy()

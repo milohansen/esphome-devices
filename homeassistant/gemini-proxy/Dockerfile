@@ -1,20 +1,16 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+FROM python:3.11-slim
 
-# Install requirements for the add-on
-RUN \
-  apk add --no-cache \
-    python3 \
-    py3-pip \
-    py3-numpy \
-    py3-scipy \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     make \
-    musl-dev \
-    linux-headers
+    linux-headers-generic \
+    libasound2-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies directly to avoid missing file issues
+# Install Python dependencies
+# onnxruntime should have aarch64 wheels for standard Python images
 RUN pip3 install \
     google-genai \
     numpy \
@@ -22,8 +18,10 @@ RUN pip3 install \
     onnxruntime \
     --break-system-packages
 
-WORKDIR /app
 COPY . /app
-RUN chmod a+x /app/run.sh
 
-CMD [ "/app/run.sh" ]
+# COPY run.sh /run.sh
+# RUN chmod a+x /run.sh
+
+# CMD [ "/run.sh" ]
+CMD [ "python3", "/app/proxy.py" ]
