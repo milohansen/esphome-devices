@@ -16,11 +16,11 @@ microphone:
     bits_per_sample: 16bit
     adc_type: external
     channel: stereo
-    on_data:
-      - logger.log:
-          format: "Received %d bytes"
-          args: ['x.size()']
-          tag: "mic"
+    # on_data:
+    #   - logger.log:
+    #       format: "Received %d bytes"
+    #       args: ['x.size()']
+    #       tag: "mic"
 
 speaker:
   - platform: i2s_audio
