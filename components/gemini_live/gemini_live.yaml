@@ -1,0 +1,31 @@
+esphome:
+  includes:
+    - components/gemini_live/gemini_live.h
+
+# Define the custom component
+custom_component:
+- lambda: |-
+    // Ensure ids are available. If this file is included, these IDs must exist in the main config.
+    auto *gemini = new esphome::gemini_live::GeminiLiveComponent(id(box_mic), id(box_speaker));
+    return {gemini};
+  components:
+  - id: gemini_live_component
+
+# Example Triggers
+# You must adjust the IP address to point to your Home Assistant Add-on IP.
+# Usually this is the Home Assistant server IP.
+
+micro_wake_word:
+  on_wake_word_detected:
+    - lambda: |-
+        // CHANGE THIS IP:
+        std::string proxy_ip = "192.168.1.100"; 
+        id(gemini_live_component)->start_streaming(proxy_ip);
+        ESP_LOGD("gemini", "Wake Word detected - Starting Stream");
+
+# Stop stream on silence or button press
+# Example: If you have a binary_sensor for a button
+# binary_sensor:
+#   - id: boot_button
+#     on_press:
+#       - lambda: id(gemini_live_component)->stop_streaming();
