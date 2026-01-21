@@ -35,7 +35,7 @@ VAD_CHUNK_SIZE_BYTES = VAD_CHUNK_SIZE_SAMPLES * 2  # 16-bit audio = 2 bytes/samp
 
 # Logging
 logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -304,6 +304,28 @@ class AudioProxy:
         while self.running:
             try:
                 async for response in session.receive():
+                    # 1. Handle Tool Calls
+                    if response.tool_call:
+                        function_calls = response.tool_call.function_calls
+                        function_responses = []
+
+                        for call in function_calls:
+                            # Execute the tool via Home Assistant
+                            result = await self.tool_handler.handle_tool_call(call.name, call.args)
+                            
+                            # Create response object
+                            function_responses.append(
+                                types.FunctionResponse(
+                                    name=call.name,
+                                    id=call.id,
+                                    response={"result": result}
+                                )
+                            )
+
+                        # Send responses back to Gemini
+                        if function_responses:
+                            await session.send_tool_response(function_responses=function_responses)
+
                     server_content = response.server_content
                     if not server_content:
                         continue
@@ -329,31 +351,6 @@ class AudioProxy:
                                     ESP_OUTPUT_RATE,
                                 )
                                 await self.audio_queue_speaker.put(audio_48k)
-
-                    # 3. Handle Tool Calls
-                    if server_content.tool_call:
-                        function_calls = server_content.tool_call.function_calls
-                        function_responses = []
-
-                        for call in function_calls:
-                            # Execute the tool via Home Assistant
-                            result = await self.tool_handler.handle_tool_call(call.name, call.args)
-                            
-                            # Create response object
-                            function_responses.append(
-                                types.FunctionResponse(
-                                    name=call.name,
-                                    id=call.id,
-                                    response={"result": result}
-                                )
-                            )
-
-                        # Send responses back to Gemini
-                        if function_responses:
-                            tool_response = types.LiveClientToolResponse(
-                                function_responses=function_responses
-                            )
-                            await session.send(input=tool_response)
 
                     if server_content.turn_complete:
                         self.ai_is_speaking = False
@@ -407,6 +404,8 @@ class AudioProxy:
         await runner.setup()
         site = web.TCPSite(runner, "0.0.0.0", UDP_PORT)
         await site.start()
+
+        await self.ha_client.get_states()
 
         logger.info(f"Web Interface available at http://{UDP_IP}:{UDP_PORT}")
 
