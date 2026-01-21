@@ -8,6 +8,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+HA_URL = "http://supervisor/core/api"
 HA_TOKEN = os.getenv('SUPERVISOR_TOKEN')
 
 # --- Home Assistant Client ---
@@ -34,6 +35,7 @@ class HomeAssistantClient:
                         for state in states:
                             if "friendly_name" in state.get("attributes", {}):
                                 self.entities[state["attributes"]["friendly_name"].lower()] = state["entity_id"]
+                        logger.debug(f"Fetched {len(states)} states from Home Assistant.")
                         return states
                     else:
                         logger.error(f"Failed to fetch states: {resp.status}")
