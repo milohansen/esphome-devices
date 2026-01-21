@@ -15,3 +15,5 @@ ports:
   7000/tcp: 7000
 map:
   - config:rw
+  
+homeassistant_api: true

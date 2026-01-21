@@ -239,6 +239,7 @@ namespace esphome
       }
 
       // Called from Main Loop
+      // Process outgoing audio queue
       void process_tx_queue()
       {
         // if (!this->is_streaming || !this->proxy_addr_valid || !this->socket_)
