@@ -1,6 +1,6 @@
 name: "Gemini Live Proxy"
 description: "Proxy for Gemini Live API"
-version: "1.0.0"
+version: "1.0.1"
 slug: "gemini_live_proxy"
 init: false
 arch:
@@ -15,5 +15,9 @@ ports:
   7000/tcp: 7000
 map:
   - config:rw
-  
+
+hassio_api: true
+hassio_role: homeassistant
+
 homeassistant_api: true
+auth_api: true
