@@ -1,10 +1,11 @@
+import datetime
 from google.genai import types
 import logging
 import os
 from aiohttp import ClientSession
 
 logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -35,10 +36,10 @@ class HomeAssistantClient:
                         for state in states:
                             if "friendly_name" in state.get("attributes", {}):
                                 self.entities[state["attributes"]["friendly_name"].lower()] = state["entity_id"]
-                        logger.debug(f"Fetched {len(states)} states from Home Assistant.")
+                        logger.info(f"Fetched {len(states)} states from Home Assistant.")
                         return states
                     else:
-                        logger.error(f"Failed to fetch states: {resp.status}")
+                        logger.error(f"Failed to fetch states: [{resp.status}] {await resp.text()}")
                         return []
             except Exception as e:
                 logger.error(f"HA API Error: {e}")
@@ -74,6 +75,7 @@ class HomeAssistantClient:
             try:
                 async with session.post(url, headers=self.headers, json=payload) as resp:
                     if resp.status == 200:
+                        logger.info(f"Success! {await resp.text()}")
                         return "Success"
                     else:
                         err_text = await resp.text()
@@ -135,7 +137,7 @@ class ToolHandler:
 
     async def _handle_set_state(self, args):
         state = args.get("state")
-        domain = "homeassistant"
+        domain = args.get("device_class")
         service = "turn_on"
         
         if state == "off":
@@ -205,14 +207,11 @@ def get_tools():
                                 "items": { "type": "STRING" }
                             },
                             "device_class": {
-                                "type": "ARRAY",
-                                "items": {
-                                    "type": "STRING",
-                                    "enum": ["tv", "speaker", "switch", "light", "fan", "lock", "cover"]
-                                }
+                                "type": "STRING",
+                                "enum": ["tv", "speaker", "switch", "light", "fan", "lock", "cover"]
                             }
                         },
-                        "required": ["state"]
+                        "required": ["state", "device_class"]
                     }
                 ),
                 types.FunctionDeclaration(
