@@ -1,5 +1,0 @@
-google-genai
-numpy
-scipy
-onnxruntime
-aiohttp
