@@ -2,6 +2,10 @@ gemini_live:
   id: gemini_live_component
   microphone: box_mic
   speaker: box_speaker
+  connection_type: bridge # direct or bridge
+  model: "gemini-2.5-flash-native-audio-preview-12-2025"
+  gemini_token: gemini_token
+  gemini_config: gemini_config
   on_stop_streaming:
     - logger.log: "Gemini has stopped streaming!"
     - binary_sensor.template.publish:
@@ -9,21 +13,34 @@ gemini_live:
         state: false
     - micro_wake_word.start:
 
-wifi:
-  on_connect:
-    - logger.log:
-        format: "WiFi connected, initializing Gemini Live Component"
-        level: DEBUG
-        tag: "gemini"
-    - lambda: |-
-        std::string proxy_ip = "192.168.1.192:7000"; 
-        // std::string proxy_ip = "http://homeassistant.local:7000"; 
-        id(gemini_live_component)->initialize(proxy_ip);
-        ESP_LOGD("gemini", "Initialized Gemini Live Component");
+text_sensor:
+  - platform: template
+    id: gemini_token
+    name: "Gemini Token"
+  - platform: template
+    id: gemini_config
+    name: "Gemini Config"
 
 # Example Triggers
 # You must adjust the IP address to point to your Home Assistant Add-on IP.
 # Usually this is the Home Assistant server IP.
+
+wifi:
+  on_connect:
+    then:
+      - logger.log:
+          format: "WiFi connected, initializing Gemini Live Component in bridge mode"
+          level: DEBUG
+          tag: "gemini"
+      - lambda: |-
+          if (id(gemini_live_component)->get_connection_type() == "bridge") {
+            std::string proxy_ip = "192.168.1.192:7000";
+            id(gemini_live_component)->initialize(proxy_ip);
+            ESP_LOGD("gemini", "Initialized Gemini Live Component in bridge mode");
+          } else {
+            id(gemini_live_component)->initialize();
+            ESP_LOGD("gemini", "Initialized Gemini Live Component in direct mode");
+          }
 
 micro_wake_word:
   on_wake_word_detected:
