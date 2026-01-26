@@ -40,11 +40,9 @@ CONFIG_SCHEMA = cv.Schema(
                 ),
             }
         ),
-        cv.Optional(CONF_CONNECTION_TYPE, default="bridge"): cv.string_enum(
-            ["direct", "bridge"]
-        ),
+        cv.Optional(CONF_CONNECTION_TYPE, "bridge"): cv.string, # type: ignore
         cv.Optional(
-            CONF_MODEL, default="gemini-2.5-flash-native-audio-preview-12-2025"
+            CONF_MODEL, default="gemini-2.5-flash-native-audio-preview-12-2025" # type: ignore
         ): cv.string,
         cv.Optional(CONF_GEMINI_TOKEN): cv.use_id(text_sensor.TextSensor),
         cv.Optional(CONF_GEMINI_CONFIG): cv.use_id(text_sensor.TextSensor),
