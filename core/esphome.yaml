@@ -70,7 +70,10 @@ time:
       then:
         # Write time to RTC
         - rx8130.write_time:
-        # - script.execute: time_update
+        - lvgl.widget.refresh: time_label
+        - lvgl.widget.refresh: time_label_shadow
+        - lvgl.widget.refresh: date_label
+        - lvgl.widget.refresh: date_label_shadow
     on_time:
       # Update the time label every minute
       - seconds: 0
