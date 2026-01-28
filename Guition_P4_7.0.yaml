@@ -95,6 +95,12 @@ external_components:
   - source:
       type: local
       path: components
+    components: [ material_theme ]
+
+  # - source: github://milohansen/esphome-slideshow
+  - source: ../esphome-slideshow/components
+    components: [ slideshow ]
+    refresh: 0s
 
 # Material Theme component - Dynamic Material Design 3 color schemes
 material_theme:
@@ -124,7 +130,7 @@ packages: # Local
   screen: !include hw/screen.yaml
   lvgl: !include hw/lvgl.yaml
 
-  gemini_live: !include components/gemini_live/gemini_live.yaml
+  # gemini_live: !include components/gemini_live/gemini_live.yaml
 
 ## ENABLE / DISABLE WAKE WORDS ## IF LOW ON MEMORY, USE LESS WAKE WORDS ##########################################################################
 

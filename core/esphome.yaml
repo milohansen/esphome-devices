@@ -33,11 +33,8 @@ ota:
               args: ["x"]
         - lvgl.bar.update:
             id: updating_percent_bar
-            value: !lambda return (int)x;
+            value: !lambda return (int)(x * 10);  # Scale to 0-1000
         - lambda: "id(lvgl_component).loop();"
-        - logger.log:
-            format: "OTA progress %0.1f%%"
-            args: ["x"]
 
 wifi:
   id: wifi_id

@@ -500,10 +500,18 @@ lvgl:
                 - button:
                     id: test_button
                     text: "TEST"
+                    on_click:
+                      then:
+                      - logger.log: "Test button clicked!"
+                      - slideshow.advance: slideshow_component
                     <<: *button_template
                 - button:
                     id: test_button_secondary
                     text: "TEST"
+                    on_click:
+                      then:
+                      - logger.log: "Test button clicked!"
+                      - slideshow.refresh: slideshow_component
                     <<: *button_secondary_template
                 - button:
                     id: test_button_tertiary
@@ -647,11 +655,28 @@ lvgl:
                 id: updating_percent_bar
                 bg_color: white
                 bg_opa: 20%
+                min_value: 0
+                max_value: 1000
+                animated: false
                 indicator:
                   bg_color: white
                   bg_opa: COVER
                 x: 128
                 y: -128
+                align: BOTTOM_LEFT
+                width: 768
+            - bar:
+                id: updating_percent_bar_ref
+                bg_color: white
+                bg_opa: 20%
+                min_value: 0
+                max_value: 100
+                value: 100
+                indicator:
+                  bg_color: white
+                  bg_opa: COVER
+                x: 128
+                y: -108
                 align: BOTTOM_LEFT
                 width: 768
 
@@ -859,7 +884,8 @@ lvgl:
                   <<: *button_tertiary_template
                   on_click:
                     then:
-                      - script.execute: advance_slideshow
+                      - slideshow.advance: slideshow_component
+                      # - script.execute: advance_slideshow
                       # - number.increment: image_index
                       # - script.execute: find_next_valid_slot
               

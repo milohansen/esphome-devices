@@ -1,3 +1,53 @@
+slideshow:
+  id: slideshow_component
+
+  advance_interval: 5min
+  refresh_interval: 25min
+
+  image_slot_count: 6
+  image_slots:
+    - online_image_0
+    - online_image_1
+    - online_image_2
+    - online_image_3
+    - online_image_4
+    - online_image_5
+
+  placeholder: placeholder_image
+
+  on_refresh:
+    then:
+      - logger.log: "Slideshow requested more images!"
+      # Call your existing complex script
+      - script.execute: 
+          id: fetch_slideshow_queue
+          count: 5
+          is_new: false
+
+  on_advance:
+    then:
+      - logger.log: "Slideshow on_advance"
+      - slideshow.suspend: slideshow_component
+      - lambda: |-
+          int mod_index = x % 6;
+          id(image_index).publish_state((float)mod_index);
+      - script.execute: advance_slideshow
+      - script.execute: apply_image_colors
+  on_image_ready:
+    then:
+      - logger.log: "Slideshow on_image_ready"
+      - lambda: |-
+          int mod_index = index % 6;
+          ESP_LOGI("slideshow", "Image ready at index %d (%d)", index, mod_index);
+          auto *widget_a = id(image_widgets)[mod_index];
+          lv_img_set_src(widget_a, id(online_images)[mod_index]->get_lv_img_dsc());
+  on_queue_updated:
+    then:
+      - logger.log: "Slideshow on_queue_updated"
+  on_error:
+    then:
+      - logger.log: "Slideshow on_error"
+
 script:
   # -------------------------------------------------------------------------
   # API / Data Fetching
@@ -41,6 +91,8 @@ script:
 
                   JsonArray root = doc.as<JsonArray>();
 
+                  std::vector<std::string> new_items;
+
                   for (JsonArray img_data : root) {
                     if (img_data.size() > 0) {
                       // Handle Single URL or Pair of URLs
@@ -51,13 +103,14 @@ script:
                         JsonArray urls = img_data[0].as<JsonArray>();
                         if (urls.size() > 0) stored_value = urls[0].as<std::string>();
                         // Use pipe delimiter for pairs
-                        if (urls.size() > 1) stored_value += "|" + urls[1].as<std::string>();
+                        // if (urls.size() > 1) stored_value += "|" + urls[1].as<std::string>();
                       } else {
                         stored_value = img_data[0].as<std::string>();
                       }
                       
                       if (!stored_value.empty()) {
                         id(slideshow_queue_ids).push_back(stored_value);
+                        new_items.push_back(stored_value);
 
                         // Map color
                         if (img_data.size() > 1) {
@@ -67,7 +120,11 @@ script:
                       }
                     }
                   }
-                  
+
+                  id(slideshow_component).enqueue(new_items);
+
+                  return;
+
                   // Log the result
                   size_t added_count = id(slideshow_queue_ids).size() - previous_size;
                   ESP_LOGI("slideshow_api", "Appended %d images. Total: %d", added_count, id(slideshow_queue_ids).size());
@@ -81,18 +138,18 @@ script:
                     id(image_index).publish_state(0); 
                   }
 
-              - if:
-                  condition:
-                    switch.is_off: first_photo_loaded
-                  then:
-                    - script.execute: load_first_image
-                  else:
-                    - delay: 100ms
-                    - script.execute: manage_slideshow_memory
-          
-          on_error: 
+              # - if:
+              #     condition:
+              #       switch.is_off: first_photo_loaded
+              #     then:
+              #       - script.execute: load_first_image
+              #     else:
+              #       - delay: 100ms
+              #       - script.execute: manage_slideshow_memory
+
+          on_error:
             then:
-            # TODO: Implement retry/backoff if needed
+              # TODO: Implement retry/backoff if needed
               - logger.log: "Error fetching slideshow queue"
               - delay: 2s
               - script.execute:
@@ -125,8 +182,8 @@ script:
           timeout: 30s
       - switch.turn_on: first_photo_loaded
       - logger.log: "First photo loaded, starting slideshow memory management"
-      - script.execute: manage_slideshow_memory
-      - script.execute: slideshow_timer
+      # - script.execute: manage_slideshow_memory
+      # - script.execute: slideshow_timer
 
   - id: manage_slideshow_memory
     mode: single
@@ -137,7 +194,7 @@ script:
           const int WINDOW_OFFSET = -1;
           int current_q_idx = id(slideshow_queue_index);
           int total_imgs = id(slideshow_queue_ids).size();
-          
+
           if (total_imgs == 0) return;
 
           // 1. Calculate the active "Window" of Queue Indices
@@ -190,8 +247,8 @@ script:
               int full_w = ${screenwidth};
               if (url_b.empty()) {
                 // Single Mode
-                lv_obj_add_flag(widget_b, LV_OBJ_FLAG_HIDDEN);
                 lv_obj_set_width(widget_a, full_w);
+                lv_obj_add_flag(widget_b, LV_OBJ_FLAG_HIDDEN);
               } else {
                 // Pair Mode
                 int half_w = (full_w - 4) / 2; // Subtract gap
@@ -240,10 +297,10 @@ script:
     mode: single # Prevent double-clicks from messing up math
     then:
       - lambda: |-
-          int total = id(slideshow_queue_ids).size();
-          if (total > 0) {
+          // int total = id(slideshow_queue_ids).size();
+          // if (total > 0) {
             // 1. Advance the Global Queue Index
-            int next_q = (id(slideshow_queue_index) + 1) % total;
+            int next_q = (id(slideshow_queue_index) + 1); //  % total;
             id(slideshow_queue_index) = next_q;
             
             // 2. Calculate which physical Slot (0-5) this corresponds to
@@ -253,7 +310,7 @@ script:
             
             // 3. Update the Display
             id(image_index).publish_state(next_slot);
-          }
+          // }
       # 5. Scroll the UI
       - script.execute: handle_lvgl_scroll
       # pause to allow scroll to finish
@@ -261,23 +318,24 @@ script:
           condition:
             switch.is_off: slideshow_scrolling
           timeout: 2s
+      - slideshow.unsuspend: slideshow_component
       # 6. Apply Image Colors
-      - script.execute: apply_image_colors
-      - script.execute: slideshow_timer
-      - delay: 50ms
-      # Update Memory (Load the new lookahead, free the old previous)
-      - script.execute: manage_slideshow_memory
-      - if:
-          condition:
-            lambda: |-
-              return (id(slideshow_queue_ids).size() - id(slideshow_queue_index))<=3;
-          then:
-            - script.execute:
-                id: fetch_slideshow_queue
-                count: 5
-                is_new: false
-            - delay: 1s
-            - script.execute: cleanup_slideshow_queue
+      # - script.execute: apply_image_colors
+      # - script.execute: slideshow_timer
+      # - delay: 50ms
+      # # Update Memory (Load the new lookahead, free the old previous)
+      # - script.execute: manage_slideshow_memory
+      # - if:
+      #     condition:
+      #       lambda: |-
+      #         return (id(slideshow_queue_ids).size() - id(slideshow_queue_index))<=3;
+      #     then:
+      #       - script.execute:
+      #           id: fetch_slideshow_queue
+      #           count: 5
+      #           is_new: false
+      #       - delay: 1s
+      #       - script.execute: cleanup_slideshow_queue
 
   - id: handle_lvgl_scroll
     then:
@@ -291,9 +349,10 @@ script:
     then:
       - lambda: |-
           int q_idx = id(slideshow_queue_index);
-          
+
           if (id(slot_source_colors_map).contains(q_idx)) {
             std::string color_str = id(slot_source_colors_map)[q_idx];
+            id(current_source_color).publish_state(color_str);
             ESP_LOGD("slideshow_colors", "Setting color for Queue Index %d (%s)", q_idx, color_str.c_str());
             
             // Clean hex string
@@ -354,7 +413,7 @@ script:
     mode: restart
     then:
       - delay: !lambda "return (int)(id(image_duration_minutes).state * 60 * 1000);"
-      - script.execute: advance_slideshow
+      # - script.execute: advance_slideshow
       # - script.execute: slideshow_timer
 
   - id: update_debug_status
@@ -376,10 +435,10 @@ script:
           // Configuration
           const int KEEP_HISTORY = 12; // Keep at least 12 images *before* current index
           const int MIN_QUEUE_SIZE = 24; // Don't bother cleaning if queue is small
-          
+
           int current_idx = id(slideshow_queue_index);
           auto& vec = id(slideshow_queue_ids);
-          
+
           // Safety check
           if (vec.size() < MIN_QUEUE_SIZE || current_idx < KEEP_HISTORY + 6) {
             return;
@@ -445,13 +504,13 @@ script:
             switch.is_on: first_photo_loading
           then:
             - switch.turn_off: first_photo_loading
-  
+
   - id: online_image_error
     parameters:
       index: int
       is_secondary: bool
     then:
-      - logger.log: 
+      - logger.log:
           format: "Download failed for slot %d (secondary: %s)"
           args: [index, 'is_secondary ? "true" : "false"']
           level: WARN
@@ -474,7 +533,7 @@ globals:
   - id: slideshow_queue_ids
     type: "std::vector<std::string>"
     restore_value: no
-    
+
   - id: slot_source_colors_map
     type: "std::map<int, std::string>"
     restore_value: no
@@ -498,11 +557,16 @@ text_sensor:
     platform: template
     name: "Slideshow Queue Status"
     icon: mdi:playlist-check
-    
+
   - id: slideshow_debug_status
     platform: template
     name: "Slideshow Slot Status"
     icon: mdi:developer-board
+
+  - id: current_source_color
+    platform: template
+    name: "Slideshow Current Source Color"
+    icon: mdi:palette
 
 mapping:
   # Map index to Component
@@ -549,7 +613,6 @@ mapping:
       4: background_image_4_b
       5: background_image_5_b
 
-
 switch:
   - id: first_photo_loaded
     platform: template
@@ -577,5 +640,5 @@ switch:
     optimistic: true
     restore_mode: RESTORE_DEFAULT_ON
     # internal: true
-    on_state: 
+    on_state:
       - script.execute: set_debug_visibility
