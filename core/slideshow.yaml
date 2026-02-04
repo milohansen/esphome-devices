@@ -13,7 +13,7 @@ slideshow:
     - online_image_4
     - online_image_5
 
-  placeholder: placeholder_image
+  # placeholder: placeholder_image
 
   on_refresh:
     then:
